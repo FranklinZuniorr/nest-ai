@@ -13,8 +13,7 @@ export class AiController {
     public async cria(@Body() text: Ai): Promise <NestResponse> {
         
         const data = await this.aiService.solicitarAi(text);
-
-
+        console.log(data)
         return new NestResponseBuilder()
                 .comStatus(HttpStatus.CREATED)
                 .comBody(data)

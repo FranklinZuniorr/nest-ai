@@ -35,10 +35,16 @@ export class AiService {
         .post("/completions", data)
         .then((response) => {
             const answer = response.data.choices[0].text.trim();
-            return answer
+            return {
+                r: true,
+                data: answer
+            }
         })
         .catch((error) => {
-            return error
+            return {
+                r: false,
+                data: error
+            }
         });
 
         return dataRes
