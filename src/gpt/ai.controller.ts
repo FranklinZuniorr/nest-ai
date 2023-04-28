@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Query } from '@nestjs/common';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { AiService } from './ai.service';
@@ -9,10 +9,22 @@ export class AiController {
 
     constructor(private aiService: AiService) {}
 
-    @Post()
-    public async cria(@Body() text: Ai): Promise <NestResponse> {
+    @Get()
+    public async getAiResponse(@Body() text: Ai, @Query("msg") msg: string): Promise <NestResponse> {
         
-        const data = await this.aiService.solicitarAi(text);
+        const data = await this.aiService.solicitarAi(text, null);
+        console.log(data)
+        console.log(msg)
+        return new NestResponseBuilder()
+                .comStatus(HttpStatus.CREATED)
+                .comBody(data)
+                .build();
+    }
+
+    @Get("/qs")
+    public async getAiReponseQs(@Query("msg") text: string): Promise <NestResponse> {
+        
+        const data = await this.aiService.solicitarAi(null, text);
         console.log(data)
         return new NestResponseBuilder()
                 .comStatus(HttpStatus.CREATED)

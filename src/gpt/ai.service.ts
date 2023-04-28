@@ -6,7 +6,7 @@ require("dotenv").config();
 @Injectable()
 export class AiService {
 
-    public solicitarAi(text: Ai): any {
+    public solicitarAi(text: Ai, textQs: string): any {
 
         const apiKey = process.env.OPENAI_API_KEY;
         const baseURL = "https://api.openai.com/v1";
@@ -18,8 +18,13 @@ export class AiService {
             "Content-Type": "application/json",
         },
         });
+        
+        let prompt = textQs;
 
-        const prompt = text.msg;
+        if(text != null){
+            prompt = text.msg
+        }
+
         const model = "text-davinci-003";
         const maxTokens = 500;
         const temperature = 1;
