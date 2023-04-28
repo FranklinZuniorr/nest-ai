@@ -14,6 +14,7 @@ export class UsuarioService {
     
     public cria(usuario: Usuario): Usuario {
         this.usuarios.push(usuario);
+        console.log(usuario)
         
         return usuario;
     }
