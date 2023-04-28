@@ -14,7 +14,7 @@ export class AiController {
 
         console.log(perm)
         
-        const data = await this.aiService.solicitarAi(text, null);
+        const data = await this.aiService.solicitarAi(text, null, perm);
         console.log(data)
         return new NestResponseBuilder()
                 .comStatus(HttpStatus.CREATED)
@@ -23,9 +23,9 @@ export class AiController {
     }
 
     @Get("/qs")
-    public async getAiReponseQs(@Query("msg") text: string): Promise <NestResponse> {
+    public async getAiReponseQs(@Query("msg") text: string, @Headers('perm') perm: string): Promise <NestResponse> {
         
-        const data = await this.aiService.solicitarAi(null, text);
+        const data = await this.aiService.solicitarAi(null, text, perm);
         console.log(data)
         return new NestResponseBuilder()
                 .comStatus(HttpStatus.CREATED)
