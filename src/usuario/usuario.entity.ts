@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsString, IsEmail, Matches } from 'class-validator';
 import { Exclude, Expose } from 'class-transformer';
 import { IsNomeDeUsuarioUnico } from './is-nome-de-usuario-unico.validator';
 
@@ -35,6 +35,9 @@ export class Usuario {
     })
     @IsNotEmpty({
         message: 'senha é obrigatório.'
+    })
+    @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/, {
+        message: 'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e um caractere especial.'
     })
     senha: string;
 

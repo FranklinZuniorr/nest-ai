@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
