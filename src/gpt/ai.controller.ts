@@ -17,7 +17,7 @@ export class AiController {
         const data = await this.aiService.solicitarAi(text, null, perm);
         console.log(data)
         return new NestResponseBuilder()
-                .comStatus(HttpStatus.CREATED)
+                .comStatus(HttpStatus.OK)
                 .comBody(data)
                 .build();
     }
@@ -28,7 +28,7 @@ export class AiController {
         const data = await this.aiService.solicitarAi(null, text, perm);
         console.log(data)
         return new NestResponseBuilder()
-                .comStatus(HttpStatus.CREATED)
+                .comStatus(HttpStatus.OK)
                 .comBody(data)
                 .build();
     }

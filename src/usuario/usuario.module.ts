@@ -1,13 +1,13 @@
 import { Module } from "@nestjs/common";
 import { UsuarioController } from "./usuario.controller";
 import { UsuarioService } from "./usuario.service";
-import { IsNomeDeUsuarioUnicoConstraint } from "./is-nome-de-usuario-unico.validator";
+import { IsEmailDeUsuarioUnicoConstraint } from "./is-email-de-usuario-unico.validator";
 
 @Module({
     controllers: [UsuarioController],
     providers: [
         UsuarioService,
-        IsNomeDeUsuarioUnicoConstraint
+        IsEmailDeUsuarioUnicoConstraint
     ]
 })
 export class UsuarioModule {}

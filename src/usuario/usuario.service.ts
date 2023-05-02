@@ -5,22 +5,20 @@ import { Usuario } from './usuario.entity';
 export class UsuarioService {
     private usuarios: Array<Usuario> = [{ 
         id: 1,
-        nomeDeUsuario: 'gabriel',
         email: 'gabriel.leite@alura.com.br',
         senha: '123456',
-        nomeCompleto: 'Gabriel Leite',
-        dataDeEntrada: new Date()
     }];
     
     public cria(usuario: Usuario): Usuario {
-        this.usuarios.push(usuario);
-        console.log(usuario)
+        const usuarioFiltro = {email: usuario.email, senha: usuario.senha, id: this.usuarios.length}
+        this.usuarios.push(usuarioFiltro);
+        console.log(usuarioFiltro)
         
-        return usuario;
+        return usuarioFiltro;
     }
 
-    public buscaPorNomeDeUsuario(nomeDeUsuario: string): Usuario {
-        const usuarioEncontrado = this.usuarios.find(usuario => usuario.nomeDeUsuario == nomeDeUsuario);
+    public buscaPorNomeDeUsuario(email: string): Usuario {
+        const usuarioEncontrado = this.usuarios.find(usuario => usuario.email == email);
 
         return usuarioEncontrado;
     }
