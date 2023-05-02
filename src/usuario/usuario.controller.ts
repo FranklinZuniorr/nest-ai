@@ -11,7 +11,7 @@ export class UsuarioController {
 
     @Get(':emailDeUsuario')
     public buscaPorNomeDeUsuario(@Param('emailDeUsuario') emailDeUsuario: string): Usuario {
-        const usuarioEncontrado = this.usuarioService.buscaPorNomeDeUsuario(emailDeUsuario);
+        const usuarioEncontrado = this.usuarioService.buscaPorEmailDeUsuario(emailDeUsuario);
 
         if (!usuarioEncontrado) {
             throw new NotFoundException({
@@ -26,12 +26,25 @@ export class UsuarioController {
     public cria(@Body() usuario: Usuario): NestResponse {
         
         const usuarioCriado = this.usuarioService.cria(usuario);
-        return new NestResponseBuilder()
-                .comStatus(HttpStatus.CREATED)
-                .comHeaders({
-                    'Location': `/users/${usuarioCriado.email}`
-                })
-                .comBody(usuarioCriado)
-                .build();
+        console.log(usuarioCriado);
+
+        if(usuarioCriado.r){
+            return new NestResponseBuilder()
+                    .comStatus(HttpStatus.CREATED)
+                    .comHeaders({
+                        'Location': `/users/${usuarioCriado.email}`
+                    })
+                    .comBody(usuarioCriado)
+                    .build();
+        }else{
+            return new NestResponseBuilder()
+                    .comStatus(HttpStatus.BAD_REQUEST)
+                    .comHeaders({
+                        'Location': `/users/${usuarioCriado.email}`
+                    })
+                    .comBody(usuarioCriado)
+                    .build();
+        }
+
     }
 }

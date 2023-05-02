@@ -9,8 +9,8 @@ export class IsEmailDeUsuarioUnicoConstraint implements ValidatorConstraintInter
     constructor(private usuarioService: UsuarioService) {}
 
     validate(emailDeUsuario: string, validationArguments?: ValidationArguments): boolean | Promise<boolean> {
-        console.log(!!!this.usuarioService.buscaPorNomeDeUsuario(emailDeUsuario))
-        return !!!this.usuarioService.buscaPorNomeDeUsuario(emailDeUsuario);
+        console.log(!!!this.usuarioService.buscaPorEmailDeUsuario(emailDeUsuario))
+        return !!!this.usuarioService.buscaPorEmailDeUsuario(emailDeUsuario);
     }
 }
 

@@ -9,15 +9,21 @@ export class UsuarioService {
         senha: '123456',
     }];
     
-    public cria(usuario: Usuario): Usuario {
-        const usuarioFiltro = {email: usuario.email, senha: usuario.senha, id: this.usuarios.length}
-        this.usuarios.push(usuarioFiltro);
-        console.log(usuarioFiltro)
-        
-        return usuarioFiltro;
+    public cria(usuario: Usuario): any {
+
+        if(!this.buscaPorEmailDeUsuario(usuario.email)){
+            const usuarioFiltro = {email: usuario.email, senha: usuario.senha, id: this.usuarios.length}
+            this.usuarios.push(usuarioFiltro);
+            console.log(usuarioFiltro)
+            
+            return {r: true, data: "Registrado com sucesso!"};
+        }else{
+            return {r: false, data: "E-mail já existe na base de dados!"};
+        }
+
     }
 
-    public buscaPorNomeDeUsuario(email: string): Usuario {
+    public buscaPorEmailDeUsuario(email: string): Usuario {
         const usuarioEncontrado = this.usuarios.find(usuario => usuario.email == email);
 
         return usuarioEncontrado;

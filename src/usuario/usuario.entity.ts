@@ -5,7 +5,7 @@ import { IsEmailDeUsuarioUnico } from './is-email-de-usuario-unico.validator';
 export class Usuario {
     id: number;
 
-    @IsEmailDeUsuarioUnico()
+
     @Expose({
         name: 'email'
     })
