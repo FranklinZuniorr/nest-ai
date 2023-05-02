@@ -13,7 +13,7 @@ export class Usuario {
         message: 'email precisa ser um endereço de email válido.'
     })
     email: string;
-
+    
     @Expose({
         name: 'password'
     })
@@ -26,5 +26,5 @@ export class Usuario {
     @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/, {
         message: 'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e um caractere especial.'
     })
-    senha: string;
+    senha: string | Promise<string>;
 }

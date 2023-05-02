@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Usuario } from './usuario.entity';
+import { BcryptService } from './bcrypt/bcrypt.service';
 
 @Injectable()
 export class UsuarioService {
@@ -9,10 +10,13 @@ export class UsuarioService {
         senha: '123456',
     }];
     
-    public cria(usuario: Usuario): any {
+    public async cria(usuario: Usuario): Promise<any> {
 
         if(!this.buscaPorEmailDeUsuario(usuario.email)){
-            const usuarioFiltro = {email: usuario.email, senha: usuario.senha, id: this.usuarios.length}
+
+            const { email, senha } = usuario;
+            
+            const usuarioFiltro = {email: email, senha: await this.setHash(senha), id: this.usuarios.length}
             this.usuarios.push(usuarioFiltro);
             console.log(usuarioFiltro)
             
@@ -21,6 +25,11 @@ export class UsuarioService {
             return {r: false, data: "E-mail já existe na base de dados!"};
         }
 
+    }
+
+    async setHash(password){
+        const data = await BcryptService.hashPassword(password);
+        return data
     }
 
     public buscaPorEmailDeUsuario(email: string): Usuario {

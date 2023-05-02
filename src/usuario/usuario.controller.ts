@@ -23,9 +23,9 @@ export class UsuarioController {
     }
 
     @Post()
-    public cria(@Body() usuario: Usuario): NestResponse {
+    public async cria(@Body() usuario: Usuario): Promise<NestResponse> {
         
-        const usuarioCriado = this.usuarioService.cria(usuario);
+        const usuarioCriado = await this.usuarioService.cria(usuario);
         console.log(usuarioCriado);
 
         if(usuarioCriado.r){
