@@ -4,7 +4,7 @@ import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 
-@Controller('users')
+@Controller('/')
 export class UsuarioController {
 
     constructor(private usuarioService: UsuarioService) {}
@@ -22,7 +22,7 @@ export class UsuarioController {
         return usuarioEncontrado;
     } */
 
-    @Post()
+    @Post('new-user')
     public async createUser(@Body() usuario: Usuario): Promise<NestResponse> {
         
         const usuarioCriado = await this.usuarioService.create(usuario);
@@ -38,7 +38,7 @@ export class UsuarioController {
 
     };
 
-    @Get('login')
+    @Post('login')
     public async loginUser(@Body() usuario: Usuario): Promise<NestResponse> {
 
         const userLogged = await this.usuarioService.login(usuario);
