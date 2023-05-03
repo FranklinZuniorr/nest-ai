@@ -12,7 +12,7 @@ import * as Dropbox from 'dropbox';
 export class UsuarioController {
 
     private dropbox = new Dropbox.Dropbox({
-        accessToken: 'sl.Bdv73Bz_n8ogN8saTlF3UPjZjqe1O4428TL7vv0Lxbhc8mbYY4W3NnV52N8AT-dddkU1uXwnzYAQAogK2D3Xe6OgVj6FXs5MmGYBiEkPjAYTDKiSSv0PAeXCDEE9Z1VdaUm9UZo256nj',
+        accessToken: 'sl.Bdv_0UHXe0q7Hw_BdQ6xUIhG6eykpAiWTc6V7DqaTtNexqknQ41pwRkgpdkWbfICEQUmhugR1OqUcGJzQBusmpV0v80LppEBAubdniqKjIbnR0wt0pY9NmkHze3r4wcEx4fSKRvNmxk_',
     });
 
     constructor(private usuarioService: UsuarioService) {}
@@ -64,10 +64,10 @@ export class UsuarioController {
     @Post('upload-image')
     @UseInterceptors(FileInterceptor('file' , {
         fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-            return callback(new Error('Só imagens são permitidas!'), false);
-        }
-        callback(null, true);
+            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+                return callback(new Error('Só imagens são permitidas!'), false);
+            }
+            callback(null, true);
         },
     }))
     async upload(@UploadedFile() file) {

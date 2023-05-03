@@ -8,28 +8,39 @@ export class UsuarioService {
         id: 1,
         email: 'gabriel.leite@alura.com.br',
         senha: '123456',
+        username: "gabrico"
     }];
     
     public async create(usuario: Usuario): Promise<any> {
 
-        if(!this.buscaPorEmailDeUsuario(usuario.email)){
+        if(this.buscaPorEmailDeUsuario(usuario.email) == undefined && this.buscaPorNomeDeUsuario(usuario.username) == undefined){
 
-            const { email, senha } = usuario;
+            const { email, senha, username } = usuario;
             
-            const userFilter = {email: email, senha: await this.setHash(senha), id: this.usuarios.length}
+            const userFilter = {email: email, senha: await this.setHash(senha), username, id: this.usuarios.length}
             this.usuarios.push(userFilter);
             console.log(userFilter)
             
             return {r: true, data: "Registrado com sucesso!", status: HttpStatus.CREATED};
         }else{
-            return {r: false, data: "E-mail já existe na base de dados!", status: HttpStatus.BAD_REQUEST};
+
+            console.log(this.buscaPorEmailDeUsuario(usuario.email))
+
+            if(this.buscaPorEmailDeUsuario(usuario.email) != undefined && this.buscaPorNomeDeUsuario(usuario.username) != undefined){
+                return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
+            }else{
+                const emailAndNameExist = this.buscaPorEmailDeUsuario(usuario.email)? "E-mail":"Nome"; 
+    
+                return {r: false, data: `${emailAndNameExist} já existe na base de dados!`, status: HttpStatus.BAD_REQUEST};
+            }
+
         };
 
     };
 
     public async login(usuario: Usuario): Promise<any> {
 
-        if(this.buscaPorEmailDeUsuario(usuario.email)){
+        if(this.buscaPorEmailDeUsuario(usuario.email) != undefined){
 
             const userFound = this.buscaPorEmailDeUsuario(usuario.email);
 
@@ -63,6 +74,12 @@ export class UsuarioService {
 
     public buscaPorEmailDeUsuario(email: string): Usuario {
         const usuarioEncontrado = this.usuarios.find(usuario => usuario.email == email);
+
+        return usuarioEncontrado;
+    };
+
+    public buscaPorNomeDeUsuario(name: string): Usuario {
+        const usuarioEncontrado = this.usuarios.find(usuario => usuario.username == name);
 
         return usuarioEncontrado;
     };
