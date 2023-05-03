@@ -37,4 +37,6 @@ export class Usuario {
         message: 'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e um caractere especial.'
     })
     senha: string | Promise<string>;
+
+    exist?: boolean;
 }

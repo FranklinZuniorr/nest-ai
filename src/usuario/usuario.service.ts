@@ -13,7 +13,7 @@ export class UsuarioService {
     
     public async create(usuario: Usuario): Promise<any> {
 
-        if(this.buscaPorEmailDeUsuario(usuario.email) == undefined && this.buscaPorNomeDeUsuario(usuario.username) == undefined){
+        if(!this.buscaPorEmailDeUsuario(usuario.email).exist && !this.buscaPorNomeDeUsuario(usuario.username).exist){
 
             const { email, senha, username } = usuario;
             
@@ -26,10 +26,10 @@ export class UsuarioService {
 
             console.log(this.buscaPorEmailDeUsuario(usuario.email))
 
-            if(this.buscaPorEmailDeUsuario(usuario.email) != undefined && this.buscaPorNomeDeUsuario(usuario.username) != undefined){
+            if(this.buscaPorEmailDeUsuario(usuario.email).exist && this.buscaPorNomeDeUsuario(usuario.username).exist){
                 return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
             }else{
-                const emailAndNameExist = this.buscaPorEmailDeUsuario(usuario.email)? "E-mail":"Nome"; 
+                const emailAndNameExist = this.buscaPorEmailDeUsuario(usuario.email).exist? "E-mail":"Nome"; 
     
                 return {r: false, data: `${emailAndNameExist} já existe na base de dados!`, status: HttpStatus.BAD_REQUEST};
             }
@@ -40,7 +40,7 @@ export class UsuarioService {
 
     public async login(usuario: Usuario): Promise<any> {
 
-        if(this.buscaPorEmailDeUsuario(usuario.email) != undefined){
+        if(this.buscaPorEmailDeUsuario(usuario.email).exist){
 
             const userFound = this.buscaPorEmailDeUsuario(usuario.email);
 
@@ -75,12 +75,20 @@ export class UsuarioService {
     public buscaPorEmailDeUsuario(email: string): Usuario {
         const usuarioEncontrado = this.usuarios.find(usuario => usuario.email == email);
 
-        return usuarioEncontrado;
+        if(usuarioEncontrado != undefined){
+            return {...usuarioEncontrado, exist: true}
+        }
+
+        return {...usuarioEncontrado, exist: false};
     };
 
     public buscaPorNomeDeUsuario(name: string): Usuario {
         const usuarioEncontrado = this.usuarios.find(usuario => usuario.username == name);
 
-        return usuarioEncontrado;
+        if(usuarioEncontrado != undefined){
+            return {...usuarioEncontrado, exist: true}
+        }
+
+        return {...usuarioEncontrado, exist: false};
     };
 };
