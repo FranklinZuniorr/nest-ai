@@ -1,11 +1,19 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { extname } from 'path';
+import * as Dropbox from 'dropbox';
 
 @Controller('/')
 export class UsuarioController {
+
+    private dropbox = new Dropbox.Dropbox({
+        accessToken: 'sl.Bdv73Bz_n8ogN8saTlF3UPjZjqe1O4428TL7vv0Lxbhc8mbYY4W3NnV52N8AT-dddkU1uXwnzYAQAogK2D3Xe6OgVj6FXs5MmGYBiEkPjAYTDKiSSv0PAeXCDEE9Z1VdaUm9UZo256nj',
+    });
 
     constructor(private usuarioService: UsuarioService) {}
 
@@ -52,6 +60,76 @@ export class UsuarioController {
         .build();
 
     }
+
+    @Post('upload-image')
+    @UseInterceptors(FileInterceptor('file' , {
+        fileFilter: (req, file, callback) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+            return callback(new Error('Só imagens são permitidas!'), false);
+        }
+        callback(null, true);
+        },
+    }))
+    async upload(@UploadedFile() file) {
+        console.log(file)
+
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+
+        const result = await this.dropbox.filesUpload({
+        path: `/${randomName}${extname(file.originalname)}`,
+        contents: file.buffer,
+        });
+
+        const sharedLink = await this.dropbox.sharingCreateSharedLinkWithSettings({
+            path: result.result.path_display,
+        });
+        
+        return {result, url: sharedLink.result.url.replace("?dl=0", "?raw=1")};
+    }
+
+    /* @UseInterceptors(FileInterceptor('file', {
+        storage: memoryStorage(),
+        preservePath: true,
+        fileFilter: (req, file, callback) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+            return callback(new Error('Only image files are allowed!'), false);
+        }
+        callback(null, true);
+        },
+    }))
+    async upload(@UploadedFile() file) {
+        
+        console.log(file)
+
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+
+        const result = await this.dropbox.filesUpload({
+        path: `/${randomName}${extname(file.originalname)}`,
+        contents: file.buffer,
+        });
+        return result;
+    } */
+
+
+    /* @Post('upload')
+    @UseInterceptors(FileInterceptor('file', {
+        storage: memoryStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+            const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+            return callback(null, `${randomName}${extname(file.originalname)}`)
+        },
+        }),
+        preservePath: true // Configuração para manter o caminho original do arquivo
+    }))
+    async upload(@UploadedFile() file) {
+        const result = await this.dropbox.filesUpload({
+        path: `/${file.originalname}`,
+        contents: file.buffer,
+        });
+
+        return result;
+    } */
 }
 
 const usuarioService = new UsuarioService();
