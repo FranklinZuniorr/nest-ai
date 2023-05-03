@@ -9,8 +9,8 @@ export class UsuarioController {
 
     constructor(private usuarioService: UsuarioService) {}
 
-    @Get(':emailDeUsuario')
-    public buscaPorNomeDeUsuario(@Param('emailDeUsuario') emailDeUsuario: string): Usuario {
+   /*  @Get(':emailDeUsuario')
+    public buscaPorEmailDeUsuario(@Param('emailDeUsuario') emailDeUsuario: string): Usuario {
         const usuarioEncontrado = this.usuarioService.buscaPorEmailDeUsuario(emailDeUsuario);
 
         if (!usuarioEncontrado) {
@@ -20,31 +20,36 @@ export class UsuarioController {
             });
         }
         return usuarioEncontrado;
-    }
+    } */
 
     @Post()
-    public async cria(@Body() usuario: Usuario): Promise<NestResponse> {
+    public async createUser(@Body() usuario: Usuario): Promise<NestResponse> {
         
-        const usuarioCriado = await this.usuarioService.cria(usuario);
+        const usuarioCriado = await this.usuarioService.create(usuario);
         console.log(usuarioCriado);
 
-        if(usuarioCriado.r){
-            return new NestResponseBuilder()
-                    .comStatus(HttpStatus.CREATED)
-                    .comHeaders({
-                        'Location': `/users/${usuarioCriado.email}`
-                    })
-                    .comBody(usuarioCriado)
-                    .build();
-        }else{
-            return new NestResponseBuilder()
-                    .comStatus(HttpStatus.BAD_REQUEST)
-                    .comHeaders({
-                        'Location': `/users/${usuarioCriado.email}`
-                    })
-                    .comBody(usuarioCriado)
-                    .build();
-        }
+        return new NestResponseBuilder()
+                .comStatus(usuarioCriado.status)
+                .comHeaders({
+                    'Location': `/users/${usuarioCriado.email}`
+                })
+                .comBody(usuarioCriado)
+                .build();
+
+    };
+
+    @Get('login')
+    public async loginUser(@Body() usuario: Usuario): Promise<NestResponse> {
+
+        const userLogged = await this.usuarioService.login(usuario);
+
+        return new NestResponseBuilder()
+        .comStatus(userLogged.status)
+        .comHeaders({
+            'Location': `/users/${userLogged.email}`
+        })
+        .comBody(userLogged)
+        .build();
 
     }
 }
