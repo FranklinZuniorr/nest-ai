@@ -17,14 +17,14 @@ export class UsuarioService {
 
             const { email, senha, username } = usuario;
             
-            const userFilter = {email: email, senha: await this.setHash(senha), username, id: this.usuarios.length}
+            const userFilter = {email: email, senha: await this.setHash(senha), username, id: this.usuarios.length};
             this.usuarios.push(userFilter);
-            console.log(userFilter)
+            console.log(userFilter);
             
             return {r: true, data: "Registrado com sucesso!", status: HttpStatus.CREATED};
         }else{
 
-            console.log(this.buscaPorEmailDeUsuario(usuario.email))
+            console.log(this.buscaPorEmailDeUsuario(usuario.email));
 
             if(this.buscaPorEmailDeUsuario(usuario.email).exist && this.buscaPorNomeDeUsuario(usuario.username).exist){
                 return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
@@ -32,7 +32,7 @@ export class UsuarioService {
                 const emailAndNameExist = this.buscaPorEmailDeUsuario(usuario.email).exist? "E-mail":"Nome"; 
     
                 return {r: false, data: `${emailAndNameExist} já existe na base de dados!`, status: HttpStatus.BAD_REQUEST};
-            }
+            };
 
         };
 
@@ -51,13 +51,13 @@ export class UsuarioService {
 
             if(!verification){
                 return {r: false, data: "Senha incorreta!", status: HttpStatus.BAD_REQUEST}
-            }
+            };
             
             return {r: true, data: userFilter, status: HttpStatus.ACCEPTED};
 
         }else{
             return {r: false, data: "Usuário não foi encontrado!", status: HttpStatus.BAD_REQUEST};
-        }
+        };
     };
 
     //-------------------------------------------------------
@@ -70,14 +70,14 @@ export class UsuarioService {
     async compareHashedPasswordAndPassword(password, passwordHashed){
         const data = await BcryptService.comparePassword(password, passwordHashed);
         return data
-    }
+    };
 
     public buscaPorEmailDeUsuario(email: string): Usuario {
         const usuarioEncontrado = this.usuarios.find(usuario => usuario.email == email);
 
         if(usuarioEncontrado != undefined){
             return {...usuarioEncontrado, exist: true}
-        }
+        };
 
         return {...usuarioEncontrado, exist: false};
     };
@@ -87,7 +87,7 @@ export class UsuarioService {
 
         if(usuarioEncontrado != undefined){
             return {...usuarioEncontrado, exist: true}
-        }
+        };
 
         return {...usuarioEncontrado, exist: false};
     };
