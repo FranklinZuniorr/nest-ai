@@ -53,3 +53,6 @@ export class UsuarioController {
 
     }
 }
+
+const usuarioService = new UsuarioService();
+const teste = new UsuarioController(usuarioService);
