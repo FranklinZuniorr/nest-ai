@@ -22,11 +22,11 @@ export class AuthService {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         ignoreExpiration: false,
-        secret: type == "refresh"? process.env.REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET
+        secret: type == "refresh"? process.env.REFRESH_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET
       });
       return payload;
     } catch (err) {
-      return err;
+      return err
     }
   }
 }

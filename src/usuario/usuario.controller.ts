@@ -4,7 +4,7 @@ import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { refreshDto } from './accessTokenAndRefreshToken/refreshDto';
+import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
 @Controller('/')
 export class UsuarioController {
 
@@ -63,16 +63,32 @@ export class UsuarioController {
             callback(null, true);
         },
     }))
-    async upload(@UploadedFile() file): Promise<NestResponse> {
-        const data = await this.usuarioService.uploadImage(file);
+    async upload(@UploadedFile() file, @Headers('accessToken') accessToken: string): Promise<NestResponse> {
+
+        console.log(accessToken)
+
+        const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken);
+
+        if(dataVerifyAccessToken.r){
+            const data = await this.usuarioService.uploadImage(file);
+    
+            return new NestResponseBuilder()
+            .comStatus(data.status)
+            .comHeaders({
+                'Info': data.r
+            })
+            .comBody(data)
+            .build();
+        }
 
         return new NestResponseBuilder()
-        .comStatus(data.status)
+        .comStatus(dataVerifyAccessToken.status)
         .comHeaders({
-            'Info': data.r
+            'Info': dataVerifyAccessToken.r
         })
-        .comBody(data)
+        .comBody(dataVerifyAccessToken)
         .build();
+
     }
 
     @Post('refresh-token')

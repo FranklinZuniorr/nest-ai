@@ -6,7 +6,7 @@ import { extname } from 'path';
 import * as Dropbox from 'dropbox';
 import { AuthService } from './accessTokenAndRefreshToken/AuthService';
 import { JwtService } from '@nestjs/jwt';
-import { refreshDto } from './accessTokenAndRefreshToken/refreshDto';
+import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
 interface response{
     r: boolean,
     data: any,
@@ -90,7 +90,7 @@ export class UsuarioService extends AuthService {
         };
     };
 
-    public async verifyRefreshTokenAndGenerateTokens(refreshToken: refreshDto): Promise<response> {
+    public async verifyRefreshTokenAndGenerateTokens(refreshToken: refreshDto): Promise<response>{
 
         const verify = await this.verifyToken(refreshToken.refreshToken, "refresh");
 
@@ -112,8 +112,45 @@ export class UsuarioService extends AuthService {
         };
     }
 
-    public async verifyAccessTokenPass(){
+    public async verifyAccessTokenPass(accessToken: string): Promise<response>{
+
         
+        if(accessToken != ""){
+
+            const verify = await this.verifyToken(accessToken, "access");
+            console.log(verify)
+                
+    
+            if(verify.name === 'TokenExpiredError') {
+                return {
+                    r: false, 
+                    data: "AccessTokenExpiredError",
+                    status: HttpStatus.BAD_REQUEST
+                }
+            }
+
+            if(verify.name === "JsonWebTokenError"){
+                return {
+                    r: false, 
+                    data: "JsonWebTokenError",
+                    status: HttpStatus.BAD_REQUEST
+                }
+            }
+    
+            return {
+                r: true, 
+                data: "AccessTokenOk", 
+                status: HttpStatus.ACCEPTED
+            };
+
+        }
+
+        return {
+            r: false, 
+            data: "Nenhum accessToken encontrado",
+            status: HttpStatus.BAD_REQUEST
+        }
+
     }
 
     public async uploadImage(file): Promise<response>{
@@ -124,7 +161,7 @@ export class UsuarioService extends AuthService {
         const result = await this.dropbox.filesUpload({
         path: `/${randomName}${extname(file.originalname)}`,
         contents: file.buffer,
-        });
+        })
         
         if(result.status == 200){
             const sharedLink = await this.dropbox.sharingCreateSharedLinkWithSettings({
