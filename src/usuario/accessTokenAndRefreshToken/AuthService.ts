@@ -4,21 +4,21 @@ import { refreshDto } from './refreshAndAccessDto';
 import { response } from 'src/responseDto/response';
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(private readonly jwtService: JwtService) {};
 
   protected async generateAccessToken(payload: object): Promise<string> {
     return this.jwtService.sign(payload, {
       secret: process.env.ACCESS_TOKEN_SECRET,
       expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
     });
-  }
+  };
 
   protected async generateRefreshToken(payload: object): Promise<string> {
     return this.jwtService.sign(payload, {
       secret: process.env.REFRESH_TOKEN_SECRET,
       expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
     });
-  }
+  };
 
   protected async verifyToken(token: string, type: string): Promise<any> {
     try {
@@ -29,8 +29,8 @@ export class AuthService {
       return payload;
     } catch (err) {
       return err
-    }
-  }
+    };
+  };
 
   public async verifyRefreshTokenAndGenerateTokens(refreshToken: refreshDto): Promise<response>{
 
@@ -45,16 +45,16 @@ export class AuthService {
               r: false, 
               data: {...verify, name: "RefreshTokenExpiredError"},
               status: HttpStatus.BAD_REQUEST
-          }
-      }
+          };
+      };
 
       if(verify.name === "JsonWebTokenError"){
         return {
             r: false, 
             data: verify.toString().split(":")[1].trim(),
             status: HttpStatus.BAD_REQUEST
-        }
-      }
+        };
+      };
   
       return {
           r: true, 
@@ -71,9 +71,9 @@ export class AuthService {
       r: false, 
       data: "Nenhum refreshToken encontrado",
       status: HttpStatus.BAD_REQUEST
-  }
+    };
 
-  }
+  };
 
   public async verifyAccessTokenPass(accessToken: string): Promise<response>{
 
@@ -87,16 +87,16 @@ export class AuthService {
               r: false, 
               data: "AccessTokenExpiredError",
               status: HttpStatus.BAD_REQUEST
-          }
-      }
+          };
+      };
 
       if(verify.name === "JsonWebTokenError"){
-          return {
-              r: false, 
-              data: verify.toString().split(":")[1].trim(),
-              status: HttpStatus.BAD_REQUEST
-          }
-      }
+        return {
+            r: false, 
+            data: verify.toString().split(":")[1].trim(),
+            status: HttpStatus.BAD_REQUEST
+        };
+      };
       
       return {
           r: true, 
@@ -109,7 +109,7 @@ export class AuthService {
         r: false, 
         data: "Nenhum accessToken encontrado",
         status: HttpStatus.BAD_REQUEST
-    }
+    };
 
-  }
-}
+  };
+};

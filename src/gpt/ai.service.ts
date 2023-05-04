@@ -13,7 +13,7 @@ export class AiService extends AuthService {
         super(jwtService)
     }
 
-    public solicitarAi(text: Ai, textQs: string): any {
+    public async solicitarAi(text: Ai, textQs: string): Promise<any> {
 
         const apiKey = process.env.OPENAI_API_KEY;
         const baseURL = "https://api.openai.com/v1";
@@ -50,7 +50,7 @@ export class AiService extends AuthService {
             return {r: true, data: answer, status: HttpStatus.OK}
         })
         .catch((error) => {
-            return {r: false, data: error, status: HttpStatus.BAD_REQUEST}
+            return {r: false, data: "Erro na solicitação da AI.", status: HttpStatus.BAD_REQUEST}
         });
 
         return dataRes

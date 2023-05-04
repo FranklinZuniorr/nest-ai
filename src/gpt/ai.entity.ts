@@ -11,4 +11,4 @@ export class Ai {
     })
     msg: string;
 
-}
+};
