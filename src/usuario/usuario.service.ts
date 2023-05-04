@@ -4,15 +4,24 @@ import { BcryptService } from './bcrypt/bcrypt.service';
 import { memoryStorage } from 'multer';
 import { extname } from 'path';
 import * as Dropbox from 'dropbox';
-
+import { AuthService } from './accessTokenAndRefreshToken/AuthService';
+import { JwtService } from '@nestjs/jwt';
+import { refreshDto } from './accessTokenAndRefreshToken/refreshDto';
 interface response{
     r: boolean,
     data: any,
     status: number
 }
 
+const jwtService = new JwtService();
+
 @Injectable()
-export class UsuarioService {
+export class UsuarioService extends AuthService {
+
+    constructor(){
+        super(jwtService)
+    }
+
     private usuarios: Array<Usuario> = [{ 
         id: 1,
         email: 'gabriel.leite@alura.com.br',
@@ -66,12 +75,46 @@ export class UsuarioService {
                 return {r: false, data: "Senha incorreta!", status: HttpStatus.BAD_REQUEST}
             };
             
-            return {r: true, data: userFilter, status: HttpStatus.ACCEPTED};
+            return {
+                r: true, 
+                data: {
+                    userFilter, 
+                    token: await this.generateAccessToken({user: userFilter, type: "acces"}), 
+                    refreshToken: await this.generateRefreshToken({user: userFilter, type: "refresh"})
+                }, 
+                status: HttpStatus.ACCEPTED
+            };
 
         }else{
             return {r: false, data: "Usuário não foi encontrado!", status: HttpStatus.BAD_REQUEST};
         };
     };
+
+    public async verifyRefreshTokenAndGenerateTokens(refreshToken: refreshDto): Promise<response> {
+
+        const verify = await this.verifyToken(refreshToken.refreshToken, "refresh");
+
+        if(verify.name === 'TokenExpiredError') {
+            return {
+                r: false, 
+                data: {...verify, name: "RefreshTokenExpiredError"},
+                status: HttpStatus.BAD_REQUEST
+            }
+        }
+
+        return {
+            r: true, 
+            data: {
+                token: await this.generateAccessToken({user: verify.user.email, type: "acces"}), 
+                refreshToken: await this.generateRefreshToken({user: verify.user.email, type: "refresh"})
+            }, 
+            status: HttpStatus.ACCEPTED
+        };
+    }
+
+    public async verifyAccessTokenPass(){
+        
+    }
 
     public async uploadImage(file): Promise<response>{
         console.log(file)

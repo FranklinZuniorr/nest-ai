@@ -4,6 +4,7 @@ import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { refreshDto } from './accessTokenAndRefreshToken/refreshDto';
 @Controller('/')
 export class UsuarioController {
 
@@ -64,6 +65,19 @@ export class UsuarioController {
     }))
     async upload(@UploadedFile() file): Promise<NestResponse> {
         const data = await this.usuarioService.uploadImage(file);
+
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
+    }
+
+    @Post('refresh-token')
+    async verifyRefreshToken(@Body() refreshToken: refreshDto): Promise<NestResponse>{
+        const data = await this.usuarioService.verifyRefreshTokenAndGenerateTokens(refreshToken);
 
         return new NestResponseBuilder()
         .comStatus(data.status)
