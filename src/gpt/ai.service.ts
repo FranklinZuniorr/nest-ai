@@ -1,65 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { Ai } from './ai.entity';
+import { AuthService } from 'src/usuario/accessTokenAndRefreshToken/AuthService';
+import { JwtService } from '@nestjs/jwt';
 const axios = require("axios");
 require("dotenv").config();
 
+const jwtService = new JwtService();
 @Injectable()
-export class AiService {
+export class AiService extends AuthService {
 
-    public solicitarAi(text: Ai, textQs: string, perm: string): any {
+    constructor(){
+        super(jwtService)
+    }
 
-        if(perm == "gold"){
-            const apiKey = process.env.OPENAI_API_KEY;
-            const baseURL = "https://api.openai.com/v1";
+    public solicitarAi(text: Ai, textQs: string): any {
 
-            const openai = axios.create({
-            baseURL,
-            headers: {
-                Authorization: `Bearer ${apiKey}`,
-                "Content-Type": "application/json",
-            },
-            });
-            
-            let prompt = textQs;
+        const apiKey = process.env.OPENAI_API_KEY;
+        const baseURL = "https://api.openai.com/v1";
 
-            if(text != null){
-                prompt = text.msg
-            }
+        const openai = axios.create({
+        baseURL,
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+        },
+        });
+        
+        let prompt = textQs;
 
-            const model = "text-davinci-003";
-            const maxTokens = 500;
-            const temperature = 1;
-
-            const data = {
-            prompt,
-            model,
-            max_tokens: maxTokens,
-            temperature,
-            };
-
-            const dataRes = openai
-            .post("/completions", data)
-            .then((response) => {
-                const answer = response.data.choices[0].text.trim();
-                return {
-                    r: true,
-                    data: answer
-                }
-            })
-            .catch((error) => {
-                return {
-                    r: false,
-                    data: error
-                }
-            });
-
-            return dataRes
+        if(text != null){
+            prompt = text.msg
         }
 
-        return {
-            r: false,
-            info: "Você não tem permissão para essa solicitação."
-        }
+        const model = "text-davinci-003";
+        const maxTokens = 500;
+        const temperature = 1;
+
+        const data = {
+        prompt,
+        model,
+        max_tokens: maxTokens,
+        temperature,
+        };
+
+        const dataRes = openai
+        .post("/completions", data)
+        .then((response) => {
+            const answer = response.data.choices[0].text.trim();
+            return {r: true, data: answer, status: HttpStatus.OK}
+        })
+        .catch((error) => {
+            return {r: false, data: error, status: HttpStatus.BAD_REQUEST}
+        });
+
+        return dataRes
 
     }
 }

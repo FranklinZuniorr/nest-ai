@@ -3,11 +3,11 @@ import { Exclude, Expose } from 'class-transformer';
 
 export class Ai {
 
-    @Expose({
-        name: 'msg'
-    })
     @IsNotEmpty({
         message: 'text é obrigatório.'
+    })
+    @Expose({
+        name: 'msg'
     })
     msg: string;
 

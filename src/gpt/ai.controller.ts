@@ -10,22 +10,32 @@ export class AiController {
     constructor(private aiService: AiService) {}
 
     @Get()
-    public async getAiResponse(@Body() text: Ai, @Headers('perm') perm: string): Promise <NestResponse> {
+    public async getAiResponse(@Body() text: Ai, @Headers('accessToken') accessToken: string): Promise <NestResponse> {
 
-        console.log(perm)
-        
-        const data = await this.aiService.solicitarAi(text, null, perm);
-        console.log(data)
+        const dataVerifyAccessToken = await this.aiService.verifyAccessTokenPass(accessToken);
+
+        if(dataVerifyAccessToken.r){
+            const response = await this.aiService.solicitarAi(text, null);
+            return new NestResponseBuilder()
+            .comStatus(response.status)
+            .comBody(response.data)
+            .build();
+        }
+
         return new NestResponseBuilder()
-                .comStatus(HttpStatus.OK)
-                .comBody(data)
-                .build();
+        .comStatus(dataVerifyAccessToken.status)
+        .comHeaders({
+            'Info': dataVerifyAccessToken.r
+        })
+        .comBody(dataVerifyAccessToken)
+        .build();
+        
     }
 
     @Get("/qs")
     public async getAiReponseQs(@Query("msg") text: string, @Headers('perm') perm: string): Promise <NestResponse> {
         
-        const data = await this.aiService.solicitarAi(null, text, perm);
+        const data = await this.aiService.solicitarAi(null, text);
         console.log(data)
         return new NestResponseBuilder()
                 .comStatus(HttpStatus.OK)

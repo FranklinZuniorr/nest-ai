@@ -7,17 +7,12 @@ import * as Dropbox from 'dropbox';
 import { AuthService } from './accessTokenAndRefreshToken/AuthService';
 import { JwtService } from '@nestjs/jwt';
 import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
-interface response{
-    r: boolean,
-    data: any,
-    status: number
-}
+import { response } from 'src/responseDto/response';
 
 const jwtService = new JwtService();
-
 @Injectable()
 export class UsuarioService extends AuthService {
-
+    
     constructor(){
         super(jwtService)
     }
@@ -89,69 +84,6 @@ export class UsuarioService extends AuthService {
             return {r: false, data: "Usuário não foi encontrado!", status: HttpStatus.BAD_REQUEST};
         };
     };
-
-    public async verifyRefreshTokenAndGenerateTokens(refreshToken: refreshDto): Promise<response>{
-
-        const verify = await this.verifyToken(refreshToken.refreshToken, "refresh");
-
-        if(verify.name === 'TokenExpiredError') {
-            return {
-                r: false, 
-                data: {...verify, name: "RefreshTokenExpiredError"},
-                status: HttpStatus.BAD_REQUEST
-            }
-        }
-
-        return {
-            r: true, 
-            data: {
-                token: await this.generateAccessToken({user: verify.user.email, type: "acces"}), 
-                refreshToken: await this.generateRefreshToken({user: verify.user.email, type: "refresh"})
-            }, 
-            status: HttpStatus.ACCEPTED
-        };
-    }
-
-    public async verifyAccessTokenPass(accessToken: string): Promise<response>{
-
-        
-        if(accessToken != ""){
-
-            const verify = await this.verifyToken(accessToken, "access");
-            console.log(verify)
-                
-    
-            if(verify.name === 'TokenExpiredError') {
-                return {
-                    r: false, 
-                    data: "AccessTokenExpiredError",
-                    status: HttpStatus.BAD_REQUEST
-                }
-            }
-
-            if(verify.name === "JsonWebTokenError"){
-                return {
-                    r: false, 
-                    data: "JsonWebTokenError",
-                    status: HttpStatus.BAD_REQUEST
-                }
-            }
-    
-            return {
-                r: true, 
-                data: "AccessTokenOk", 
-                status: HttpStatus.ACCEPTED
-            };
-
-        }
-
-        return {
-            r: false, 
-            data: "Nenhum accessToken encontrado",
-            status: HttpStatus.BAD_REQUEST
-        }
-
-    }
 
     public async uploadImage(file): Promise<response>{
         console.log(file)
