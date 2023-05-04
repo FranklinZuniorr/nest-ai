@@ -1,0 +1,123 @@
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { UsuarioService } from './usuario.service';
+import { Usuario } from './usuario.entity';
+import { NestResponse } from '../core/http/nest-response';
+import { NestResponseBuilder } from '../core/http/nest-response-builder';
+import { FileInterceptor } from '@nestjs/platform-express';
+@Controller('/')
+export class UsuarioController {
+
+    constructor(private usuarioService: UsuarioService) {}
+
+   /*  @Get(':emailDeUsuario')
+    public buscaPorEmailDeUsuario(@Param('emailDeUsuario') emailDeUsuario: string): Usuario {
+        const usuarioEncontrado = this.usuarioService.buscaPorEmailDeUsuario(emailDeUsuario);
+
+        if (!usuarioEncontrado) {
+            throw new NotFoundException({
+                statusCode: HttpStatus.NOT_FOUND,
+                message: 'Usuário não encontrado.'
+            });
+        }
+        return usuarioEncontrado;
+    } */
+
+    @Post('new-user')
+    public async createUser(@Body() usuario: Usuario): Promise<NestResponse> {
+        
+        const userCreated = await this.usuarioService.create(usuario);
+        console.log(userCreated);
+
+        return new NestResponseBuilder()
+        .comStatus(userCreated.status)
+        .comHeaders({
+            'Info': userCreated.r
+        })
+        .comBody(userCreated)
+        .build();
+
+    };
+
+    @Post('login')
+    public async loginUser(@Body() usuario: Usuario): Promise<NestResponse> {
+
+        const userLogged = await this.usuarioService.login(usuario);
+
+        return new NestResponseBuilder()
+        .comStatus(userLogged.status)
+        .comHeaders({
+            'Info': userLogged.r
+        })
+        .comBody(userLogged)
+        .build();
+
+    }
+
+    @Post('upload-image')
+    @UseInterceptors(FileInterceptor('file' , {
+        fileFilter: (req, file, callback) => {
+            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+                return callback(new Error('Só imagens são permitidas!'), false);
+            }
+            callback(null, true);
+        },
+    }))
+    async upload(@UploadedFile() file): Promise<NestResponse> {
+        const data = await this.usuarioService.uploadImage(file);
+
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
+    }
+
+    /* @UseInterceptors(FileInterceptor('file', {
+        storage: memoryStorage(),
+        preservePath: true,
+        fileFilter: (req, file, callback) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+            return callback(new Error('Only image files are allowed!'), false);
+        }
+        callback(null, true);
+        },
+    }))
+    async upload(@UploadedFile() file) {
+        
+        console.log(file)
+
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+
+        const result = await this.dropbox.filesUpload({
+        path: `/${randomName}${extname(file.originalname)}`,
+        contents: file.buffer,
+        });
+        return result;
+    } */
+
+
+    /* @Post('upload')
+    @UseInterceptors(FileInterceptor('file', {
+        storage: memoryStorage({
+        destination: './uploads',
+        filename: (req, file, callback) => {
+            const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+            return callback(null, `${randomName}${extname(file.originalname)}`)
+        },
+        }),
+        preservePath: true // Configuração para manter o caminho original do arquivo
+    }))
+    async upload(@UploadedFile() file) {
+        const result = await this.dropbox.filesUpload({
+        path: `/${file.originalname}`,
+        contents: file.buffer,
+        });
+
+        return result;
+    } */
+}
+
+const usuarioService = new UsuarioService();
+const teste = new UsuarioController(usuarioService);
