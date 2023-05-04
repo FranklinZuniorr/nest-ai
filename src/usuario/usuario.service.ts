@@ -1,6 +1,15 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { Usuario } from './usuario.entity';
 import { BcryptService } from './bcrypt/bcrypt.service';
+import { memoryStorage } from 'multer';
+import { extname } from 'path';
+import * as Dropbox from 'dropbox';
+
+interface response{
+    r: boolean,
+    data: any,
+    status: number
+}
 
 @Injectable()
 export class UsuarioService {
@@ -10,8 +19,12 @@ export class UsuarioService {
         senha: '123456',
         username: "gabrico"
     }];
+
+    private dropbox = new Dropbox.Dropbox({
+        accessToken: process.env.DROPBOX_KEY,
+    });
     
-    public async create(usuario: Usuario): Promise<any> {
+    public async create(usuario: Usuario): Promise<response> {
 
         if(!this.buscaPorEmailDeUsuario(usuario.email).exist && !this.buscaPorNomeDeUsuario(usuario.username).exist){
 
@@ -38,7 +51,7 @@ export class UsuarioService {
 
     };
 
-    public async login(usuario: Usuario): Promise<any> {
+    public async login(usuario: Usuario): Promise<response> {
 
         if(this.buscaPorEmailDeUsuario(usuario.email).exist){
 
@@ -59,6 +72,27 @@ export class UsuarioService {
             return {r: false, data: "Usuário não foi encontrado!", status: HttpStatus.BAD_REQUEST};
         };
     };
+
+    public async uploadImage(file): Promise<response>{
+        console.log(file)
+
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+
+        const result = await this.dropbox.filesUpload({
+        path: `/${randomName}${extname(file.originalname)}`,
+        contents: file.buffer,
+        });
+        
+        if(result.status == 200){
+            const sharedLink = await this.dropbox.sharingCreateSharedLinkWithSettings({
+                path: result.result.path_display,
+            });
+            return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED}
+        }
+
+        return {r: false, data: "", status: HttpStatus.BAD_REQUEST}
+
+    }
 
     //-------------------------------------------------------
 

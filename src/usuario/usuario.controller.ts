@@ -4,16 +4,8 @@ import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
-import { extname } from 'path';
-import * as Dropbox from 'dropbox';
-
 @Controller('/')
 export class UsuarioController {
-
-    private dropbox = new Dropbox.Dropbox({
-        accessToken: 'sl.Bdv_0UHXe0q7Hw_BdQ6xUIhG6eykpAiWTc6V7DqaTtNexqknQ41pwRkgpdkWbfICEQUmhugR1OqUcGJzQBusmpV0v80LppEBAubdniqKjIbnR0wt0pY9NmkHze3r4wcEx4fSKRvNmxk_',
-    });
 
     constructor(private usuarioService: UsuarioService) {}
 
@@ -33,16 +25,16 @@ export class UsuarioController {
     @Post('new-user')
     public async createUser(@Body() usuario: Usuario): Promise<NestResponse> {
         
-        const usuarioCriado = await this.usuarioService.create(usuario);
-        console.log(usuarioCriado);
+        const userCreated = await this.usuarioService.create(usuario);
+        console.log(userCreated);
 
         return new NestResponseBuilder()
-                .comStatus(usuarioCriado.status)
-                .comHeaders({
-                    'Location': `/users/${usuarioCriado.email}`
-                })
-                .comBody(usuarioCriado)
-                .build();
+        .comStatus(userCreated.status)
+        .comHeaders({
+            'Info': userCreated.r
+        })
+        .comBody(userCreated)
+        .build();
 
     };
 
@@ -54,7 +46,7 @@ export class UsuarioController {
         return new NestResponseBuilder()
         .comStatus(userLogged.status)
         .comHeaders({
-            'Location': `/users/${userLogged.email}`
+            'Info': userLogged.r
         })
         .comBody(userLogged)
         .build();
@@ -70,21 +62,16 @@ export class UsuarioController {
             callback(null, true);
         },
     }))
-    async upload(@UploadedFile() file) {
-        console.log(file)
+    async upload(@UploadedFile() file): Promise<NestResponse> {
+        const data = await this.usuarioService.uploadImage(file);
 
-        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-
-        const result = await this.dropbox.filesUpload({
-        path: `/${randomName}${extname(file.originalname)}`,
-        contents: file.buffer,
-        });
-
-        const sharedLink = await this.dropbox.sharingCreateSharedLinkWithSettings({
-            path: result.result.path_display,
-        });
-        
-        return {result, url: sharedLink.result.url.replace("?dl=0", "?raw=1")};
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
     }
 
     /* @UseInterceptors(FileInterceptor('file', {
