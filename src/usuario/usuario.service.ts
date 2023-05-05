@@ -90,13 +90,31 @@ export class UsuarioService extends AuthService {
         if(code != undefined && code.length > 0){
             const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
 
-            await axios.post('https://api.dropboxapi.com/oauth2/token', {
+            /* await axios.post('https://api.dropboxapi.com/oauth2/token', {
                 code,
                 grant_type: 'authorization_code',
                 clientId: "i8p06kgx6l9hvyk",
                 clientSecret: "9rfn9d72o3ozhua",
                 redirect_uri: "https://www.google.com.br/",
-            }).then(res => console.log(res)).catch(err => console.log(err))
+            }).then(res => console.log(res)).catch(err => console.log(err)) */
+
+            const teste = await axios({
+                method: 'post',
+                url: 'https://api.dropboxapi.com/oauth2/token',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Authorization': 'Basic'
+                },
+                data: new URLSearchParams({
+                  'code': code,
+                  'grant_type': 'authorization_code',
+                  'client_id': 'i8p06kgx6l9hvyk',
+                  'client_secret': '9rfn9d72o3ozhua',
+                  'redirect_uri': 'https://www.google.com.br/',
+                })
+              })
+
+              console.log(teste)
 
 
             return
