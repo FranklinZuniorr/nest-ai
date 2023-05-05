@@ -18,15 +18,19 @@ export class FitroDeExcecaoHttp implements ExceptionFilter {
         const { status, body } = exception instanceof HttpException 
             ? {
                 status: exception.getStatus(),
-                body: exception.getResponse()
+                body: {r: false, data: exception.getResponse(), status: exception.getStatus()}
             }
             : {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,
                 body: {
-                    statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-                    timestamp: new Date().toISOString(),
-                    message: exception.message,
-                    path: requisicao.path
+                    r: false,
+                    data: {
+                        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                        timestamp: new Date().toISOString(),
+                        message: exception.message,
+                        path: requisicao.path
+                    },
+                    status: HttpStatus.INTERNAL_SERVER_ERROR
                 }
             };
         
