@@ -2,16 +2,16 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { Ai } from './ai.entity';
 import { AuthService } from 'src/usuario/accessTokenAndRefreshToken/AuthService';
 import { JwtService } from '@nestjs/jwt';
+import { utils } from 'src/utils/utils';
+import { UsuarioService } from 'src/usuario/usuario.service';
+
 const axios = require("axios");
 require("dotenv").config();
 
-const jwtService = new JwtService();
 @Injectable()
-export class AiService extends AuthService {
+export class AiService{
 
-    constructor(){
-        super(jwtService)
-    }
+    constructor(public usuarioService: UsuarioService){}
 
     public async solicitarAi(text: Ai, textQs: string): Promise<any> {
 
@@ -50,7 +50,7 @@ export class AiService extends AuthService {
             return {r: true, data: answer, status: HttpStatus.OK}
         })
         .catch((error) => {
-            return {r: false, data: "Erro na solicitação da AI.", status: HttpStatus.BAD_REQUEST}
+            return {r: false, data: utils.errorExternalServicesTreatment(error), status: HttpStatus.INTERNAL_SERVER_ERROR}
         });
 
         return dataRes

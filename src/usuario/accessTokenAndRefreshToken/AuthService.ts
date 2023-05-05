@@ -2,25 +2,26 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { refreshDto } from './refreshAndAccessDto';
 import { response } from 'src/responseDto/response';
+import { utils } from 'src/utils/utils';
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {};
 
-  protected async generateAccessToken(payload: object): Promise<string> {
+  public async generateAccessToken(payload: object): Promise<string> {
     return this.jwtService.sign(payload, {
       secret: process.env.ACCESS_TOKEN_SECRET,
       expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
     });
   };
 
-  protected async generateRefreshToken(payload: object): Promise<string> {
+  public async generateRefreshToken(payload: object): Promise<string> {
     return this.jwtService.sign(payload, {
       secret: process.env.REFRESH_TOKEN_SECRET,
       expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
     });
   };
 
-  protected async verifyToken(token: string, type: string): Promise<any> {
+  public async verifyToken(token: string, type: string): Promise<any> {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         ignoreExpiration: false,
@@ -51,7 +52,7 @@ export class AuthService {
       if(verify.name === "JsonWebTokenError"){
         return {
             r: false, 
-            data: verify.toString().split(":")[1].trim(),
+            data: utils.errorExternalServicesTreatment(verify),
             status: HttpStatus.BAD_REQUEST
         };
       };
@@ -93,7 +94,7 @@ export class AuthService {
       if(verify.name === "JsonWebTokenError"){
         return {
             r: false, 
-            data: verify.toString().split(":")[1].trim(),
+            data: utils.errorExternalServicesTreatment(verify),
             status: HttpStatus.BAD_REQUEST
         };
       };

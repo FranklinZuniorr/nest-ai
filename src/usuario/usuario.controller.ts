@@ -65,11 +65,10 @@ export class UsuarioController {
     }))
     async upload(@UploadedFile() file, @Headers('accessToken') accessToken: string): Promise<NestResponse> {
 
-        console.log(accessToken)
-
         const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken);
 
         if(dataVerifyAccessToken.r){
+            console.log("Acces OK")
             const data = await this.usuarioService.uploadImage(file);
     
             return new NestResponseBuilder()

@@ -4,7 +4,8 @@ import { UsuarioModule } from './usuario/usuario.module';
 import { FitroDeExcecaoHttp } from './common/filtros/filtro-de-excecao-http.filter';
 import { TransformaRespostaInterceptor } from './core/http/transforma-resposta.interceptor';
 import { AiModule } from './gpt/ai.module';
-
+import { AuthService } from './usuario/accessTokenAndRefreshToken/AuthService';
+import { JwtService } from '@nestjs/jwt';
 @Module({
   imports: [UsuarioModule, AiModule],
   controllers: [],

@@ -8,6 +8,7 @@ import { AuthService } from './accessTokenAndRefreshToken/AuthService';
 import { JwtService } from '@nestjs/jwt';
 import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
 import { response } from 'src/responseDto/response';
+import { utils } from 'src/utils/utils';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -93,7 +94,7 @@ export class UsuarioService extends AuthService {
         const result = await this.dropbox.filesUpload({
         path: `/${randomName}${extname(file.originalname)}`,
         contents: file.buffer,
-        })
+        }).then(res => res).catch(err => err);
         
         if(result.status == 200){
             const sharedLink = await this.dropbox.sharingCreateSharedLinkWithSettings({
@@ -102,18 +103,18 @@ export class UsuarioService extends AuthService {
             return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED}
         }
 
-        return {r: false, data: "", status: HttpStatus.BAD_REQUEST}
+        return {r: false, data: utils.errorExternalServicesTreatment(result), status: HttpStatus.BAD_REQUEST}
 
     }
 
     //-------------------------------------------------------
 
-    async setHash(password){
+    private async setHash(password){
         const data = await BcryptService.hashPassword(password);
         return data
     };
 
-    async compareHashedPasswordAndPassword(password, passwordHashed){
+    private async compareHashedPasswordAndPassword(password, passwordHashed){
         const data = await BcryptService.comparePassword(password, passwordHashed);
         return data
     };

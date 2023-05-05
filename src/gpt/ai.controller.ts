@@ -12,7 +12,7 @@ export class AiController {
     @Get()
     public async getAiResponse(@Body() text: Ai, @Headers('accessToken') accessToken: string): Promise <NestResponse> {
 
-        const dataVerifyAccessToken = await this.aiService.verifyAccessTokenPass(accessToken);
+        const dataVerifyAccessToken = await this.aiService.usuarioService.verifyAccessTokenPass(accessToken);
 
         if(dataVerifyAccessToken.r){
             const response = await this.aiService.solicitarAi(text, null);
@@ -38,7 +38,7 @@ export class AiController {
     @Get("/qs")
     public async getAiReponseQs(@Query("msg") text: string, @Headers('accessToken') accessToken: string): Promise <NestResponse> {
 
-        const dataVerifyAccessToken = await this.aiService.verifyAccessTokenPass(accessToken);
+        const dataVerifyAccessToken = await this.aiService.usuarioService.verifyAccessTokenPass(accessToken);
 
         if(dataVerifyAccessToken.r){
             const response = await this.aiService.solicitarAi(null, text);
