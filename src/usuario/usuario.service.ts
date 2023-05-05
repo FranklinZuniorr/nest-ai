@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
 import { response } from 'src/responseDto/response';
 import { utils } from 'src/utils/utils';
+import axios from 'axios';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -24,10 +25,6 @@ export class UsuarioService extends AuthService {
         senha: '123456',
         username: "gabrico"
     }];
-
-    private dropbox = new Dropbox.Dropbox({
-        accessToken: process.env.DROPBOX_KEY,
-    });
     
     public async create(usuario: Usuario): Promise<response> {
 
@@ -86,24 +83,50 @@ export class UsuarioService extends AuthService {
         };
     };
 
-    public async uploadImage(file): Promise<response>{
+    public async uploadImage(file, code: string): Promise<response>{
         console.log(file)
+        console.log(code)
 
-        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+        if(code != undefined && code.length > 0){
+            const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
 
-        const result = await this.dropbox.filesUpload({
-        path: `/${randomName}${extname(file.originalname)}`,
-        contents: file.buffer,
-        }).then(res => res).catch(err => err);
-        
-        if(result.status == 200){
-            const sharedLink = await this.dropbox.sharingCreateSharedLinkWithSettings({
-                path: result.result.path_display,
+            await axios.post('https://api.dropboxapi.com/oauth2/token', {
+                code,
+                grant_type: 'authorization_code',
+                clientId: "i8p06kgx6l9hvyk",
+                clientSecret: "9rfn9d72o3ozhua",
+                redirect_uri: "https://www.google.com.br/",
+            }).then(res => console.log(res)).catch(err => console.log(err))
+
+
+            return
+
+            const dropbox = new Dropbox.Dropbox({
+                accessToken: "",
+                clientId: "i8p06kgx6l9hvyk",
+                clientSecret: "9rfn9d72o3ozhua"
             });
-            return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED}
+    
+            const result = await dropbox.filesUpload({
+            path: `/${randomName}${extname(file.originalname)}`,
+            contents: file.buffer,
+            }).then(res => res).catch(err => err);
+            
+            if(result.status == 200){
+                const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
+                    path: result.result.path_display,
+                });
+                return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED}
+            }
+    
+            /* axios.get("https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/")
+            .then(res => console.log(res)).catch(err => console.) */
+    
+            return {r: false, data: utils.errorExternalServicesTreatment(result), status: HttpStatus.BAD_REQUEST}
         }
 
-        return {r: false, data: utils.errorExternalServicesTreatment(result), status: HttpStatus.BAD_REQUEST}
+        return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.BAD_REQUEST}
+
 
     }
 

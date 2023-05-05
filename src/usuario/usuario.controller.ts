@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
@@ -63,13 +63,13 @@ export class UsuarioController {
             callback(null, true);
         },
     }))
-    async upload(@UploadedFile() file, @Headers('accessToken') accessToken: string): Promise<NestResponse> {
+    async upload(@UploadedFile() file, @Headers('accessToken') accessToken: string, @Query('code') code: string): Promise<NestResponse> {
 
         const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken);
 
         if(dataVerifyAccessToken.r){
             console.log("Acces OK")
-            const data = await this.usuarioService.uploadImage(file);
+            const data = await this.usuarioService.uploadImage(file, code);
     
             return new NestResponseBuilder()
             .comStatus(data.status)
