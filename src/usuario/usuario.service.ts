@@ -54,7 +54,7 @@ export class UsuarioService extends AuthService {
 
         if((await this.buscaPorEmailDeUsuario(usuario.email)).exist){
 
-            const userFound = await this.userModel.findOne({ "email":usuario.email })
+            const userFound = await this.userModel.findOne({ "email":usuario.email.toLowerCase() })
             .exec()
             .then((doc) => doc?.toObject())
             .catch((err) => err);
