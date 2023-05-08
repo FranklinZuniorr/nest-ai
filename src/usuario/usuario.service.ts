@@ -28,6 +28,10 @@ export class UsuarioService extends AuthService {
         if(!(await this.buscaPorEmailDeUsuario(usuario.email)).exist && !(await this.buscaPorNomeDeUsuario(usuario.username)).exist){
 
             const { email, password, username } = usuario;
+
+            /* if(password.toString().length < 8){
+                return {r: false, data: `A senha precisa ter ao menos 8 caracteres!`, status: HttpStatus.BAD_REQUEST};
+            }; */
             
             const userFilter = {email: email.toLowerCase(), password: await this.setHash(password), username};
             const createdUser = new this.userModel(userFilter);
