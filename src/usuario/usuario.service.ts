@@ -98,49 +98,48 @@ export class UsuarioService extends AuthService {
                 redirect_uri: "https://www.google.com.br/",
             }).then(res => console.log(res)).catch(err => console.log(err)) */
 
-            const teste = await axios({
-                method: 'post',
-                url: 'https://api.dropboxapi.com/oauth2/token',
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                  'Authorization': 'Basic'
-                },
-                data: new URLSearchParams({
-                  'code': code,
-                  'grant_type': 'authorization_code',
-                  'client_id': 'i8p06kgx6l9hvyk',
-                  'client_secret': '9rfn9d72o3ozhua',
-                  'redirect_uri': 'https://www.google.com.br/',
-                })
-              })
+            const url = 'https://api.dropboxapi.com/oauth2/token';
+            const data = new URLSearchParams();
+            data.append('code', code);
+            data.append('grant_type', 'authorization_code');
+            data.append('client_id', 'i8p06kgx6l9hvyk');
+            data.append('client_secret', '9rfn9d72o3ozhua');
+            data.append('redirect_uri', 'https://www.google.com.br/');
 
-              console.log(teste)
-
-
-            return
-
-            const dropbox = new Dropbox.Dropbox({
-                accessToken: "",
-                clientId: "i8p06kgx6l9hvyk",
-                clientSecret: "9rfn9d72o3ozhua"
-            });
-    
-            const result = await dropbox.filesUpload({
-            path: `/${randomName}${extname(file.originalname)}`,
-            contents: file.buffer,
-            }).then(res => res).catch(err => err);
-            
-            if(result.status == 200){
-                const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-                    path: result.result.path_display,
-                });
-                return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED}
+            const response = await axios.post(url, data.toString(), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
+            }).then(res => res).catch(err => err)
+
+            console.log(response)
+
+            if(response.statusText === "OK"){
+                const dropbox = new Dropbox.Dropbox({
+                    accessToken: response.data.access_token,
+                    clientId: "i8p06kgx6l9hvyk",
+                    clientSecret: "9rfn9d72o3ozhua"
+                });
+        
+                const result = await dropbox.filesUpload({
+                path: `/${randomName}${extname(file.originalname)}`,
+                contents: file.buffer,
+                }).then(res => res).catch(err => err);
+                
+                if(result.status == 200){
+                    const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
+                        path: result.result.path_display,
+                    });
+                    return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED}
+                }
+            }
+
+
     
             /* axios.get("https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/")
             .then(res => console.log(res)).catch(err => console.) */
     
-            return {r: false, data: utils.errorExternalServicesTreatment(result), status: HttpStatus.BAD_REQUEST}
+            return {r: false, data: {info: utils.errorExternalServicesTreatment(response), dropBox: response.response.data}, status: HttpStatus.BAD_REQUEST}
         }
 
         return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.BAD_REQUEST}
