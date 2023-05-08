@@ -21,13 +21,6 @@ export class UsuarioService extends AuthService {
     constructor(@InjectModel(User.name) private userModel: Model<User>){
         super(jwtService)
     }
-
-    private usuarios: Array<Usuario> = [{ 
-        id: 1,
-        email: 'gabriel.leite@alura.com.br',
-        password: '123456',
-        username: "gabrico"
-    }];
     
     public async create(usuario: Usuario): Promise<response> {
 
@@ -35,8 +28,7 @@ export class UsuarioService extends AuthService {
 
             const { email, password, username } = usuario;
             
-            const userFilter = {email: email, password: await this.setHash(password), username, id: this.usuarios.length};
-            this.usuarios.push(userFilter);
+            const userFilter = {email: email.toLowerCase(), password: await this.setHash(password), username};
             const createdUser = new this.userModel(userFilter);
             createdUser.save();
             console.log(userFilter);
@@ -100,14 +92,6 @@ export class UsuarioService extends AuthService {
         if(code != undefined && code.length > 0){
             const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
 
-            /* await axios.post('https://api.dropboxapi.com/oauth2/token', {
-                code,
-                grant_type: 'authorization_code',
-                clientId: "i8p06kgx6l9hvyk",
-                clientSecret: "9rfn9d72o3ozhua",
-                redirect_uri: "https://www.google.com.br/",
-            }).then(res => console.log(res)).catch(err => console.log(err)) */
-
             const url = 'https://api.dropboxapi.com/oauth2/token';
             const data = new URLSearchParams();
             data.append('code', code);
@@ -142,11 +126,17 @@ export class UsuarioService extends AuthService {
                     });
 
                     const verifyToken = await this.verifyToken(token, "access");
-                    console.log(verifyToken)
-                    const user = this.userModel.findById(verifyToken.id);
-                    user.set("img_profile", sharedLink.result.url.replace("?dl=0", "?raw=1"));
-                    return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED}
+                    console.log(verifyToken.user.id)
+                    const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
+                        { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
+                        { new: true }).exec();
+                    console.log("------------")
+                    console.log(user)
+                    console.log("------------")
+                    return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED};
                 }
+
+                return {r: false, data: "Erro ao fazer upload da imagem, tente novamente.", status: HttpStatus.INTERNAL_SERVER_ERROR};
             }
 
 
@@ -157,7 +147,7 @@ export class UsuarioService extends AuthService {
             return {r: false, data: {info: utils.errorExternalServicesTreatment(response), dropBox: response.response.data}, status: HttpStatus.BAD_REQUEST}
         }
 
-        return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.BAD_REQUEST}
+        return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.ACCEPTED}
 
 
     }
@@ -175,7 +165,8 @@ export class UsuarioService extends AuthService {
     };
 
     public async buscaPorEmailDeUsuario(email: string): Promise<responseBuscaPorEmailDeUsuario> {
-        const usuarioEncontrado = await this.userModel.findOne({ email }).exec();
+        const filterEmail = email.toLowerCase();
+        const usuarioEncontrado = await this.userModel.findOne({ email: filterEmail }).exec();
 
         if(usuarioEncontrado){
             return {exist: true}
@@ -184,8 +175,8 @@ export class UsuarioService extends AuthService {
         return {exist: false};
     };
 
-    public async buscaPorNomeDeUsuario(name: string): Promise<responseBuscaPorNomeDeUsuario> {
-        const usuarioEncontrado = await this.userModel.findOne({ name }).exec();
+    public async buscaPorNomeDeUsuario(username: string): Promise<responseBuscaPorNomeDeUsuario> {
+        const usuarioEncontrado = await this.userModel.findOne({ username }).exec();
 
         if(usuarioEncontrado){
             return {exist: true}
