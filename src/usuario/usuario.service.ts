@@ -7,33 +7,38 @@ import * as Dropbox from 'dropbox';
 import { AuthService } from './accessTokenAndRefreshToken/AuthService';
 import { JwtService } from '@nestjs/jwt';
 import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
-import { response } from 'src/responseDto/response';
+import { response, responseBuscaPorEmailDeUsuario, responseBuscaPorNomeDeUsuario } from 'src/responseDto/response';
 import { utils } from 'src/utils/utils';
 import axios from 'axios';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from 'src/mongoDb/user.schema';
+import { Model } from 'mongoose';
 
 const jwtService = new JwtService();
 @Injectable()
 export class UsuarioService extends AuthService {
     
-    constructor(){
+    constructor(@InjectModel(User.name) private userModel: Model<User>){
         super(jwtService)
     }
 
     private usuarios: Array<Usuario> = [{ 
         id: 1,
         email: 'gabriel.leite@alura.com.br',
-        senha: '123456',
+        password: '123456',
         username: "gabrico"
     }];
     
     public async create(usuario: Usuario): Promise<response> {
 
-        if(!this.buscaPorEmailDeUsuario(usuario.email).exist && !this.buscaPorNomeDeUsuario(usuario.username).exist){
+        if(!(await this.buscaPorEmailDeUsuario(usuario.email)).exist && !(await this.buscaPorNomeDeUsuario(usuario.username)).exist){
 
-            const { email, senha, username } = usuario;
+            const { email, password, username } = usuario;
             
-            const userFilter = {email: email, senha: await this.setHash(senha), username, id: this.usuarios.length};
+            const userFilter = {email: email, password: await this.setHash(password), username, id: this.usuarios.length};
             this.usuarios.push(userFilter);
+            const createdUser = new this.userModel(userFilter);
+            createdUser.save();
             console.log(userFilter);
             
             return {r: true, data: "Registrado com sucesso!", status: HttpStatus.CREATED};
@@ -41,10 +46,10 @@ export class UsuarioService extends AuthService {
 
             console.log(this.buscaPorEmailDeUsuario(usuario.email));
 
-            if(this.buscaPorEmailDeUsuario(usuario.email).exist && this.buscaPorNomeDeUsuario(usuario.username).exist){
+            if((await this.buscaPorEmailDeUsuario(usuario.email)).exist && (await this.buscaPorNomeDeUsuario(usuario.username)).exist){
                 return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
             }else{
-                const emailAndNameExist = this.buscaPorEmailDeUsuario(usuario.email).exist? "E-mail":"Nome"; 
+                const emailAndNameExist = (await this.buscaPorEmailDeUsuario(usuario.email)).exist? "E-mail":"Nome"; 
     
                 return {r: false, data: `${emailAndNameExist} já existe na base de dados!`, status: HttpStatus.BAD_REQUEST};
             };
@@ -55,14 +60,19 @@ export class UsuarioService extends AuthService {
 
     public async login(usuario: Usuario): Promise<response> {
 
-        if(this.buscaPorEmailDeUsuario(usuario.email).exist){
+        if((await this.buscaPorEmailDeUsuario(usuario.email)).exist){
 
-            const userFound = this.buscaPorEmailDeUsuario(usuario.email);
+            const userFound = await this.userModel.findOne({ "email":usuario.email })
+            .exec()
+            .then((doc) => doc?.toObject())
+            .catch((err) => err);
 
-            const { email, senha } = usuario;
+            console.log(userFound)
 
-            const verification = await this.compareHashedPasswordAndPassword(senha, userFound.senha);
-            const userFilter = {email: email};
+            const { email, password, username, _id } = userFound;
+
+            const verification = await this.compareHashedPasswordAndPassword(usuario.password, userFound.password);
+            const userFilter = {email: email, username: username, id: _id};
 
             if(!verification){
                 return {r: false, data: "Senha incorreta!", status: HttpStatus.BAD_REQUEST}
@@ -72,7 +82,7 @@ export class UsuarioService extends AuthService {
                 r: true, 
                 data: {
                     userFilter, 
-                    token: await this.generateAccessToken({user: userFilter, type: "acces"}), 
+                    token: await this.generateAccessToken({user: userFilter, type: "access"}), 
                     refreshToken: await this.generateRefreshToken({user: userFilter, type: "refresh"})
                 }, 
                 status: HttpStatus.ACCEPTED
@@ -83,7 +93,7 @@ export class UsuarioService extends AuthService {
         };
     };
 
-    public async uploadImage(file, code: string): Promise<response>{
+    public async uploadImage(file, code: string, token: string): Promise<response>{
         console.log(file)
         console.log(code)
 
@@ -130,6 +140,11 @@ export class UsuarioService extends AuthService {
                     const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
                         path: result.result.path_display,
                     });
+
+                    const verifyToken = await this.verifyToken(token, "access");
+                    console.log(verifyToken)
+                    const user = this.userModel.findById(verifyToken.id);
+                    user.set("img_profile", sharedLink.result.url.replace("?dl=0", "?raw=1"));
                     return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED}
                 }
             }
@@ -159,23 +174,23 @@ export class UsuarioService extends AuthService {
         return data
     };
 
-    public buscaPorEmailDeUsuario(email: string): Usuario {
-        const usuarioEncontrado = this.usuarios.find(usuario => usuario.email == email);
+    public async buscaPorEmailDeUsuario(email: string): Promise<responseBuscaPorEmailDeUsuario> {
+        const usuarioEncontrado = await this.userModel.findOne({ email }).exec();
 
-        if(usuarioEncontrado != undefined){
-            return {...usuarioEncontrado, exist: true}
+        if(usuarioEncontrado){
+            return {exist: true}
         };
 
-        return {...usuarioEncontrado, exist: false};
+        return {exist: false};
     };
 
-    public buscaPorNomeDeUsuario(name: string): Usuario {
-        const usuarioEncontrado = this.usuarios.find(usuario => usuario.username == name);
+    public async buscaPorNomeDeUsuario(name: string): Promise<responseBuscaPorNomeDeUsuario> {
+        const usuarioEncontrado = await this.userModel.findOne({ name }).exec();
 
-        if(usuarioEncontrado != undefined){
-            return {...usuarioEncontrado, exist: true}
+        if(usuarioEncontrado){
+            return {exist: true}
         };
 
-        return {...usuarioEncontrado, exist: false};
+        return {exist: false};
     };
 };

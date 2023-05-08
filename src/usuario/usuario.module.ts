@@ -5,14 +5,20 @@ import { IsEmailDeUsuarioUnicoConstraint } from "./is-email-de-usuario-unico.val
 import { BcryptService } from "./bcrypt/bcrypt.service";
 import { AuthService } from "./accessTokenAndRefreshToken/AuthService";
 import { JwtService } from "@nestjs/jwt";
+import { Model } from "mongoose";
+import { MongooseModule } from "@nestjs/mongoose";
+import { User, UserSchema } from "src/mongoDb/user.schema";
 @Module({
+    imports: [
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    ],
     controllers: [UsuarioController],
     providers: [
         UsuarioService,
         IsEmailDeUsuarioUnicoConstraint,
         BcryptService,
         AuthService,
-        JwtService
+        JwtService,
     ]
 })
 export class UsuarioModule {}

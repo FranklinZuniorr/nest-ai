@@ -3,3 +3,11 @@ export interface response{
     data: any,
     status: number
 };
+
+export interface responseBuscaPorEmailDeUsuario{
+    exist: boolean
+};
+
+export interface responseBuscaPorNomeDeUsuario{
+    exist: boolean
+};

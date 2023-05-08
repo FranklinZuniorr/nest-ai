@@ -4,10 +4,12 @@ import { UsuarioModule } from './usuario/usuario.module';
 import { FitroDeExcecaoHttp } from './common/filtros/filtro-de-excecao-http.filter';
 import { TransformaRespostaInterceptor } from './core/http/transforma-resposta.interceptor';
 import { AiModule } from './gpt/ai.module';
-import { AuthService } from './usuario/accessTokenAndRefreshToken/AuthService';
-import { JwtService } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
+import { DatabaseModule } from './mongoDb/dataBase.module';
+import { UsuarioController } from './usuario/usuario.controller';
+import { AiController } from './gpt/ai.controller';
 @Module({
-  imports: [UsuarioModule, AiModule],
+  imports: [UsuarioModule, AiModule, DatabaseModule ],
   controllers: [],
   providers: [
     {

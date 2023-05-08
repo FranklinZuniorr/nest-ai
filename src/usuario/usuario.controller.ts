@@ -69,7 +69,7 @@ export class UsuarioController {
 
         if(dataVerifyAccessToken.r){
             console.log("Acces OK")
-            const data = await this.usuarioService.uploadImage(file, code);
+            const data = await this.usuarioService.uploadImage(file, code, accessToken);
     
             return new NestResponseBuilder()
             .comStatus(data.status)
@@ -147,6 +147,3 @@ export class UsuarioController {
         return result;
     } */
 }
-
-const usuarioService = new UsuarioService();
-const teste = new UsuarioController(usuarioService);
