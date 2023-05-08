@@ -1,10 +1,11 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
+import { UsuarioEdit } from './usuario.entity.edit';
 @Controller('/')
 export class UsuarioController {
 
@@ -38,6 +39,33 @@ export class UsuarioController {
         .build();
 
     };
+
+    @Put('edit-user')
+    public async editUser(@Body() usuario: UsuarioEdit, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
+
+        const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken);
+
+        if(dataVerifyAccessToken.r){
+            const data = await this.usuarioService.edit(accessToken, usuario);
+    
+            return new NestResponseBuilder()
+            .comStatus(data.status)
+            .comHeaders({
+                'Info': data.r
+            })
+            .comBody(data)
+            .build();
+        }
+
+        return new NestResponseBuilder()
+        .comStatus(dataVerifyAccessToken.status)
+        .comHeaders({
+            'Info': dataVerifyAccessToken.r
+        })
+        .comBody(dataVerifyAccessToken)
+        .build();
+
+    }
 
     @Post('login')
     public async loginUser(@Body() usuario: Usuario): Promise<NestResponse> {

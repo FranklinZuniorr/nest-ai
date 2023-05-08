@@ -13,6 +13,7 @@ import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
+import { UsuarioEdit } from './usuario.entity.edit';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -42,6 +43,48 @@ export class UsuarioService extends AuthService {
                 return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
             }else{
                 const emailAndNameExist = (await this.buscaPorEmailDeUsuario(usuario.email)).exist? "E-mail":"Nome"; 
+    
+                return {r: false, data: `${emailAndNameExist} já existe na base de dados!`, status: HttpStatus.BAD_REQUEST};
+            };
+
+        };
+
+    };
+
+    public async edit(token: string, body: UsuarioEdit): Promise<response> {
+
+        const verifyToken = await this.verifyToken(token, "access");
+        const { username, email, password } = body;
+
+        if(!(await this.buscaPorEmailDeUsuario(email)).exist && !(await this.buscaPorNomeDeUsuario(username)).exist){
+
+            const verifyCond = (data) => {
+                if(data != undefined && data != "" && data != null){
+                    return true
+                };
+
+                return false
+            };
+
+            const user = await this.userModel.findByIdAndUpdate(
+                verifyToken.user.id,
+                { $set: { ...(verifyCond(username) && {username}), ...(verifyCond(email) && {email: email.toLowerCase()}), ...(verifyCond(password) && {password: await this.setHash(password)}) } },
+                { new: true }
+            ).exec();
+        
+            if (user) {
+                console.log(user);
+                return { r: true, data: "Editado com sucesso!", status: HttpStatus.OK };
+            }
+        
+            return { r: false, data: "Usuário não foi encontrado!", status: HttpStatus.CREATED };
+
+        }else{
+
+            if((await this.buscaPorEmailDeUsuario(email)).exist && (await this.buscaPorNomeDeUsuario(username)).exist){
+                return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
+            }else{
+                const emailAndNameExist = (await this.buscaPorEmailDeUsuario(email)).exist? "E-mail":"Nome"; 
     
                 return {r: false, data: `${emailAndNameExist} já existe na base de dados!`, status: HttpStatus.BAD_REQUEST};
             };
