@@ -54,34 +54,30 @@ export class UsuarioService extends AuthService {
     public async edit(token: string, body: UsuarioEdit): Promise<response> {
 
         const verifyToken = await this.verifyToken(token, "access");
+        let exist = undefined;
         const { username, email, password } = body;
 
-        if(!(await this.buscaPorEmailDeUsuario(email)).exist && !(await this.buscaPorNomeDeUsuario(username)).exist){
-
-            const verifyCond = (data) => {
-                if(data != undefined && data != "" && data != null){
-                    return true
-                };
-
-                return false
+        const verifyCond = (data) => {
+            if(data != undefined && data != "" && data != null){
+                return true
             };
 
-            const user = await this.userModel.findByIdAndUpdate(
-                verifyToken.user.id,
-                { $set: { ...(verifyCond(username) && {username}), ...(verifyCond(email) && {email: email.toLowerCase()}), ...(verifyCond(password) && {password: await this.setHash(password)}) } },
-                { new: true }
-            ).exec();
-        
-            if (user) {
-                console.log(user);
-                return { r: true, data: "Editado com sucesso!", status: HttpStatus.OK };
-            }
-        
-            return { r: false, data: "Usuário não foi encontrado!", status: HttpStatus.CREATED };
+            return false
+        };
+
+        if(!(await this.buscaPorEmailDeUsuario(email)).exist && 
+        (await this.buscaPorEmailDeUsuario(email)).exist != undefined && 
+        !(await this.buscaPorNomeDeUsuario(username)).exist &&
+        (await this.buscaPorNomeDeUsuario(username)).exist != undefined){
+
+            exist = false;
 
         }else{
 
-            if((await this.buscaPorEmailDeUsuario(email)).exist && (await this.buscaPorNomeDeUsuario(username)).exist){
+            if((await this.buscaPorEmailDeUsuario(email)).exist && 
+            (await this.buscaPorEmailDeUsuario(email)).exist != undefined && 
+            (await this.buscaPorNomeDeUsuario(username)).exist && 
+            (await this.buscaPorNomeDeUsuario(username)).exist != undefined){
                 return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
             }else{
                 const emailAndNameExist = (await this.buscaPorEmailDeUsuario(email)).exist? "E-mail":"Nome"; 
@@ -90,6 +86,20 @@ export class UsuarioService extends AuthService {
             };
 
         };
+
+
+        const user = await this.userModel.findByIdAndUpdate(
+            verifyToken.user.id,
+            { $set: { ...(verifyCond(username) && !exist && {username}), ...(verifyCond(email) && !exist && {email: email.toLowerCase()}), ...(verifyCond(password) && !exist && {password: await this.setHash(password)}) } },
+            { new: true }
+        ).exec();
+    
+        if (user) {
+            console.log(user);
+            return { r: true, data: "Editado com sucesso!", status: HttpStatus.OK };
+        }
+    
+        return { r: false, data: "Usuário não foi encontrado!", status: HttpStatus.CREATED };
 
     };
 
@@ -208,23 +218,31 @@ export class UsuarioService extends AuthService {
     };
 
     public async buscaPorEmailDeUsuario(email: string): Promise<responseBuscaPorEmailDeUsuario> {
-        const filterEmail = email.toLowerCase();
-        const usuarioEncontrado = await this.userModel.findOne({ email: filterEmail }).exec();
-
-        if(usuarioEncontrado){
-            return {exist: true}
+        if(email != undefined){
+            const filterEmail = email.toLowerCase();
+            const usuarioEncontrado = await this.userModel.findOne({ email: filterEmail }).exec();
+    
+            if(usuarioEncontrado){
+                return {exist: true}
+            };
+    
+            return {exist: false};
         };
 
-        return {exist: false};
+        return {exist: undefined}
     };
 
     public async buscaPorNomeDeUsuario(username: string): Promise<responseBuscaPorNomeDeUsuario> {
-        const usuarioEncontrado = await this.userModel.findOne({ username }).exec();
-
-        if(usuarioEncontrado){
-            return {exist: true}
+        if(username != undefined){
+            const usuarioEncontrado = await this.userModel.findOne({ username }).exec();
+    
+            if(usuarioEncontrado){
+                return {exist: true}
+            };
+    
+            return {exist: false};
         };
 
-        return {exist: false};
+        return {exist: undefined}
     };
 };
