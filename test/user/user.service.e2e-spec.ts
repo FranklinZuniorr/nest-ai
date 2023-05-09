@@ -10,11 +10,14 @@ import { Usuario } from "src/usuario/usuario.entity";
 import * as request from 'supertest';
 import { HttpStatus } from "@nestjs/common";
 import { response } from "src/responseDto/response";
+import { AuthService } from "src/usuario/accessTokenAndRefreshToken/AuthService";
+import { UsuarioEdit } from "src/usuario/usuario.entity.edit";
 
 require("dotenv").config("./.env")
 
 describe("AppController", () => {
   let appController: UsuarioController;
+  let appService: AuthService;
   let mongod: MongoMemoryServer;
   let mongoConnection: Connection;
   let articleModel: Model<User>;
@@ -65,24 +68,41 @@ describe("AppController", () => {
         password: 'password123',
       };
 
-      const response = appController.createUser(user)
+      const response = appController.createUser(user);
 
       expect((await response).status).toBe(HttpStatus.CREATED);
       expect((await response).body).toMatchObject(responseInterface);
     });
 
+    let token;
+
     it('Should login a user and return a response with the correct interface', async () => {
         const user: Usuario = {
           username: 'testuser',
           email: 'testuser@example.com',
-          password: 'password123',
+          password: 'password123'
         };
   
-        const response = appController.loginUser(user)
+        const response = await appController.loginUser(user);
+        console.log((await response).body)
+        token = response.body;
   
         expect((await response).status).toBe(HttpStatus.ACCEPTED);
         expect((await response).body).toMatchObject(responseInterface);
-      });
+    });
+
+    it('Should edit a user and return a response with the correct interface', async () => {
+        const user: UsuarioEdit = {
+            username: 'testedivcxt'
+        };
+
+        console.log(token.data.token)
+
+        const response = appController.editUser(user, token.data.token);
+        console.log((await response).body)
+        expect((await response).status).toBe(HttpStatus.OK);
+        expect((await response).body).toMatchObject(responseInterface);
+    })
   });
 
 })
