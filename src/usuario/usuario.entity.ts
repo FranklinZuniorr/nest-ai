@@ -3,7 +3,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { IsEmailDeUsuarioUnico } from './is-email-de-usuario-unico.validator';
 
 export class Usuario {
-    id: number;
+    id?: number;
 
 
     @Expose({
