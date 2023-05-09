@@ -109,7 +109,7 @@ export class UsuarioService extends AuthService {
         const user = await this.userModel.findByIdAndRemove(
             verifyToken.user.id,
             { select: "email" }
-        ).exec();
+        ).exec()
     
         if (user) {
             console.log(user);
