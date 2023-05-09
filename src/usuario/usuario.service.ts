@@ -61,14 +61,6 @@ export class UsuarioService extends AuthService {
         let exist = undefined;
         const { username, email, password } = body;
 
-        const verifyCond = (data) => {
-            if(data != undefined && data != "" && data != null){
-                return true
-            };
-
-            return false
-        };
-
         if(!(await this.buscaPorEmailDeUsuario(email)).exist && 
         (await this.buscaPorEmailDeUsuario(email)).exist != undefined && 
         !(await this.buscaPorNomeDeUsuario(username)).exist &&
@@ -91,17 +83,38 @@ export class UsuarioService extends AuthService {
 
         };
 
-
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
-            { $set: { ...(verifyCond(username) && !exist && {username}), ...(verifyCond(email) && !exist && {email: email.toLowerCase()}), ...(verifyCond(password) && !exist && {password: await this.setHash(password)}) } },
+            { $set: { 
+            ...(utils.verifyCond(username) && !exist && {username}), 
+            ...(utils.verifyCond(email) && !exist && {email: email.toLowerCase()}), 
+            ...(utils.verifyCond(password) && !exist && {password: await this.setHash(password)}) 
+            }},
             { new: true }
         ).exec();
     
         if (user) {
             console.log(user);
-            return { r: true, data: "Editado com sucesso!", status: HttpStatus.OK };
-        }
+            return { r: true, data: `${user.email} editado com sucesso!`, status: HttpStatus.OK };
+        };
+    
+        return { r: false, data: "Usuário não foi encontrado!", status: HttpStatus.CREATED };
+
+    };
+
+    public async delete(token: string): Promise<response>{
+
+        const verifyToken = await this.verifyToken(token, "access");
+
+        const user = await this.userModel.findByIdAndRemove(
+            verifyToken.user.id,
+            { select: "email" }
+        ).exec();
+    
+        if (user) {
+            console.log(user);
+            return { r: true, data: `${user.email} deletado com sucesso!`, status: HttpStatus.OK };
+        };
     
         return { r: false, data: "Usuário não foi encontrado!", status: HttpStatus.CREATED };
 
@@ -161,7 +174,7 @@ export class UsuarioService extends AuthService {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-            }).then(res => res).catch(err => err)
+            }).then(res => res).catch(err => err);
 
             console.log(response)
 
@@ -201,11 +214,10 @@ export class UsuarioService extends AuthService {
             /* axios.get("https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/")
             .then(res => console.log(res)).catch(err => console.) */
     
-            return {r: false, data: {info: utils.errorExternalServicesTreatment(response), dropBox: response.response.data}, status: HttpStatus.BAD_REQUEST}
+            return {r: false, data: {info: utils.errorExternalServicesTreatment(response), dropBox: response.response.data}, status: HttpStatus.BAD_REQUEST};
         }
 
-        return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.ACCEPTED}
-
+        return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.ACCEPTED};
 
     }
 

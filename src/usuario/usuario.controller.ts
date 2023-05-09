@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put, Delete } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
@@ -55,7 +55,7 @@ export class UsuarioController {
             })
             .comBody(data)
             .build();
-        }
+        };
 
         return new NestResponseBuilder()
         .comStatus(dataVerifyAccessToken.status)
@@ -65,7 +65,34 @@ export class UsuarioController {
         .comBody(dataVerifyAccessToken)
         .build();
 
-    }
+    };
+
+    @Delete('delete-user')
+    public async removeUser(@Headers('accessToken') accessToken: string): Promise<NestResponse>{
+
+        const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken);
+
+        if(dataVerifyAccessToken.r){
+            const data = await this.usuarioService.delete(accessToken);
+    
+            return new NestResponseBuilder()
+            .comStatus(data.status)
+            .comHeaders({
+                'Info': data.r
+            })
+            .comBody(data)
+            .build();
+        };
+
+        return new NestResponseBuilder()
+        .comStatus(dataVerifyAccessToken.status)
+        .comHeaders({
+            'Info': dataVerifyAccessToken.r
+        })
+        .comBody(dataVerifyAccessToken)
+        .build();
+
+    };
 
     @Post('login')
     public async loginUser(@Body() usuario: Usuario): Promise<NestResponse> {
@@ -80,7 +107,7 @@ export class UsuarioController {
         .comBody(userLogged)
         .build();
 
-    }
+    };
 
     @Post('upload-image')
     @UseInterceptors(FileInterceptor('file' , {
@@ -106,7 +133,7 @@ export class UsuarioController {
             })
             .comBody(data)
             .build();
-        }
+        };
 
         return new NestResponseBuilder()
         .comStatus(dataVerifyAccessToken.status)
@@ -116,7 +143,7 @@ export class UsuarioController {
         .comBody(dataVerifyAccessToken)
         .build();
 
-    }
+    };
 
     @Post('refresh-token')
     async verifyRefreshToken(@Body() refreshToken: refreshDto): Promise<NestResponse>{
@@ -129,7 +156,7 @@ export class UsuarioController {
         })
         .comBody(data)
         .build();
-    }
+    };
 
     /* @UseInterceptors(FileInterceptor('file', {
         storage: memoryStorage(),
