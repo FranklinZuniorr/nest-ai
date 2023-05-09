@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put, Delete, UseGuards } from '@nestjs/common';
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario.entity';
 import { NestResponse } from '../core/http/nest-response';
@@ -6,6 +6,7 @@ import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
 import { UsuarioEdit } from './usuario.entity.edit';
+import { email } from './email.entity';
 @Controller('/')
 export class UsuarioController {
 
@@ -92,6 +93,19 @@ export class UsuarioController {
         .comBody(dataVerifyAccessToken)
         .build();
 
+    };
+
+    @Post('forget-password')
+    public async forgetPassword(@Body() email: email){
+        const data = await this.usuarioService.editPassword(email);
+
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
     };
 
     @Post('login')

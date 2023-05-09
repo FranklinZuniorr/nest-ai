@@ -14,6 +14,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { UsuarioEdit } from './usuario.entity.edit';
+import { email } from './email.entity';
+const nodemailer = require('nodemailer');
 
 const jwtService = new JwtService();
 @Injectable()
@@ -38,17 +40,17 @@ export class UsuarioService extends AuthService {
             createdUser.save();
             console.log(userFilter);
             
-            return {r: true, data: "Registrado com sucesso!", status: HttpStatus.CREATED};
+            return {r: true, data: {msg: "Registrado com sucesso!"}, status: HttpStatus.CREATED};
         }else{
 
             console.log(this.buscaPorEmailDeUsuario(usuario.email));
 
             if((await this.buscaPorEmailDeUsuario(usuario.email)).exist && (await this.buscaPorNomeDeUsuario(usuario.username)).exist){
-                return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
+                return {r: false, data: {msg: `E-mail e nome já existem na base de dados!`}, status: HttpStatus.BAD_REQUEST};
             }else{
                 const emailAndNameExist = (await this.buscaPorEmailDeUsuario(usuario.email)).exist? "E-mail":"Nome"; 
     
-                return {r: false, data: `${emailAndNameExist} já existe na base de dados!`, status: HttpStatus.BAD_REQUEST};
+                return {r: false, data: {msg: `${emailAndNameExist} já existe na base de dados!`}, status: HttpStatus.BAD_REQUEST};
             };
 
         };
@@ -74,11 +76,11 @@ export class UsuarioService extends AuthService {
             (await this.buscaPorEmailDeUsuario(email)).exist != undefined && 
             (await this.buscaPorNomeDeUsuario(username)).exist && 
             (await this.buscaPorNomeDeUsuario(username)).exist != undefined){
-                return {r: false, data: `E-mail e nome já existem na base de dados!`, status: HttpStatus.BAD_REQUEST};
+                return {r: false, data: {msg: `E-mail e nome já existem na base de dados!`}, status: HttpStatus.BAD_REQUEST};
             }else{
                 const emailAndNameExist = (await this.buscaPorEmailDeUsuario(email)).exist? "E-mail":"Nome"; 
     
-                return {r: false, data: `${emailAndNameExist} já existe na base de dados!`, status: HttpStatus.BAD_REQUEST};
+                return {r: false, data: {msg: `${emailAndNameExist} já existe na base de dados!`}, status: HttpStatus.BAD_REQUEST};
             };
 
         };
@@ -95,10 +97,10 @@ export class UsuarioService extends AuthService {
     
         if (user) {
             console.log(user);
-            return { r: true, data: `${user.email} editado com sucesso!`, status: HttpStatus.OK };
+            return { r: true, data: {msg: `${user.email} editado com sucesso!`}, status: HttpStatus.OK };
         };
     
-        return { r: false, data: "Usuário não foi encontrado!", status: HttpStatus.CREATED };
+        return { r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.CREATED };
 
     };
 
@@ -109,14 +111,14 @@ export class UsuarioService extends AuthService {
         const user = await this.userModel.findByIdAndRemove(
             verifyToken.user.id,
             { select: "email" }
-        ).exec()
+        ).exec();
     
         if (user) {
             console.log(user);
-            return { r: true, data: `${user.email} deletado com sucesso!`, status: HttpStatus.OK };
+            return { r: true, data: {msg: `${user.email} deletado com sucesso!`}, status: HttpStatus.OK };
         };
     
-        return { r: false, data: "Usuário não foi encontrado!", status: HttpStatus.CREATED };
+        return { r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.CREATED };
 
     };
 
@@ -133,11 +135,11 @@ export class UsuarioService extends AuthService {
 
             const { email, password, username, _id } = userFound;
 
-            const verification = await this.compareHashedPasswordAndPassword(usuario.password, userFound.password);
+            const verification = await this.compareHashedPasswordAndPassword(usuario.password, password);
             const userFilter = {email: email, username: username, id: _id};
 
             if(!verification){
-                return {r: false, data: "Senha incorreta!", status: HttpStatus.BAD_REQUEST}
+                return {r: false, data: {msg: "Senha incorreta!"}, status: HttpStatus.BAD_REQUEST}
             };
             
             return {
@@ -151,7 +153,7 @@ export class UsuarioService extends AuthService {
             };
 
         }else{
-            return {r: false, data: "Usuário não foi encontrado!", status: HttpStatus.BAD_REQUEST};
+            return {r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
         };
     };
 
@@ -181,8 +183,8 @@ export class UsuarioService extends AuthService {
             if(response.statusText === "OK"){
                 const dropbox = new Dropbox.Dropbox({
                     accessToken: response.data.access_token,
-                    clientId: "i8p06kgx6l9hvyk",
-                    clientSecret: "9rfn9d72o3ozhua"
+                    clientId: process.env.DROPBOX_CLIENT_ID,
+                    clientSecret: process.env.DROPBOX_CLIENT_SECRET
                 });
         
                 const result = await dropbox.filesUpload({
@@ -203,10 +205,10 @@ export class UsuarioService extends AuthService {
                     console.log("------------")
                     console.log(user)
                     console.log("------------")
-                    return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result}, status: HttpStatus.CREATED};
+                    return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result, msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
                 }
 
-                return {r: false, data: "Erro ao fazer upload da imagem, tente novamente.", status: HttpStatus.INTERNAL_SERVER_ERROR};
+                return {r: false, data: {msg: "Erro ao fazer upload da imagem, tente novamente."}, status: HttpStatus.INTERNAL_SERVER_ERROR};
             }
 
 
@@ -219,7 +221,29 @@ export class UsuarioService extends AuthService {
 
         return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.ACCEPTED};
 
-    }
+    };
+
+    public async editPassword(emailInfo: email): Promise<response>{
+
+        if(utils.verifyCond(emailInfo)){
+
+            const userFound = await this.userModel.findOne({ "email":emailInfo.email.toLowerCase() })
+            .exec();
+
+            console.log(userFound)
+
+            if(userFound){
+                return await utils.sendEmail("link..", "Alteração de senha.", emailInfo.email);
+            }else{
+                return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST}
+            };
+
+
+        }else{
+            return {r: false, data: {msg: "E-mail não foi enviado!"}, status: HttpStatus.BAD_REQUEST}
+        };
+
+    };
 
     //-------------------------------------------------------
 
