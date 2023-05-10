@@ -60,37 +60,30 @@ export class UsuarioService extends AuthService {
     public async edit(token: string, body: UsuarioEdit): Promise<response> {
 
         const verifyToken = await this.verifyToken(token, "access");
-        let exist = undefined;
+        let exist = {
+            username: undefined,
+            email: undefined
+        };
         const { username, email, password } = body;
 
-        if(!(await this.buscaPorEmailDeUsuario(email)).exist && 
-        (await this.buscaPorEmailDeUsuario(email)).exist != undefined && 
-        !(await this.buscaPorNomeDeUsuario(username)).exist &&
-        (await this.buscaPorNomeDeUsuario(username)).exist != undefined){
+        (await this.buscaPorEmailDeUsuario(email)).exist? exist.email = true:false;
+        (await this.buscaPorNomeDeUsuario(username)).exist? exist.username = true:false;
 
-            exist = false;
 
-        }else{
+        if(exist.email && exist.username){
+            return {r: false, data: {msg: `E-mail e nome já existem na base de dados!`}, status: HttpStatus.BAD_REQUEST};
+        };
 
-            if((await this.buscaPorEmailDeUsuario(email)).exist && 
-            (await this.buscaPorEmailDeUsuario(email)).exist != undefined && 
-            (await this.buscaPorNomeDeUsuario(username)).exist && 
-            (await this.buscaPorNomeDeUsuario(username)).exist != undefined){
-                return {r: false, data: {msg: `E-mail e nome já existem na base de dados!`}, status: HttpStatus.BAD_REQUEST};
-            }else{
-                const emailAndNameExist = (await this.buscaPorEmailDeUsuario(email)).exist? "E-mail":"Nome"; 
-    
-                return {r: false, data: {msg: `${emailAndNameExist} já existe na base de dados!`}, status: HttpStatus.BAD_REQUEST};
-            };
-
+        if(exist.email || exist.username){
+            return {r: false, data: {msg: `${exist.email? "E-mail":"Nome"} já existe na base de dados!`}, status: HttpStatus.BAD_REQUEST};
         };
 
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
             { $set: { 
-            ...(utils.verifyCond(username) && !exist && {username}), 
-            ...(utils.verifyCond(email) && !exist && {email: email.toLowerCase()}), 
-            ...(utils.verifyCond(password) && !exist && {password: await this.setHash(password)}) 
+            ...(utils.verifyCond(username) && !exist.username && {username}), 
+            ...(utils.verifyCond(email) && !exist.email && {email: email.toLowerCase()}), 
+            ...(utils.verifyCond(password) && {password: await this.setHash(password)}) 
             }},
             { new: true }
         ).exec();
