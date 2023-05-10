@@ -3,7 +3,7 @@ import { Ai } from './ai.entity';
 import { AuthService } from 'src/usuario/accessTokenAndRefreshToken/AuthService';
 import { JwtService } from '@nestjs/jwt';
 import { utils } from 'src/utils/utils';
-import { UsuarioService } from 'src/usuario/usuario.service';
+import { UsuarioService } from 'src/usuario/user.service';
 import axios from 'axios';
 require("dotenv").config();
 @Injectable()

@@ -4,15 +4,15 @@ import { Connection, connect, Model } from "mongoose";
 import { getModelToken } from "@nestjs/mongoose";
 import { User } from "src/mongoDb/user.schema";
 import { UserSchema } from "src/mongoDb/user.schema";
-import { UsuarioController } from "src/usuario/usuario.controller";
-import { UsuarioService } from "src/usuario/usuario.service";
-import { Usuario } from "src/usuario/usuario.entity";
+import { UsuarioController } from "src/usuario/user.controller";
+import { UsuarioService } from "src/usuario/user.service";
+import { Usuario } from "src/usuario/user.entity";
 import * as request from 'supertest';
 import { HttpStatus } from "@nestjs/common";
-import { response } from "src/responseDto/response";
 import { AuthService } from "src/usuario/accessTokenAndRefreshToken/AuthService";
-import { UsuarioEdit } from "src/usuario/usuario.entity.edit";
+import { UsuarioEdit } from "src/usuario/user.entity.edit";
 import * as fs from 'fs';
+import { response } from "src/core/http/responseDto/response";
 
 require("dotenv").config("./.env")
 

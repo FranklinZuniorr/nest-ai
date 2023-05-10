@@ -1,8 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { refreshDto } from './refreshAndAccessDto';
-import { response } from 'src/responseDto/response';
 import { utils } from 'src/utils/utils';
+import { response } from 'src/core/http/responseDto/response';
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {};
@@ -37,7 +37,7 @@ export class AuthService {
 
     console.log(refreshToken.refreshToken)
 
-    if(refreshToken.refreshToken != undefined){
+    if(utils.verifyCond(refreshToken.refreshToken)){
 
       const verify = await this.verifyToken(refreshToken.refreshToken, "refresh");
   
@@ -78,7 +78,7 @@ export class AuthService {
 
   public async verifyAccessTokenPass(accessToken: string): Promise<response>{
 
-    if(accessToken != ""){
+    if(utils.verifyCond(accessToken)){
       const verify = await this.verifyToken(accessToken, "access");
       console.log(verify)
           

@@ -1,5 +1,6 @@
 import { HttpStatus } from "@nestjs/common";
-import { response } from "src/responseDto/response";
+import { response } from "src/core/http/responseDto/response";
+
 
 const nodemailer = require('nodemailer');
 export class utils{

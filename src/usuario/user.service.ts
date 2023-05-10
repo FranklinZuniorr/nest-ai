@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { Usuario } from './usuario.entity';
+import { Usuario } from './user.entity';
 import { BcryptService } from './bcrypt/bcrypt.service';
 import { memoryStorage } from 'multer';
 import { extname } from 'path';
@@ -7,13 +7,13 @@ import * as Dropbox from 'dropbox';
 import { AuthService } from './accessTokenAndRefreshToken/AuthService';
 import { JwtService } from '@nestjs/jwt';
 import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
-import { response, responseBuscaPorEmailDeUsuario, responseBuscaPorNomeDeUsuario } from 'src/responseDto/response';
+import { response, responseBuscaPorEmailDeUsuario, responseBuscaPorNomeDeUsuario } from 'src/core/http/responseDto/response';
 import { utils } from 'src/utils/utils';
 import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
-import { UsuarioEdit } from './usuario.entity.edit';
+import { UsuarioEdit } from './user.entity.edit';
 import { email } from './email.entity';
 
 const jwtService = new JwtService();

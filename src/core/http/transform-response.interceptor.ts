@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { NestResponse } from './nest-response';
 
 @Injectable()
-export class TransformaRespostaInterceptor implements NestInterceptor {
+export class TransformResponseInterceptor implements NestInterceptor {
 
     private httpAdapter: AbstractHttpAdapter;
 

@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 import { AiService } from "./ai.service";
 import { AiController } from "./ai.controller";
-import { UsuarioModule } from "src/usuario/usuario.module";
-import { UsuarioService } from "src/usuario/usuario.service";
+import { UsuarioModule } from "src/usuario/user.module";
+import { UsuarioService } from "src/usuario/user.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "src/mongoDb/user.schema";
 

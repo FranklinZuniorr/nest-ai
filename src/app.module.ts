@@ -1,8 +1,8 @@
 import { Module, ClassSerializerInterceptor } from '@nestjs/common';
 import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
-import { UsuarioModule } from './usuario/usuario.module';
-import { FitroDeExcecaoHttp } from './common/filtros/filtro-de-excecao-http.filter';
-import { TransformaRespostaInterceptor } from './core/http/transforma-resposta.interceptor';
+import { UsuarioModule } from './usuario/user.module';
+import { FilterOfExceptionHttp } from './common/filtros/filter-of-exception-http.filter';
+import { TransformResponseInterceptor } from './core/http/transform-response.interceptor';
 import { AiModule } from './gpt/ai.module';
 import { DatabaseModule } from './mongoDb/dataBase.module';
 @Module({
@@ -11,7 +11,7 @@ import { DatabaseModule } from './mongoDb/dataBase.module';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: FitroDeExcecaoHttp
+      useClass: FilterOfExceptionHttp
     },
     {
       provide: APP_INTERCEPTOR,
@@ -19,7 +19,7 @@ import { DatabaseModule } from './mongoDb/dataBase.module';
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: TransformaRespostaInterceptor
+      useClass: TransformResponseInterceptor
     }
   ],
 })

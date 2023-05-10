@@ -1,12 +1,14 @@
 import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put, Delete, UseGuards } from '@nestjs/common';
-import { UsuarioService } from './usuario.service';
-import { Usuario } from './usuario.entity';
+import { UsuarioService } from './user.service';
+import { Usuario } from './user.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
-import { UsuarioEdit } from './usuario.entity.edit';
+import { UsuarioEdit } from './user.entity.edit';
 import { email } from './email.entity';
+import { JwtMiddleware } from 'src/core/http/verify-token-middleware';
+
 @Controller('/')
 export class UsuarioController {
 
