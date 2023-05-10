@@ -44,7 +44,7 @@ export class AuthService {
       if(verify.name === 'TokenExpiredError') {
           return {
               r: false, 
-              data: {...verify, name: "RefreshTokenExpiredError"},
+              data: {...verify, msg: "RefreshTokenExpiredError!"},
               status: HttpStatus.BAD_REQUEST
           };
       };
@@ -52,7 +52,7 @@ export class AuthService {
       if(verify.name === "JsonWebTokenError"){
         return {
             r: false, 
-            data: utils.errorExternalServicesTreatment(verify),
+            data: {info: utils.errorExternalServicesTreatment(verify), msg: "JsonWebRefreshTokenError!"},
             status: HttpStatus.BAD_REQUEST
         };
       };
@@ -60,7 +60,7 @@ export class AuthService {
       return {
           r: true, 
           data: {
-              msg: "RefreshTokenOk",
+              msg: "RefreshTokenOk!",
               token: await this.generateAccessToken({user: verify.user.email, type: "acces"}), 
               refreshToken: await this.generateRefreshToken({user: verify.user.email, type: "refresh"})
           }, 
@@ -70,7 +70,7 @@ export class AuthService {
 
     return {
       r: false, 
-      data: "Nenhum refreshToken encontrado",
+      data: {msg: "Nenhum refreshToken encontrado!"},
       status: HttpStatus.BAD_REQUEST
     };
 
@@ -86,7 +86,7 @@ export class AuthService {
       if(verify.name === 'TokenExpiredError') {
           return {
               r: false, 
-              data: "AccessTokenExpiredError",
+              data: {msg: "AccessTokenExpiredError!"},
               status: HttpStatus.BAD_REQUEST
           };
       };
@@ -94,21 +94,21 @@ export class AuthService {
       if(verify.name === "JsonWebTokenError"){
         return {
             r: false, 
-            data: utils.errorExternalServicesTreatment(verify),
+            data: {info: utils.errorExternalServicesTreatment(verify), msg: "JsonWebAccessTokenError!"},
             status: HttpStatus.BAD_REQUEST
         };
       };
       
       return {
           r: true, 
-          data: "AccessTokenOk", 
+          data: {msg: "AccessTokenOk!"}, 
           status: HttpStatus.ACCEPTED
       };
     }
 
     return {
         r: false, 
-        data: "Nenhum accessToken encontrado",
+        data: {msg: "Nenhum accessToken encontrado!"},
         status: HttpStatus.BAD_REQUEST
     };
 

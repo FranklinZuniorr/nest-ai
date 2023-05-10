@@ -15,7 +15,6 @@ import { User, UserDocument } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { UsuarioEdit } from './usuario.entity.edit';
 import { email } from './email.entity';
-const nodemailer = require('nodemailer');
 
 const jwtService = new JwtService();
 @Injectable()
@@ -35,7 +34,7 @@ export class UsuarioService extends AuthService {
                 return {r: false, data: `A senha precisa ter ao menos 8 caracteres!`, status: HttpStatus.BAD_REQUEST};
             }; */
             
-            const userFilter = {email: email.toLowerCase(), password: await this.setHash(password), username};
+            const userFilter = {email: email.toLowerCase(), password: await this.setHash(password), username, coins: 0};
             const createdUser = new this.userModel(userFilter);
             createdUser.save();
             console.log(userFilter);
@@ -64,7 +63,7 @@ export class UsuarioService extends AuthService {
             username: undefined,
             email: undefined
         };
-        const { username, email, password } = body;
+        const { username, email, password, coins } = body;
 
         (await this.buscaPorEmailDeUsuario(email)).exist? exist.email = true:false;
         (await this.buscaPorNomeDeUsuario(username)).exist? exist.username = true:false;
@@ -83,7 +82,8 @@ export class UsuarioService extends AuthService {
             { $set: { 
             ...(utils.verifyCond(username) && !exist.username && {username}), 
             ...(utils.verifyCond(email) && !exist.email && {email: email.toLowerCase()}), 
-            ...(utils.verifyCond(password) && {password: await this.setHash(password)}) 
+            ...(utils.verifyCond(password) && {password: await this.setHash(password)}),
+            ...(utils.verifyCond(coins) && {coins})
             }},
             { new: true }
         ).exec();
@@ -191,7 +191,9 @@ export class UsuarioService extends AuthService {
                     });
 
                     const verifyToken = await this.verifyToken(token, "access");
-                    console.log(verifyToken.user.id)
+                    
+                    console.log(verifyToken)
+                    console.log("------------")
                     const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
                         { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
                         { new: true }).exec();
@@ -201,7 +203,7 @@ export class UsuarioService extends AuthService {
                     return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result, msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
                 }
 
-                return {r: false, data: {msg: "Erro ao fazer upload da imagem, tente novamente."}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                return {r: false, data: {msg: "Erro ao fazer upload da imagem!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
             }
 
 
@@ -209,7 +211,7 @@ export class UsuarioService extends AuthService {
             /* axios.get("https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/")
             .then(res => console.log(res)).catch(err => console.) */
     
-            return {r: false, data: {info: utils.errorExternalServicesTreatment(response), dropBox: response.response.data}, status: HttpStatus.BAD_REQUEST};
+            return {r: false, data: {info: utils.errorExternalServicesTreatment(response), dropBox: response.response.data, msg: "DropBox error."}, status: HttpStatus.BAD_REQUEST};
         }
 
         return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.ACCEPTED};
@@ -226,7 +228,7 @@ export class UsuarioService extends AuthService {
             console.log(userFound)
 
             if(userFound){
-                return await utils.sendEmail("link..", "Alteração de senha.", emailInfo.email);
+                return await utils.sendEmail(`https://www.google.com.br/?accessToken=${await this.generateAccessToken({msg: "Alteração de senha.", type: "access"})}`, "Alteração de senha.", emailInfo.email);
             }else{
                 return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST}
             };

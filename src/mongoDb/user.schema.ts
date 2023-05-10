@@ -15,7 +15,10 @@ export class User {
   password: string;
 
   @Prop()
-  img?: string
+  img?: string;
+
+  @Prop()
+  coins: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
