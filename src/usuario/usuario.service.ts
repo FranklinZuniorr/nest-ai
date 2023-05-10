@@ -82,18 +82,21 @@ export class UsuarioService extends AuthService {
             { $set: { 
             ...(utils.verifyCond(username) && !exist.username && {username}), 
             ...(utils.verifyCond(email) && !exist.email && {email: email.toLowerCase()}), 
-            ...(utils.verifyCond(password) && {password: await this.setHash(password)}),
-            ...(utils.verifyCond(coins) && {coins})
-            }},
+            ...(utils.verifyCond(password) && {password: await this.setHash(password)})
+            },
+              $inc: {
+                ...(utils.verifyCond(coins) && {coins})
+              }
+            },
             { new: true }
         ).exec();
     
         if (user) {
             console.log(user);
             return { r: true, data: {msg: `${user.email} editado com sucesso!`}, status: HttpStatus.OK };
+        }else{
+            return { r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST };
         };
-    
-        return { r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.CREATED };
 
     };
 
@@ -204,9 +207,7 @@ export class UsuarioService extends AuthService {
                 }
 
                 return {r: false, data: {msg: "Erro ao fazer upload da imagem!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
-            }
-
-
+            };
     
             /* axios.get("https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/")
             .then(res => console.log(res)).catch(err => console.) */
