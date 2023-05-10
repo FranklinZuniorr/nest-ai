@@ -4,10 +4,8 @@ import { AuthService } from 'src/usuario/accessTokenAndRefreshToken/AuthService'
 import { JwtService } from '@nestjs/jwt';
 import { utils } from 'src/utils/utils';
 import { UsuarioService } from 'src/usuario/usuario.service';
-
-const axios = require("axios");
+import axios from 'axios';
 require("dotenv").config();
-
 @Injectable()
 export class AiService{
 
@@ -28,9 +26,9 @@ export class AiService{
         
         let prompt = textQs;
 
-        if(text != null){
+        if(utils.verifyCond(text)){
             prompt = text.msg
-        }
+        };
 
         const model = "text-davinci-003";
         const maxTokens = 500;
@@ -50,10 +48,9 @@ export class AiService{
             return {r: true, data: answer, status: HttpStatus.OK}
         })
         .catch((error) => {
-            return {r: false, data: utils.errorExternalServicesTreatment(error), status: HttpStatus.INTERNAL_SERVER_ERROR}
+            return {r: false, data: {info: utils.errorExternalServicesTreatment(error), msg: "OpenAi error."}, status: HttpStatus.INTERNAL_SERVER_ERROR}
         });
 
-        return dataRes
-
-    }
-}
+        return dataRes;
+    };
+};
