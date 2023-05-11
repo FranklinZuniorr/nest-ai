@@ -8,6 +8,7 @@ import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAc
 import { UsuarioEdit } from './user.entity.edit';
 import { email } from './email.entity';
 import { JwtMiddleware } from 'src/core/http/verify-token-middleware';
+import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
 
 @Controller('/')
 export class UsuarioController {
@@ -44,11 +45,12 @@ export class UsuarioController {
     };
 
     @Put('edit-user')
+    @UseInterceptors(VerifyTokenInterceptor)
     public async editUser(@Body() usuario: UsuarioEdit, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
-        const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken);
+        /* const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken); */
 
-        if(dataVerifyAccessToken.r){
+        /* if(dataVerifyAccessToken.r){ */
             const data = await this.usuarioService.edit(accessToken, usuario);
     
             return new NestResponseBuilder()
@@ -58,24 +60,25 @@ export class UsuarioController {
             })
             .comBody(data)
             .build();
-        };
+        /* }; */
 
-        return new NestResponseBuilder()
+        /* return new NestResponseBuilder()
         .comStatus(dataVerifyAccessToken.status)
         .comHeaders({
             'Info': dataVerifyAccessToken.r
         })
         .comBody(dataVerifyAccessToken)
-        .build();
+        .build(); */
 
     };
 
     @Delete('delete-user')
+    @UseInterceptors(VerifyTokenInterceptor)
     public async removeUser(@Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
-        const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken);
+        /* const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken); */
 
-        if(dataVerifyAccessToken.r){
+        /* if(dataVerifyAccessToken.r){ */
             const data = await this.usuarioService.delete(accessToken);
     
             return new NestResponseBuilder()
@@ -85,15 +88,15 @@ export class UsuarioController {
             })
             .comBody(data)
             .build();
-        };
+        /* }; */
 
-        return new NestResponseBuilder()
+        /* return new NestResponseBuilder()
         .comStatus(dataVerifyAccessToken.status)
         .comHeaders({
             'Info': dataVerifyAccessToken.r
         })
         .comBody(dataVerifyAccessToken)
-        .build();
+        .build(); */
 
     };
 
@@ -134,11 +137,12 @@ export class UsuarioController {
             callback(null, true);
         },
     }))
+    @UseInterceptors(VerifyTokenInterceptor)
     async upload(@UploadedFile() file, @Headers('accessToken') accessToken: string, @Query('code') code: string): Promise<NestResponse> {
 
-        const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken);
+        /* const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken); */
 
-        if(dataVerifyAccessToken.r){
+        /* if(dataVerifyAccessToken.r){ */
             console.log("Acces OK")
             const data = await this.usuarioService.uploadImage(file, code, accessToken);
     
@@ -149,15 +153,15 @@ export class UsuarioController {
             })
             .comBody(data)
             .build();
-        };
+        /* }; */
 
-        return new NestResponseBuilder()
+        /* return new NestResponseBuilder()
         .comStatus(dataVerifyAccessToken.status)
         .comHeaders({
             'Info': dataVerifyAccessToken.r
         })
         .comBody(dataVerifyAccessToken)
-        .build();
+        .build(); */
 
     };
 

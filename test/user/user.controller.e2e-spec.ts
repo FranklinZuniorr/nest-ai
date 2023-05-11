@@ -13,6 +13,8 @@ import { AuthService } from "src/usuario/accessTokenAndRefreshToken/AuthService"
 import { UsuarioEdit } from "src/usuario/user.entity.edit";
 import * as fs from 'fs';
 import { response } from "src/core/http/responseDto/response";
+import { JwtService } from "@nestjs/jwt";
+import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
 
 require("dotenv").config("./.env")
 
@@ -33,6 +35,9 @@ describe("AppController", () => {
       controllers: [UsuarioController],
       providers: [
         UsuarioService,
+        AuthService,
+        JwtService,
+        VerifyTokenInterceptor,
         {provide: getModelToken(User.name), useValue: userModel},
       ],
     }).compile();

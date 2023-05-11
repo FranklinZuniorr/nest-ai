@@ -9,6 +9,7 @@ import { Model } from "mongoose";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "src/mongoDb/user.schema";
 import { JwtMiddleware } from "src/core/http/verify-token-middleware";
+import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -20,6 +21,7 @@ import { JwtMiddleware } from "src/core/http/verify-token-middleware";
         BcryptService,
         AuthService,
         JwtService,
+        VerifyTokenInterceptor
     ]
 })
 
@@ -30,5 +32,5 @@ export class UsuarioModule {};
       consumer
         .apply(JwtMiddleware)
         .forRoutes('upload-image');
-    }
-} */
+    };
+}; */
