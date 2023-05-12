@@ -9,6 +9,7 @@ import { UsuarioEdit } from './user.entity.edit';
 import { email } from './email.entity';
 import { JwtMiddleware } from 'src/core/http/verify-token-middleware';
 import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 
 @Controller('/')
 export class UsuarioController {
@@ -112,6 +113,32 @@ export class UsuarioController {
         .comBody(data)
         .build();
     };
+
+/*     @MessagePattern('teste')
+    async handleMessage(@Payload() data: any, @Ctx() context: RmqContext, ack: () => void): Promise<void> {
+      console.log('Received message:', data);
+      
+      try {
+        
+          context.getChannelRef().ack(context.getMessage())
+        
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    @EventPattern({ exchange: 'testeex', routingKey: 'teste' })
+    async handleMessag2(@Payload() data: any, @Ctx() context: RmqContext, ack: () => void): Promise<void> {
+        console.log('Received message:', data);
+      
+        try {
+          
+            context.getChannelRef().ack(context.getMessage())
+          
+        } catch (error) {
+          console.log(error)
+        }
+    } */
 
     @Post('login')
     public async loginUser(@Body() usuario: Usuario): Promise<NestResponse> {

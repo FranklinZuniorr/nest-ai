@@ -8,6 +8,7 @@ import { User, UserSchema } from "src/mongoDb/user.schema";
 import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
 import { AuthService } from "src/usuario/accessTokenAndRefreshToken/AuthService";
 import { JwtService } from "@nestjs/jwt";
+import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
 
 @Module({
     imports: [UsuarioModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }])],
@@ -17,7 +18,8 @@ import { JwtService } from "@nestjs/jwt";
         UsuarioService,
         AuthService,
         JwtService,
-        VerifyTokenInterceptor
+        VerifyTokenInterceptor,
+        RabbitMQService
     ]
 })
 export class AiModule {}

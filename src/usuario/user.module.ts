@@ -10,6 +10,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "src/mongoDb/user.schema";
 import { JwtMiddleware } from "src/core/http/verify-token-middleware";
 import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
+import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -21,7 +22,8 @@ import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
         BcryptService,
         AuthService,
         JwtService,
-        VerifyTokenInterceptor
+        VerifyTokenInterceptor,
+        RabbitMQService
     ]
 })
 

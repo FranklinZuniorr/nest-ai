@@ -15,12 +15,13 @@ import { User, UserDocument } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { UsuarioEdit } from './user.entity.edit';
 import { email } from './email.entity';
+import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 
 const jwtService = new JwtService();
 @Injectable()
 export class UsuarioService extends AuthService {
     
-    constructor(@InjectModel(User.name) private userModel: Model<User>){
+    constructor(@InjectModel(User.name) private userModel: Model<User>, private readonly rabbitMQService: RabbitMQService){
         super(jwtService)
     }
     
@@ -75,6 +76,10 @@ export class UsuarioService extends AuthService {
 
         if(exist.email || exist.username){
             return {r: false, data: {msg: `${exist.email? "E-mail":"Nome"} já existe na base de dados!`}, status: HttpStatus.BAD_REQUEST};
+        };
+
+        if(!utils.verifyCond(username) && !utils.verifyCond(email) && !utils.verifyCond(password) && !utils.verifyCond(coins)){
+            return {r: false, data: {msg: "Nenhum dado de alteração foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
         };
 
         const user = await this.userModel.findByIdAndUpdate(
@@ -137,6 +142,10 @@ export class UsuarioService extends AuthService {
             if(!verification){
                 return {r: false, data: {msg: "Senha incorreta!"}, status: HttpStatus.BAD_REQUEST}
             };
+
+            /* await this.rabbitMQService.sendMessage("oioioi") */
+            /* await this.rabbitMQService.sendToExchange("testeex", 'teste', "dasdasd") */
+
             
             return {
                 r: true, 

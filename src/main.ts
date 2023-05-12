@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,5 +21,31 @@ async function bootstrap() {
   });
 
   await app.listen(process.env.PORT || 3001);
+
+  await app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [`amqp://jacqueline:alura@localhost:5672/`],
+      queue: "teste",
+      queueOptions: {
+        durable: true,
+      },
+      noAck: false
+    },
+  });
+
+  await app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [`amqp://jacqueline:alura@localhost:5672`],
+      queue: 'teste',
+      queueOptions: {
+        durable: true
+      },
+      noAck: false
+    },
+  });
+ 
+  app.startAllMicroservices();
 }
 bootstrap();
