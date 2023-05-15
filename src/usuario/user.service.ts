@@ -196,23 +196,38 @@ export class UsuarioService extends AuthService {
                 path: `/${randomName}${extname(file.originalname)}`,
                 contents: file.buffer,
                 }).then(res => res).catch(err => err);
+
+                const verifyToken = await this.verifyToken(token, "access");
                 
                 if(result.status == 200){
-                    const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-                        path: result.result.path_display,
-                    });
-
-                    const verifyToken = await this.verifyToken(token, "access");
                     
-                    console.log(verifyToken)
-                    console.log("------------")
-                    const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
-                        { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
-                        { new: true }).exec();
-                    console.log("------------")
-                    console.log(user)
-                    console.log("------------")
-                    return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result, msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
+                    try {
+                        const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
+                            path: result.result.path_display,
+                        });
+                    
+                        console.log(verifyToken)
+                        console.log("------------")
+                        const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
+                            { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
+                            { new: true }).exec();
+                        console.log("------------")
+                        console.log(user)
+                        console.log("------------")
+                        return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result, msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
+                        
+                    } catch (error) {
+                        await this.rabbitMQService.sendToExchange("testeex", 'teste', 
+                        {
+                            dropbox: {
+                            accessToken: response.data.access_token,
+                            clientId: process.env.DROPBOX_CLIENT_ID,
+                            clientSecret: process.env.DROPBOX_CLIENT_SECRET
+                            },
+                            path: result.result.path_display,
+                            userId: verifyToken.user.id
+                        });
+                    };
                 }
 
                 return {r: false, data: {msg: "Erro ao fazer upload da imagem!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};

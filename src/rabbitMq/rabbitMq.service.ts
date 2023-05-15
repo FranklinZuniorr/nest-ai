@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ClientProxyFactory, Transport, ClientProxy, MessagePattern, EventPattern, Payload, Ctx, RmqContext } from '@nestjs/microservices';
+import { InjectModel } from '@nestjs/mongoose';
+import { getModelForClass, ReturnModelType } from '@typegoose/typegoose';
 import amqp from 'amqp-connection-manager';
 import { connect, Channel } from 'amqplib';
+import * as Dropbox from 'dropbox';
+import mongoose, { Model } from 'mongoose';
+import { User, UserDocument, UserSchema } from 'src/mongoDb/user.schema';
+import { utils } from 'src/utils/utils';
 
 @Injectable()
 export class RabbitMQService {
@@ -26,7 +32,11 @@ export class RabbitMQService {
     await result.subscribe()
   } */
 
-  async sendToExchange(exchangeName: string, routingKey: string, message: string) {
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {
+    this.rabbitMqConsumeErrosUploadImage();
+  };
+
+  async sendToExchange(exchangeName: string, routingKey: string, message: object) {
     const connection = await connect(`amqp://jacqueline:alura@localhost:5672`);
     const channel = await connection.createChannel();
   
@@ -35,10 +45,69 @@ export class RabbitMQService {
   
     await channel.close();
     await connection.close();
+  };
+
+  async rabbitMqConsumeErrosUploadImage(){
+    /* const userModel: ReturnModelType<typeof User> = getModelForClass(User);
+    const rabbitMQService = new RabbitMQService(); */
+    const exchangeName = 'testeex';
+    const queueName = 'teste';
+    const routingKey = 'teste';
+    const connection = await connect(`amqp://jacqueline:alura@localhost:5672`);
+    const channel = await connection.createChannel();
+  
+    await channel.assertExchange(exchangeName, 'direct', { durable: true });
+    await channel.assertQueue(queueName, { durable: true });
+    await channel.bindQueue(queueName, exchangeName, routingKey);
+  
+    await channel.consume(queueName, async (message) => {
+      console.log(message)
+      const data = JSON.parse(message.content.toString());
+      console.log(data.data);
+  
+      channel.ack(message);
+  
+      if (Object.keys(data.data.dropbox).length > 0) {
+  
+        const dropbox = new Dropbox.Dropbox({
+          accessToken: data.data.dropbox.accessToken,
+          clientId: data.data.dropbox.clientId,
+          clientSecret: data.data.dropbox.clientSecret
+        });
+  
+        try {
+          const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
+              path: data.data.path,
+          });
+      
+          const user = await this.userModel.findByIdAndUpdate(data.data.userId, 
+              { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
+              { new: true }).exec();
+          console.log("------------")
+          console.log(user)
+          console.log("------------")
+          
+        } catch (error) {
+            console.log(error)
+            await this.sendToExchange("testeex", 'teste', 
+            {
+              dropbox: {
+              accessToken: data.data.dropbox.accessToken,
+              clientId: data.data.dropbox.clientId,
+              clientSecret: data.data.dropbox.clientSecret
+              },
+              path: data.data.path,
+              userId: data.data.userId
+            });
+        };
+  
+        // Confirma o recebimento da mensagem após o processamento
+      };
+    });
   }
 }
 
-async function consumeFromExchange() {
+/* async function consumeFromExchange() {
   const exchangeName = 'testeex';
   const queueName = 'teste';
   const routingKey = 'teste';
@@ -59,6 +128,4 @@ async function consumeFromExchange() {
     }
   });
 
-}
-
-consumeFromExchange();
+} */

@@ -15,6 +15,7 @@ import * as fs from 'fs';
 import { response } from "src/core/http/responseDto/response";
 import { JwtService } from "@nestjs/jwt";
 import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
+import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
 
 require("dotenv").config("./.env")
 
@@ -38,6 +39,7 @@ describe("AppController", () => {
         AuthService,
         JwtService,
         VerifyTokenInterceptor,
+        RabbitMQService,
         {provide: getModelToken(User.name), useValue: userModel},
       ],
     }).compile();

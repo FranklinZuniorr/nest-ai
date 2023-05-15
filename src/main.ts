@@ -22,7 +22,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT || 3001);
 
-  await app.connectMicroservice<MicroserviceOptions>({
+/*   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
       urls: [`amqp://jacqueline:alura@localhost:5672/`],
@@ -46,6 +46,6 @@ async function bootstrap() {
     },
   });
  
-  app.startAllMicroservices();
+  app.startAllMicroservices(); */
 }
 bootstrap();

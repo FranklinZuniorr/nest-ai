@@ -205,6 +205,19 @@ export class UsuarioController {
         .build();
     };
 
+    @Post('access-token')
+    async verifyAccessToken(@Body() accessToken: accessDto): Promise<NestResponse>{
+        const data = await this.usuarioService.verifyAccessTokenPass(accessToken.accessToken);
+
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
+    }
+
     /* @UseInterceptors(FileInterceptor('file', {
         storage: memoryStorage(),
         preservePath: true,
