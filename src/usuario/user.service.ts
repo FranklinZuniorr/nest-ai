@@ -235,7 +235,7 @@ export class UsuarioService extends AuthService {
                         console.log("------------")
                         console.log(user)
                         console.log("------------")
-                        return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result, msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
+                        return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
                     } catch (error) {
                         await this.rabbitMQService.sendToExchange("testeex", 'teste', 
                         {
@@ -247,7 +247,7 @@ export class UsuarioService extends AuthService {
                             path: result.result.path_display,
                             userId: verifyToken.user.id
                         });
-                        return {r: false, data: {msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                        return {r: false, data: {url: "", msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
                     };
                 };
             };

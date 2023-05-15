@@ -207,7 +207,7 @@ export class UsuarioController {
 
     @Post('access-token')
     async verifyAccessToken(@Body() accessToken: accessDto): Promise<NestResponse>{
-        const data = await this.usuarioService.verifyAccessTokenPass(accessToken.accessToken);
+        const data = await this.usuarioService.accessToken(accessToken.accessToken);
 
         return new NestResponseBuilder()
         .comStatus(data.status)
