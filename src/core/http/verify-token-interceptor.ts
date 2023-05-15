@@ -3,18 +3,18 @@ import { Observable, throwError, map, catchError, of } from 'rxjs';
 import { AuthService } from 'src/usuario/accessTokenAndRefreshToken/AuthService';
 import { NestResponse } from './nest-response';
 import { NestResponseBuilder } from './nest-response-builder';
+import { UsuarioService } from 'src/usuario/user.service';
 
 @Injectable()
 export class VerifyTokenInterceptor implements NestInterceptor {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly UsuarioService: UsuarioService) {}
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<NestResponse>> {
     const request = context.switchToHttp().getRequest();
     /* console.log(request) */
     const accessToken = request.headers.accesstoken;
 
-    
-    const dataVerify = await this.authService.verifyAccessTokenPass(accessToken);
+    const dataVerify = await this.UsuarioService.accessToken(accessToken);
     console.log(dataVerify)
     /* if (!dataVerify.r) {
         throw dataVerify
@@ -43,7 +43,7 @@ export class VerifyTokenInterceptor implements NestInterceptor {
             .build();
 
             if(!dataVerify.r){
-                return of(response)
+                return of(response);
             }
           })
     );
@@ -60,8 +60,8 @@ export class VerifyTokenInterceptor implements NestInterceptor {
 
     /* return next.handle(); */
 
-  }
-}
+  };
+};
 
 
 

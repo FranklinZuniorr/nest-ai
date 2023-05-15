@@ -19,6 +19,9 @@ export class User {
 
   @Prop()
   coins: number;
+
+  @Prop()
+  validToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

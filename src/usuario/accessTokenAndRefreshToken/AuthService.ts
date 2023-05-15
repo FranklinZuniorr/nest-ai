@@ -3,6 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import { refreshDto } from './refreshAndAccessDto';
 import { utils } from 'src/utils/utils';
 import { response } from 'src/core/http/responseDto/response';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from 'src/mongoDb/user.schema';
+import { Model } from 'mongoose';
 @Injectable()
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {};

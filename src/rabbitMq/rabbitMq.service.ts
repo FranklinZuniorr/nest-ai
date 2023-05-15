@@ -76,6 +76,15 @@ export class RabbitMQService {
         });
   
         try {
+
+          const userFilter = await this.userModel.findById(data.data.userId).exec().then((doc) => doc?.toObject()).catch((err) => err);
+
+          if("img" in userFilter){
+              const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+              const filePath = metadata.result.path_lower;
+              await dropbox.filesDeleteV2({ path: filePath });
+          };
+
           const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
               path: data.data.path,
           });

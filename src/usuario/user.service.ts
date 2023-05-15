@@ -35,7 +35,7 @@ export class UsuarioService extends AuthService {
                 return {r: false, data: `A senha precisa ter ao menos 8 caracteres!`, status: HttpStatus.BAD_REQUEST};
             }; */
             
-            const userFilter = {email: email.toLowerCase(), password: await this.setHash(password), username, coins: 0};
+            const userFilter = {email: email.toLowerCase(), password: await this.setHash(password), username, coins: 0, validToken: ""};
             const createdUser = new this.userModel(userFilter);
             createdUser.save();
             console.log(userFilter);
@@ -146,6 +146,14 @@ export class UsuarioService extends AuthService {
             /* await this.rabbitMQService.sendMessage("oioioi") */
             /* await this.rabbitMQService.sendToExchange("testeex", 'teste', "dasdasd") */
 
+            await this.userModel.findByIdAndUpdate(
+                userFilter.id,
+                { $set: { 
+                    validToken: await this.generateAccessToken({user: userFilter, type: "access"})
+                }
+                },
+                { new: true }
+            ).exec();
             
             return {
                 r: true, 
@@ -191,16 +199,29 @@ export class UsuarioService extends AuthService {
                     clientId: process.env.DROPBOX_CLIENT_ID,
                     clientSecret: process.env.DROPBOX_CLIENT_SECRET
                 });
+
+                const verifyToken = await this.verifyToken(token, "access");
+
+                const userFilter = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
+
+                if(userFilter && "img" in userFilter){
+                    const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+                    const filePath = metadata.result.path_lower;
+                    await dropbox.filesDeleteV2({ path: filePath });
+                }else if(!userFilter){
+                    return {r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
+                };
         
                 const result = await dropbox.filesUpload({
                 path: `/${randomName}${extname(file.originalname)}`,
                 contents: file.buffer,
                 }).then(res => res).catch(err => err);
-
-                const verifyToken = await this.verifyToken(token, "access");
+                
+                if(result instanceof Error){
+                    return {r: false, data: {info: utils.errorExternalServicesTreatment(result), msg: "Erro ao enviar imagem!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                };
                 
                 if(result.status == 200){
-                    
                     try {
                         const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
                             path: result.result.path_display,
@@ -215,7 +236,6 @@ export class UsuarioService extends AuthService {
                         console.log(user)
                         console.log("------------")
                         return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), result, msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
-                        
                     } catch (error) {
                         await this.rabbitMQService.sendToExchange("testeex", 'teste', 
                         {
@@ -227,10 +247,9 @@ export class UsuarioService extends AuthService {
                             path: result.result.path_display,
                             userId: verifyToken.user.id
                         });
+                        return {r: false, data: {msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
                     };
-                }
-
-                return {r: false, data: {msg: "Erro ao fazer upload da imagem!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                };
             };
     
             /* axios.get("https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/")
@@ -262,6 +281,45 @@ export class UsuarioService extends AuthService {
         }else{
             return {r: false, data: {msg: "E-mail não foi enviado!"}, status: HttpStatus.BAD_REQUEST}
         };
+
+    };
+
+    public async refreshToken(refreshToken: refreshDto): Promise<response>{
+
+        const data = await this.verifyRefreshTokenAndGenerateTokens(refreshToken);
+
+        if(data.r){
+            const verifyToken = await this.verifyToken(refreshToken.refreshToken, "refresh");
+
+            await this.userModel.findByIdAndUpdate(
+                verifyToken.user.id,
+                { $set: { 
+                    validToken: data.data.token
+                }
+                },
+                { new: true }
+            ).exec();
+        };
+
+        return data;
+
+    };
+
+    public async accessToken(accessToken: string): Promise<response>{
+
+        const verifyToken = await this.verifyToken(accessToken, "access");
+        
+        if(verifyToken instanceof Error){
+            return await this.verifyAccessTokenPass(accessToken);
+        };
+
+        const user = (await this.userModel.findById(verifyToken.user.id).exec()).toObject();
+
+        if(user.validToken === accessToken){
+            return await this.verifyAccessTokenPass(accessToken);
+        };
+
+        return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
 
     };
 

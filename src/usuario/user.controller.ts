@@ -194,7 +194,7 @@ export class UsuarioController {
 
     @Post('refresh-token')
     async verifyRefreshToken(@Body() refreshToken: refreshDto): Promise<NestResponse>{
-        const data = await this.usuarioService.verifyRefreshTokenAndGenerateTokens(refreshToken);
+        const data = await this.usuarioService.refreshToken(refreshToken);
 
         return new NestResponseBuilder()
         .comStatus(data.status)
