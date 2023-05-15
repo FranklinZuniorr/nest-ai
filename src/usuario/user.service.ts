@@ -115,6 +115,7 @@ export class UsuarioService extends AuthService {
         ).exec();
     
         if (user) {
+            console.log("---------------------")
             console.log(user);
             return { r: true, data: {msg: `${user.email} deletado com sucesso!`}, status: HttpStatus.OK };
         };
@@ -168,6 +169,22 @@ export class UsuarioService extends AuthService {
         }else{
             return {r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
         };
+    };
+
+    public async logout(accessToken: string){
+
+        const verifyToken = await this.verifyToken(accessToken, 'access');
+
+        await this.userModel.findByIdAndUpdate(
+            verifyToken.user.id,
+            { $set: { 
+                validToken: ""
+            }
+            },
+            { new: true }
+        ).exec();
+
+        return {r: true, data: {msg: "Deslogado com sucesso!"}, status: HttpStatus.OK};
     };
 
     public async uploadImage(file, code: string, token: string): Promise<response>{
@@ -272,11 +289,18 @@ export class UsuarioService extends AuthService {
             console.log(userFound)
 
             if(userFound){
+                await this.userModel.findByIdAndUpdate(
+                    userFound._id,
+                    { $set: { 
+                        validToken: await this.generateAccessToken({msg: "Alteração de senha.", type: "access"})
+                    }
+                    },
+                    { new: true }
+                ).exec();
                 return await utils.sendEmail(`https://www.google.com.br/?accessToken=${await this.generateAccessToken({msg: "Alteração de senha.", type: "access"})}`, "Alteração de senha.", emailInfo.email);
             }else{
                 return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST}
             };
-
 
         }else{
             return {r: false, data: {msg: "E-mail não foi enviado!"}, status: HttpStatus.BAD_REQUEST}
@@ -308,14 +332,15 @@ export class UsuarioService extends AuthService {
     public async accessToken(accessToken: string): Promise<response>{
 
         const verifyToken = await this.verifyToken(accessToken, "access");
+        console.log(verifyToken)
         
         if(verifyToken instanceof Error){
             return await this.verifyAccessTokenPass(accessToken);
         };
 
-        const user = (await this.userModel.findById(verifyToken.user.id).exec()).toObject();
+        const user = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
 
-        if(user.validToken === accessToken){
+        if(user && user.validToken == accessToken){
             return await this.verifyAccessTokenPass(accessToken);
         };
 

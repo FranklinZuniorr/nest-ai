@@ -155,6 +155,20 @@ export class UsuarioController {
 
     };
 
+    @Post('logout')
+    @UseInterceptors(VerifyTokenInterceptor)
+    public async logoutUser(@Headers('accessToken') accessToken: string): Promise<NestResponse> {
+        const userLogged = await this.usuarioService.logout(accessToken);
+
+        return new NestResponseBuilder()
+        .comStatus(userLogged.status)
+        .comHeaders({
+            'Info': userLogged.r
+        })
+        .comBody(userLogged)
+        .build();
+    };
+
     @Post('upload-image')
     @UseInterceptors(FileInterceptor('file' , {
         fileFilter: (req, file, callback) => {

@@ -16,13 +16,26 @@ export class VerifyTokenInterceptor implements NestInterceptor {
 
     const dataVerify = await this.UsuarioService.accessToken(accessToken);
     console.log(dataVerify)
-    /* if (!dataVerify.r) {
-        throw dataVerify
-    } */
+
+    if (!dataVerify.r) {
+      const res = new NestResponseBuilder()
+      .comStatus(dataVerify.status)
+      .comHeaders({
+          'Info': dataVerify.r
+      })
+      .comBody(dataVerify)
+      .build();
+
+      return of(res)
+    };
+
+    return next.handle();
+
+    /* ------------------------------------------- */
     
-    return next.handle().pipe(
+    /* return next.handle().pipe(
         map(data => {
-            if(!dataVerify.r){
+            if(dataVerify.r == false){
                 return new NestResponseBuilder()
                 .comStatus(dataVerify.status)
                 .comHeaders({
@@ -30,7 +43,7 @@ export class VerifyTokenInterceptor implements NestInterceptor {
                 })
                 .comBody(dataVerify)
                 .build();
-            }
+            };
             return data
         }),
         catchError((err) => {
@@ -42,11 +55,13 @@ export class VerifyTokenInterceptor implements NestInterceptor {
             .comBody(dataVerify)
             .build();
 
-            if(!dataVerify.r){
+            if(dataVerify.r == false){
                 return of(response);
-            }
+            };
           })
-    );
+    ); */
+
+    /* ------------------------------------------- */
 
         /* map((data) => {
             return new NestResponseBuilder()
