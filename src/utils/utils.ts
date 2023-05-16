@@ -3,6 +3,7 @@ import { response } from "src/core/http/responseDto/response";
 
 
 const nodemailer = require('nodemailer');
+const sendinblueTransport = require('nodemailer-sendinblue-transport');
 export class utils{
     static errorExternalServicesTreatment(error: any): object{
         return {serviceErrorName: error.name, typeError: error.toString().split(":")[1].trim()};
@@ -17,27 +18,33 @@ export class utils{
     };
 
     static sendEmail = async (text, subject, to): Promise<response> => {
-        let transporter = nodemailer.createTransport({
+
+        const transporter = new nodemailer.createTransport(
+            new sendinblueTransport({
+              apiKey: process.env.BREVO_TOKEN,
+            })
+          );
+
+        /* let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.GMAIL_EMAIL,
-                pass: process.env.GMAIL_PASSWORD
+                user: "smtp-relay.sendinblue.com/587",
+                pass: "fKqdp1VkxPL5CQGh"
             }
-        });
+        }); */
 
         let mailOptions = {
-            from: 'franklin.vieira@querodelivery.com',
+            from: process.env.BREVO_EMAIL,
             to: to.toLowerCase(),
             subject: subject,
             text: text
         };
 
-        const response = await transporter.sendMail(mailOptions);
-
-        if(response){
+        try {
+            const response = await transporter.sendMail(mailOptions);
             return {r: true, data: {response, msg: "E-mail enviado com sucesso!"}, status: HttpStatus.OK}
-        }else{
-            return {r: false, data: {error: utils.errorExternalServicesTreatment(response), msg: "Erro ao enviar e-mail!"}, status: HttpStatus.INTERNAL_SERVER_ERROR}
+        } catch (error) {
+            return {r: false, data: {error: utils.errorExternalServicesTreatment(error), msg: "Erro ao enviar e-mail!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
         };
     };
 };

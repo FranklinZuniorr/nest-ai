@@ -37,7 +37,7 @@ export class RabbitMQService {
   };
 
   async sendToExchange(exchangeName: string, routingKey: string, message: object) {
-    const connection = await connect(`amqp://jacqueline:alura@localhost:5672`);
+    const connection = await connect(process.env.RABBIT_URL);
     const channel = await connection.createChannel();
   
     await channel.assertExchange(exchangeName, 'direct', { durable: true });
@@ -50,10 +50,10 @@ export class RabbitMQService {
   async rabbitMqConsumeErrosUploadImage(){
     /* const userModel: ReturnModelType<typeof User> = getModelForClass(User);
     const rabbitMQService = new RabbitMQService(); */
-    const exchangeName = 'testeex';
-    const queueName = 'teste';
-    const routingKey = 'teste';
-    const connection = await connect(`amqp://jacqueline:alura@localhost:5672`);
+    const exchangeName = 'AICORRIGE';
+    const queueName = 'QUEUEAICORRIGE';
+    const routingKey = 'KEYAICORRIGE';
+    const connection = await connect(process.env.RABBIT_URL);
     const channel = await connection.createChannel();
   
     await channel.assertExchange(exchangeName, 'direct', { durable: true });
@@ -98,7 +98,7 @@ export class RabbitMQService {
           
         } catch (error) {
             console.log(error)
-            await this.sendToExchange("testeex", 'teste', 
+            await this.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
             {
               dropbox: {
               accessToken: data.data.dropbox.accessToken,

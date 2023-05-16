@@ -198,9 +198,9 @@ export class UsuarioService extends AuthService {
             const data = new URLSearchParams();
             data.append('code', code);
             data.append('grant_type', 'authorization_code');
-            data.append('client_id', 'i8p06kgx6l9hvyk');
-            data.append('client_secret', '9rfn9d72o3ozhua');
-            data.append('redirect_uri', 'https://www.google.com.br/');
+            data.append('client_id', process.env.DROPBOX_CLIENT_ID);
+            data.append('client_secret', process.env.DROPBOX_CLIENT_SECRET);
+            data.append('redirect_uri', process.env.DROPBOX_REDIRECT_URI);
 
             const response = await axios.post(url, data.toString(), {
             headers: {
@@ -254,7 +254,7 @@ export class UsuarioService extends AuthService {
                         console.log("------------")
                         return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
                     } catch (error) {
-                        await this.rabbitMQService.sendToExchange("testeex", 'teste', 
+                        await this.rabbitMQService.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
                         {
                             dropbox: {
                             accessToken: response.data.access_token,
@@ -275,7 +275,7 @@ export class UsuarioService extends AuthService {
             return {r: false, data: {info: utils.errorExternalServicesTreatment(response), dropBox: response.response.data, msg: "DropBox error."}, status: HttpStatus.BAD_REQUEST};
         }
 
-        return {r: true, data: {info: "O login no dropBox é necessário!", url: "https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/"}, status: HttpStatus.ACCEPTED};
+        return {r: true, data: {info: "O login no dropBox é necessário!", url: `https://www.dropbox.com/oauth2/authorize?client_id=${process.env.DROPBOX_CLIENT_ID}&response_type=code&redirect_uri=${process.env.DROPBOX_REDIRECT_URI}`}, status: HttpStatus.ACCEPTED};
 
     };
 
