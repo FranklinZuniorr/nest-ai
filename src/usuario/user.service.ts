@@ -241,7 +241,7 @@ export class UsuarioService extends AuthService {
                             };
 
                             const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-                                path: result.result.path_displa,
+                                path: result.result.path_display,
                             });
                                                     
                             const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
