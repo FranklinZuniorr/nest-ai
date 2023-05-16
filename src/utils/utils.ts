@@ -10,7 +10,7 @@ export class utils{
     };
 
     static verifyCond = (data) => {
-        if(data != undefined && data != "" && data != null){
+        if(data != undefined && data != "" && data != null && !(data instanceof Error)){
             return true;
         };
 

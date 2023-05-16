@@ -236,7 +236,7 @@ export class UsuarioService extends AuthService {
                         try {
                             const userFilter = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
 
-                            if(!userFilter){
+                            if(userFilter instanceof Error){
                                 return {r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
                             };
 
