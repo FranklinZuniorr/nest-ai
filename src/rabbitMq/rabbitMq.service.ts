@@ -77,27 +77,36 @@ export class RabbitMQService {
   
         try {
 
+          const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
+            path: data.data.path,
+          });
+
           const userFilter = await this.userModel.findById(data.data.userId).exec().then((doc) => doc?.toObject()).catch((err) => err);
 
-          if("img" in userFilter){
-              const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
-              const filePath = metadata.result.path_lower;
-              await dropbox.filesDeleteV2({ path: filePath });
+          if(!userFilter){
+            throw Error
           };
-
-          const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-              path: data.data.path,
-          });
       
           const user = await this.userModel.findByIdAndUpdate(data.data.userId, 
               { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
               { new: true }).exec();
+
+
+          if(utils.verifyCond(user)){
+            if("img" in userFilter){
+              const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+              const filePath = metadata.result.path_lower;
+              await dropbox.filesDeleteV2({ path: filePath });
+            };
+          }else{
+            throw Error
+          };
+
           console.log("------------")
           console.log(user)
           console.log("------------")
           
         } catch (error) {
-            console.log(error)
             await this.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
             {
               dropbox: {

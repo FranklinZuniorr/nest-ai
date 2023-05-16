@@ -96,7 +96,7 @@ export class UsuarioService extends AuthService {
             { new: true }
         ).exec();
     
-        if (user) {
+        if (utils.verifyCond(user)) {
             console.log(user);
             return { r: true, data: {msg: `${user.email} editado com sucesso!`}, status: HttpStatus.OK };
         }else{
@@ -133,8 +133,6 @@ export class UsuarioService extends AuthService {
             .then((doc) => doc?.toObject())
             .catch((err) => err);
 
-            console.log(userFound)
-
             const { email, password, username, _id } = userFound;
 
             const verification = await this.compareHashedPasswordAndPassword(usuario.password, password);
@@ -147,23 +145,27 @@ export class UsuarioService extends AuthService {
             /* await this.rabbitMQService.sendMessage("oioioi") */
             /* await this.rabbitMQService.sendToExchange("testeex", 'teste', "dasdasd") */
 
-            await this.userModel.findByIdAndUpdate(
+            const newToken = await this.generateAccessToken({user: userFilter, type: "access"});
+
+            const userEdit = await this.userModel.findByIdAndUpdate(
                 userFilter.id,
                 { $set: { 
-                    validToken: await this.generateAccessToken({user: userFilter, type: "access"})
+                    validToken: newToken
                 }
                 },
                 { new: true }
-            ).exec();
-            
-            return {
-                r: true, 
-                data: {
-                    userFilter, 
-                    token: await this.generateAccessToken({user: userFilter, type: "access"}), 
-                    refreshToken: await this.generateRefreshToken({user: userFilter, type: "refresh"})
-                }, 
-                status: HttpStatus.ACCEPTED
+            ).exec()
+
+            if(utils.verifyCond(userEdit)){                
+                return {
+                    r: true, 
+                    data: {
+                        userFilter, 
+                        token: newToken, 
+                        refreshToken: await this.generateRefreshToken({user: userFilter, type: "refresh"})
+                    }, 
+                    status: HttpStatus.ACCEPTED
+                };
             };
 
         }else{
@@ -175,7 +177,7 @@ export class UsuarioService extends AuthService {
 
         const verifyToken = await this.verifyToken(accessToken, 'access');
 
-        await this.userModel.findByIdAndUpdate(
+        const userEdit = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
             { $set: { 
                 validToken: ""
@@ -184,7 +186,10 @@ export class UsuarioService extends AuthService {
             { new: true }
         ).exec();
 
-        return {r: true, data: {msg: "Deslogado com sucesso!"}, status: HttpStatus.OK};
+        if(utils.verifyCond(userEdit)){
+            return {r: true, data: {msg: "Deslogado com sucesso!"}, status: HttpStatus.OK};
+        };
+
     };
 
     public async uploadImage(file, code: string, token: string): Promise<response>{
@@ -192,7 +197,7 @@ export class UsuarioService extends AuthService {
         console.log(code)
 
         if(code != undefined && code.length > 0){
-            const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+            const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
 
             const url = 'https://api.dropboxapi.com/oauth2/token';
             const data = new URLSearchParams();
@@ -202,78 +207,79 @@ export class UsuarioService extends AuthService {
             data.append('client_secret', process.env.DROPBOX_CLIENT_SECRET);
             data.append('redirect_uri', process.env.DROPBOX_REDIRECT_URI);
 
-            const response = await axios.post(url, data.toString(), {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-            }).then(res => res).catch(err => err);
-
-            console.log(response)
-
-            if(response.statusText === "OK"){
-                const dropbox = new Dropbox.Dropbox({
-                    accessToken: response.data.access_token,
-                    clientId: process.env.DROPBOX_CLIENT_ID,
-                    clientSecret: process.env.DROPBOX_CLIENT_SECRET
+            try {
+                const response = await axios.post(url, data.toString(), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
                 });
 
-                const verifyToken = await this.verifyToken(token, "access");
-
-                const userFilter = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
-
-                if(userFilter && "img" in userFilter){
-                    const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
-                    const filePath = metadata.result.path_lower;
-                    await dropbox.filesDeleteV2({ path: filePath });
-                }else if(!userFilter){
-                    return {r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
-                };
-        
-                const result = await dropbox.filesUpload({
-                path: `/${randomName}${extname(file.originalname)}`,
-                contents: file.buffer,
-                }).then(res => res).catch(err => err);
-                
-                if(result instanceof Error){
-                    return {r: false, data: {info: utils.errorExternalServicesTreatment(result), msg: "Erro ao enviar imagem!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
-                };
-                
-                if(result.status == 200){
-                    try {
-                        const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-                            path: result.result.path_display,
-                        });
+                if(response.statusText === "OK"){
+                    const dropbox = new Dropbox.Dropbox({
+                        accessToken: response.data.access_token,
+                        clientId: process.env.DROPBOX_CLIENT_ID,
+                        clientSecret: process.env.DROPBOX_CLIENT_SECRET
+                    });
+    
+                    const verifyToken = await this.verifyToken(token, "access");
+            
+                    const result = await dropbox.filesUpload({
+                    path: `/${randomName}${extname(file.originalname)}`,
+                    contents: file.buffer,
+                    }).then(res => res).catch(err => err);
                     
-                        console.log(verifyToken)
-                        console.log("------------")
-                        const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
-                            { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
-                            { new: true }).exec();
-                        console.log("------------")
-                        console.log(user)
-                        console.log("------------")
-                        return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
-                    } catch (error) {
-                        await this.rabbitMQService.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
-                        {
-                            dropbox: {
-                            accessToken: response.data.access_token,
-                            clientId: process.env.DROPBOX_CLIENT_ID,
-                            clientSecret: process.env.DROPBOX_CLIENT_SECRET
-                            },
-                            path: result.result.path_display,
-                            userId: verifyToken.user.id
-                        });
-                        return {r: false, data: {url: "", msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                    if(result instanceof Error){
+                        return {r: false, data: {info: utils.errorExternalServicesTreatment(result), msg: "Erro ao enviar imagem!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                    };
+                    
+                    if(result.status == 200){
+                        try {
+                            const userFilter = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
+
+                            if(!userFilter){
+                                return {r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
+                            };
+
+                            const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
+                                path: result.result.path_displa,
+                            });
+                                                    
+                            const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
+                                { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
+                                { new: true }).exec();
+
+                            if(utils.verifyCond(user)){
+                                if("img" in userFilter){
+                                    const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+                                    const filePath = metadata.result.path_lower;
+                                    await dropbox.filesDeleteV2({ path: filePath });
+                                };
+                            };
+
+                            console.log("------------")
+                            console.log(user)
+                            console.log("------------")
+                            return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
+                        } catch (error) {
+                            await this.rabbitMQService.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
+                            {
+                                dropbox: {
+                                accessToken: response.data.access_token,
+                                clientId: process.env.DROPBOX_CLIENT_ID,
+                                clientSecret: process.env.DROPBOX_CLIENT_SECRET
+                                },
+                                path: result.result.path_display,
+                                userId: verifyToken.user.id
+                            });
+                            return {r: false, data: {url: "", msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                        };
                     };
                 };
+            } catch (error) {
+                console.log(error)
+                return {r: false, data: {info: utils.errorExternalServicesTreatment(error), dropBox: error.response.data, msg: "DropBox error."}, status: HttpStatus.BAD_REQUEST};
             };
-    
-            /* axios.get("https://www.dropbox.com/oauth2/authorize?client_id=i8p06kgx6l9hvyk&response_type=code&redirect_uri=https://www.google.com.br/")
-            .then(res => console.log(res)).catch(err => console.) */
-    
-            return {r: false, data: {info: utils.errorExternalServicesTreatment(response), dropBox: response.response.data, msg: "DropBox error."}, status: HttpStatus.BAD_REQUEST};
-        }
+        };
 
         return {r: true, data: {info: "O login no dropBox é necessário!", url: `https://www.dropbox.com/oauth2/authorize?client_id=${process.env.DROPBOX_CLIENT_ID}&response_type=code&redirect_uri=${process.env.DROPBOX_REDIRECT_URI}`}, status: HttpStatus.ACCEPTED};
 
@@ -286,18 +292,18 @@ export class UsuarioService extends AuthService {
             const userFound = await this.userModel.findOne({ "email":emailInfo.email.toLowerCase() })
             .exec();
 
-            console.log(userFound)
+            const newToken = await this.generateAccessToken({msg: "Alteração de senha.", type: "access"});
 
             if(userFound){
                 await this.userModel.findByIdAndUpdate(
                     userFound._id,
                     { $set: { 
-                        validToken: await this.generateAccessToken({msg: "Alteração de senha.", type: "access"})
+                        validToken: newToken
                     }
                     },
                     { new: true }
                 ).exec();
-                return await utils.sendEmail(`https://www.google.com.br/?accessToken=${await this.generateAccessToken({msg: "Alteração de senha.", type: "access"})}`, "Alteração de senha.", emailInfo.email);
+                return await utils.sendEmail(`https://www.google.com.br/?accessToken=${newToken}`, "Alteração de senha.", emailInfo.email);
             }else{
                 return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST}
             };
@@ -315,7 +321,7 @@ export class UsuarioService extends AuthService {
         if(data.r){
             const verifyToken = await this.verifyToken(refreshToken.refreshToken, "refresh");
 
-            await this.userModel.findByIdAndUpdate(
+            const userEdit = await this.userModel.findByIdAndUpdate(
                 verifyToken.user.id,
                 { $set: { 
                     validToken: data.data.token
@@ -323,10 +329,13 @@ export class UsuarioService extends AuthService {
                 },
                 { new: true }
             ).exec();
-        };
+
+            if(utils.verifyCond(userEdit)){
+                return data;
+            };
+        }
 
         return data;
-
     };
 
     public async accessToken(accessToken: string): Promise<response>{
