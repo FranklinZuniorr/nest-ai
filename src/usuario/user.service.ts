@@ -78,7 +78,7 @@ export class UsuarioService extends AuthService {
             return {r: false, data: {msg: `${exist.email? "E-mail":"Nome"} já existe na base de dados!`}, status: HttpStatus.BAD_REQUEST};
         };
 
-        if(!utils.verifyCond(username) && !utils.verifyCond(email) && !utils.verifyCond(password) && !utils.verifyCond(coins)){
+        if(!utils.verifyCond(username) && !utils.verifyCond(email) && !utils.verifyCond(password)){
             return {r: false, data: {msg: "Nenhum dado de alteração foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
         };
 
@@ -88,11 +88,7 @@ export class UsuarioService extends AuthService {
             ...(utils.verifyCond(username) && !exist.username && {username}), 
             ...(utils.verifyCond(email) && !exist.email && {email: email.toLowerCase()}), 
             ...(utils.verifyCond(password) && {password: await this.setHash(password)})
-            },
-              $inc: {
-                ...(utils.verifyCond(coins) && {coins})
-              }
-            },
+            }},
             { new: true }
         ).exec();
     
@@ -102,7 +98,6 @@ export class UsuarioService extends AuthService {
         }else{
             return { r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST };
         };
-
     };
 
     public async delete(token: string): Promise<response>{
@@ -159,8 +154,7 @@ export class UsuarioService extends AuthService {
             if(utils.verifyCond(userEdit)){                
                 return {
                     r: true, 
-                    data: {
-                        userFilter, 
+                    data: { 
                         token: newToken, 
                         refreshToken: await this.generateRefreshToken({user: userFilter, type: "refresh"})
                     }, 
@@ -281,7 +275,7 @@ export class UsuarioService extends AuthService {
             };
         };
 
-        return {r: true, data: {info: "O login no dropBox é necessário!", url: `https://www.dropbox.com/oauth2/authorize?client_id=${process.env.DROPBOX_CLIENT_ID}&response_type=code&redirect_uri=${process.env.DROPBOX_REDIRECT_URI}`}, status: HttpStatus.ACCEPTED};
+        return {r: true, data: {msg: "O login no dropBox é necessário!", url: `https://www.dropbox.com/oauth2/authorize?client_id=${process.env.DROPBOX_CLIENT_ID}&response_type=code&redirect_uri=${process.env.DROPBOX_REDIRECT_URI}`}, status: HttpStatus.ACCEPTED};
 
     };
 
@@ -349,12 +343,13 @@ export class UsuarioService extends AuthService {
 
         const user = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
 
+        console.log(user)
+
         if(user && user.validToken == accessToken){
             return await this.verifyAccessTokenPass(accessToken);
         };
 
         return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
-
     };
 
     //-------------------------------------------------------

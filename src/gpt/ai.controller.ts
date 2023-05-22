@@ -17,7 +17,7 @@ export class AiController {
         /* const dataVerifyAccessToken = await this.aiService.usuarioService.verifyAccessTokenPass(accessToken); */
 
         /* if(dataVerifyAccessToken.r){ */
-            const response = await this.aiService.solicitarAi(text, null);
+            const response = await this.aiService.solicitarAi(text, accessToken);
             return new NestResponseBuilder()
             .comStatus(response.status)
             .comHeaders({
@@ -37,21 +37,21 @@ export class AiController {
         
     };
 
-    @Get("/qs")
+    /* @Get("/qs")
     @UseInterceptors(VerifyTokenInterceptor)
-    public async getAiReponseQs(@Query("msg") text: string, @Headers('accessToken') accessToken: string): Promise <NestResponse> {
+    public async getAiReponseQs(@Query("msg") text: string, @Headers('accessToken') accessToken: string): Promise <NestResponse> { */
 
         /* const dataVerifyAccessToken = await this.aiService.usuarioService.verifyAccessTokenPass(accessToken); */
 
         /* if(dataVerifyAccessToken.r){ */
-            const response = await this.aiService.solicitarAi(null, text);
+            /* const response = await this.aiService.solicitarAi(null, text);
             return new NestResponseBuilder()
             .comStatus(response.status)
             .comHeaders({
                 'Info': response.r
             })
             .comBody(response)
-            .build();
+            .build(); */
         /* }; */
 
         /* return new NestResponseBuilder()
@@ -62,5 +62,5 @@ export class AiController {
         .comBody(dataVerifyAccessToken)
         .build(); */
         
-    };
+    /* } */
 };
