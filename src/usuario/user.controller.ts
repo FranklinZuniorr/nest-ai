@@ -230,7 +230,12 @@ export class UsuarioController {
         })
         .comBody(data)
         .build();
-    }
+    };
+
+    @Post('verify-purchase-coins')
+    async verifyPurchaseCoins(){
+
+    };
 
     /* @UseInterceptors(FileInterceptor('file', {
         storage: memoryStorage(),
