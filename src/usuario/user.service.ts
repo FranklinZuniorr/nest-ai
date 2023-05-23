@@ -235,7 +235,7 @@ export class UsuarioService extends AuthService {
                             };
 
                             const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-                                path: result.result.path_display,
+                                path: result.result.path_displa,
                             }).catch(() => {
                                 throw {msg: "GENERATE"}
                             })
