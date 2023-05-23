@@ -236,7 +236,9 @@ export class UsuarioService extends AuthService {
 
                             const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
                                 path: result.result.path_display,
-                            });
+                            }).catch(() => {
+                                throw {msg: "GENERATE"}
+                            })
                                                     
                             const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
                                 { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
@@ -248,6 +250,8 @@ export class UsuarioService extends AuthService {
                                     const filePath = metadata.result.path_lower;
                                     const response = await dropbox.filesGetMetadata({ path: filePath }).then(async () => {
                                         await dropbox.filesDeleteV2({ path: filePath });
+                                    }).catch(() => {
+                                        throw {msg: "DELETE"}
                                     })
                                 };
                             };
@@ -261,7 +265,8 @@ export class UsuarioService extends AuthService {
                                 clientSecret: process.env.DROPBOX_CLIENT_SECRET
                                 },
                                 path: result.result.path_display,
-                                userId: verifyToken.user.id
+                                userId: verifyToken.user.id,
+                                msg: error.msg
                             });
                             return {r: false, data: {url: "", msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
                         };
