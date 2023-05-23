@@ -32,7 +32,7 @@ async function bootstrap() {
       },
       noAck: false
     },
-  });
+  })
 
   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
