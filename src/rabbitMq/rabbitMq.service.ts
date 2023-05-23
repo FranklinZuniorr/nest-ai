@@ -87,7 +87,7 @@ export class RabbitMQService {
               { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
               { new: true }).exec();
 
-          if(utils.verifyCond(user) && data.data.msg == "DELETE"){
+          if(utils.verifyCond(user) && data.data.msg == "GENERATE"){
             if("img" in userFilter){
               const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
               const filePath = metadata.result.path_lower;
