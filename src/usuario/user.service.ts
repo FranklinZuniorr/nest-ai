@@ -255,6 +255,9 @@ export class UsuarioService extends AuthService {
                             console.log("------------")
                             return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
                         } catch (error) {
+                            console.log("-----------err")
+                            console.log(error)
+                            console.log("-----------err")
                             await this.rabbitMQService.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
                             {
                                 dropbox: {
