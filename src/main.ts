@@ -11,14 +11,14 @@ async function bootstrap() {
   }));
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  app.enableCors({
+/*   app.enableCors({
     origin: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     preflightContinue: false,
     optionsSuccessStatus: 204,
     credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization',
-  });
+  }); */
 
   await app.listen(process.env.PORT || 3001);
 
