@@ -64,8 +64,8 @@ export class AuthService {
           r: true, 
           data: {
               msg: "RefreshTokenOk!",
-              token: await this.generateAccessToken({user: {id: verify.user.id}, type: "access"}), 
-              refreshToken: await this.generateRefreshToken({user: verify.user.email, type: "refresh"})
+              token: await this.generateAccessToken({user: {id: verify.user.id, email: verify.user.email, username: verify.user.username}, type: "access"}), 
+              refreshToken: await this.generateRefreshToken({user: {id: verify.user.id, email: verify.user.email, username: verify.user.username}, type: "refresh"})
           }, 
           status: HttpStatus.ACCEPTED
       };
