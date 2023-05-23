@@ -74,45 +74,28 @@ export class RabbitMQService {
           clientId: data.data.dropbox.clientId,
           clientSecret: data.data.dropbox.clientSecret
         });
-  
-        try {
 
-          const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-            path: data.data.path,
-          });
+        const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
+          path: data.data.path,
+        });
 
-          const userFilter = await this.userModel.findById(data.data.userId).exec().then((doc) => doc?.toObject()).catch((err) => err);
+        const userFilter = await this.userModel.findById(data.data.userId).exec().then((doc) => doc?.toObject()).catch((err) => err);
 
-          const user = await this.userModel.findByIdAndUpdate(data.data.userId, 
-              { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
-              { new: true }).exec();
+        const user = await this.userModel.findByIdAndUpdate(data.data.userId, 
+            { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
+            { new: true }).exec();
 
-          if(utils.verifyCond(user) && data.data.msg == "GENERATE"){
-            if("img" in userFilter){
-              const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
-              const filePath = metadata.result.path_lower;
-              await dropbox.filesDeleteV2({ path: filePath });
-            };
-          }
+        if(utils.verifyCond(user) && data.data.msg == "GENERATE"){
+          if("img" in userFilter){
+            const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+            const filePath = metadata.result.path_lower;
+            await dropbox.filesDeleteV2({ path: filePath });
+          };
+        };
 
           console.log("------------")
           console.log(user)
           console.log("------------")
-          
-        } catch (error) {
-            await this.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
-            {
-              dropbox: {
-              accessToken: data.data.dropbox.accessToken,
-              clientId: data.data.dropbox.clientId,
-              clientSecret: data.data.dropbox.clientSecret
-              },
-              path: data.data.path,
-              userId: data.data.userId
-            });
-        };
-  
-        // Confirma o recebimento da mensagem após o processamento
       };
     });
   }
