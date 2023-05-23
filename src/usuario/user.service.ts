@@ -242,6 +242,10 @@ export class UsuarioService extends AuthService {
                                 { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
                                 { new: true }).exec();
 
+                                console.log("----------old")
+                            console.log(userFilter)
+                            console.log("----------old")
+
                             if(utils.verifyCond(user)){
                                 if("img" in userFilter){
                                     const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
