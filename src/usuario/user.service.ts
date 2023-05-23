@@ -242,26 +242,17 @@ export class UsuarioService extends AuthService {
                                 { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
                                 { new: true }).exec();
 
-                                console.log("----------old")
-                            console.log(userFilter)
-                            console.log("----------old")
-
                             if(utils.verifyCond(user)){
                                 if("img" in userFilter){
                                     const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
                                     const filePath = metadata.result.path_lower;
-                                    await dropbox.filesDeleteV2({ path: filePath });
+                                    const response = await dropbox.filesGetMetadata({ path: filePath }).then(async () => {
+                                        await dropbox.filesDeleteV2({ path: filePath });
+                                    })
                                 };
                             };
-
-                            console.log("------------")
-                            console.log(user)
-                            console.log("------------")
                             return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
                         } catch (error) {
-                            console.log("-----------err")
-                            console.log(error)
-                            console.log("-----------err")
                             await this.rabbitMQService.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
                             {
                                 dropbox: {
