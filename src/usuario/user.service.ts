@@ -6,7 +6,7 @@ import { extname } from 'path';
 import * as Dropbox from 'dropbox';
 import { AuthService } from './accessTokenAndRefreshToken/AuthService';
 import { JwtService } from '@nestjs/jwt';
-import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
+import { AccessDto, RefreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
 import { response, responseBuscaPorEmailDeUsuario, responseBuscaPorNomeDeUsuario } from 'src/core/http/responseDto/response';
 import { utils } from 'src/utils/utils';
 import axios from 'axios';
@@ -14,7 +14,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { UsuarioEdit } from './user.entity.edit';
-import { email } from './email.entity';
+import { Email } from './email.entity';
 import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 
 const jwtService = new JwtService();
@@ -278,7 +278,7 @@ export class UsuarioService extends AuthService {
 
     };
 
-    public async editPassword(emailInfo: email): Promise<response>{
+    public async editPassword(emailInfo: Email): Promise<response>{
 
         if(utils.verifyCond(emailInfo)){
 
@@ -307,7 +307,7 @@ export class UsuarioService extends AuthService {
 
     };
 
-    public async refreshToken(refreshToken: refreshDto): Promise<response>{
+    public async refreshToken(refreshToken: RefreshDto): Promise<response>{
 
         const data = await this.verifyRefreshTokenAndGenerateTokens(refreshToken);
 

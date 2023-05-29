@@ -4,9 +4,9 @@ import { Usuario } from './user.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { accessDto, refreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
+import { AccessDto, RefreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
 import { UsuarioEdit } from './user.entity.edit';
-import { email } from './email.entity';
+import { Email } from './email.entity';
 import { JwtMiddleware } from 'src/core/http/verify-token-middleware';
 import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
 import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
@@ -102,7 +102,7 @@ export class UsuarioController {
     };
 
     @Post('forget-password')
-    public async forgetPassword(@Body() email: email){
+    public async forgetPassword(@Body() email: Email){
         const data = await this.usuarioService.editPassword(email);
 
         return new NestResponseBuilder()
@@ -207,7 +207,7 @@ export class UsuarioController {
     };
 
     @Post('refresh-token')
-    async verifyRefreshToken(@Body() refreshToken: refreshDto): Promise<NestResponse>{
+    async verifyRefreshToken(@Body() refreshToken: RefreshDto): Promise<NestResponse>{
         const data = await this.usuarioService.refreshToken(refreshToken);
 
         return new NestResponseBuilder()
@@ -220,7 +220,7 @@ export class UsuarioController {
     };
 
     @Post('access-token')
-    async verifyAccessToken(@Body() accessToken: accessDto): Promise<NestResponse>{
+    async verifyAccessToken(@Body() accessToken: AccessDto): Promise<NestResponse>{
         const data = await this.usuarioService.accessToken(accessToken.accessToken);
 
         return new NestResponseBuilder()

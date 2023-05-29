@@ -1,7 +1,7 @@
-export class refreshDto {
+export class RefreshDto {
     refreshToken: string
 };
 
-export class accessDto {
+export class AccessDto {
     accessToken: string
 };

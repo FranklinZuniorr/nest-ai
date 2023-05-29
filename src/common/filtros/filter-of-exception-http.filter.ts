@@ -18,7 +18,14 @@ export class FilterOfExceptionHttp implements ExceptionFilter {
         const { status, body } = exception instanceof HttpException 
             ? {
                 status: exception.getStatus(),
-                body: {r: false, data: {error: exception.getResponse(), msg: exception.message}, status: exception.getStatus()}
+                body: {
+                    r: false, 
+                    data: {
+                        error: exception.getResponse(), 
+                        msg: JSON.parse(JSON.stringify(exception.getResponse())).message.join('\n')
+                    }, 
+                    status: exception.getStatus()
+                }
             }
             : {
                 status: HttpStatus.INTERNAL_SERVER_ERROR,

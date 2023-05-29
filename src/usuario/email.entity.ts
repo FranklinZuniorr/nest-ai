@@ -2,7 +2,7 @@ import { IsNotEmpty, IsString, IsEmail, Matches, IsNotEmptyObject } from 'class-
 import { Exclude, Expose } from 'class-transformer';
 import { IsEmailDeUsuarioUnico } from './is-email-de-usuario-unico.validator';
 
-export class email {
+export class Email {
     @Expose({
         name: 'email'
     })

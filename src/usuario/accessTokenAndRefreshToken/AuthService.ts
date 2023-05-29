@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { refreshDto } from './refreshAndAccessDto';
+import { RefreshDto } from './refreshAndAccessDto';
 import { utils } from 'src/utils/utils';
 import { response } from 'src/core/http/responseDto/response';
 import { InjectModel } from '@nestjs/mongoose';
@@ -36,7 +36,7 @@ export class AuthService {
     };
   };
 
-  public async verifyRefreshTokenAndGenerateTokens(refreshToken: refreshDto): Promise<response>{
+  public async verifyRefreshTokenAndGenerateTokens(refreshToken: RefreshDto): Promise<response>{
 
     console.log(refreshToken.refreshToken)
 
