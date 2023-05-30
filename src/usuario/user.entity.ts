@@ -21,6 +21,9 @@ export class UserDto {
     @IsNotEmpty({
         message: 'Nome é obrigatório!'
     })
+    @Matches(/^.{15,20}$/, {
+        message: 'O nome precisa ter no mínimo 15 caracteres e no máximo 20'
+    })
     username: string;
 
     
