@@ -2,7 +2,7 @@ import { IsNotEmpty, IsString, IsEmail, Matches, IsNotEmptyObject, IsOptional } 
 import { Exclude, Expose } from 'class-transformer';
 import { IsEmailDeUsuarioUnico } from './is-email-de-usuario-unico.validator';
 
-export class UsuarioEdit {
+export class UserEdit {
     @Expose({
         name: 'email'
     })
@@ -37,4 +37,4 @@ export class UsuarioEdit {
     })
     @IsOptional()
     coins?: number;
-}
+};

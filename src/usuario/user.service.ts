@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { Usuario } from './user.entity';
+import { UserDto } from './user.entity';
 import { BcryptService } from './bcrypt/bcrypt.service';
 import { memoryStorage } from 'multer';
 import { extname } from 'path';
@@ -13,9 +13,10 @@ import axios from 'axios';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
-import { UsuarioEdit } from './user.entity.edit';
+import { UserEdit } from './user.entity.edit';
 import { Email } from './email.entity';
 import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
+import { UserLogin } from './user.entity.login';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -25,7 +26,7 @@ export class UsuarioService extends AuthService {
         super(jwtService)
     }
     
-    public async create(usuario: Usuario): Promise<response> {
+    public async create(usuario: UserDto): Promise<response> {
 
         if(!(await this.buscaPorEmailDeUsuario(usuario.email)).exist && !(await this.buscaPorNomeDeUsuario(usuario.username)).exist){
 
@@ -57,7 +58,7 @@ export class UsuarioService extends AuthService {
 
     };
 
-    public async edit(token: string, body: UsuarioEdit): Promise<response> {
+    public async edit(token: string, body: UserEdit): Promise<response> {
 
         const verifyToken = await this.verifyToken(token, "access");
         let exist = {
@@ -119,7 +120,7 @@ export class UsuarioService extends AuthService {
 
     };
 
-    public async login(usuario: Usuario): Promise<response> {
+    public async login(usuario: UserLogin): Promise<response> {
 
         if((await this.buscaPorEmailDeUsuario(usuario.email)).exist){
 

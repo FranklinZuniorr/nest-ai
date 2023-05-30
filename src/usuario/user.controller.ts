@@ -1,15 +1,16 @@
 import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put, Delete, UseGuards } from '@nestjs/common';
 import { UsuarioService } from './user.service';
-import { Usuario } from './user.entity';
+import { UserDto } from './user.entity';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AccessDto, RefreshDto } from './accessTokenAndRefreshToken/refreshAndAccessDto';
-import { UsuarioEdit } from './user.entity.edit';
+import { UserEdit } from './user.entity.edit';
 import { Email } from './email.entity';
 import { JwtMiddleware } from 'src/core/http/verify-token-middleware';
 import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
 import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
+import { UserLogin } from './user.entity.login';
 
 @Controller('/')
 export class UsuarioController {
@@ -30,7 +31,7 @@ export class UsuarioController {
     } */
 
     @Post('new-user')
-    public async createUser(@Body() usuario: Usuario): Promise<NestResponse> {
+    public async createUser(@Body() usuario: UserDto): Promise<NestResponse> {
         
         const userCreated = await this.usuarioService.create(usuario);
         console.log(userCreated);
@@ -47,7 +48,7 @@ export class UsuarioController {
 
     @Put('edit-user')
     @UseInterceptors(VerifyTokenInterceptor)
-    public async editUser(@Body() usuario: UsuarioEdit, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
+    public async editUser(@Body() usuario: UserEdit, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
         /* const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken); */
 
@@ -141,7 +142,7 @@ export class UsuarioController {
     } */
 
     @Post('login')
-    public async loginUser(@Body() usuario: Usuario): Promise<NestResponse> {
+    public async loginUser(@Body() usuario: UserLogin): Promise<NestResponse> {
 
         const userLogged = await this.usuarioService.login(usuario);
 

@@ -2,7 +2,7 @@ import { IsNotEmpty, IsString, IsEmail, Matches, IsNotEmptyObject } from 'class-
 import { Exclude, Expose } from 'class-transformer';
 import { IsEmailDeUsuarioUnico } from './is-email-de-usuario-unico.validator';
 
-export class UserDto {
+export class UserLogin {
     id?: number;
 
 
@@ -14,15 +14,6 @@ export class UserDto {
     })
     email: string;
 
-
-    @Expose({
-        name: 'username'
-    })
-    @IsNotEmpty({
-        message: 'Nome é obrigatório!'
-    })
-    username: string;
-
     
     @Expose({
         name: 'password'
@@ -33,10 +24,5 @@ export class UserDto {
     @IsNotEmpty({
         message: 'Senha é obrigatório.'
     })
-    @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/, {
-        message: 'A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número, um caractere especial e 8 caracteres ao todo.'
-    })
     password: string | Promise<string>;
-
-    exist?: boolean;
 };
