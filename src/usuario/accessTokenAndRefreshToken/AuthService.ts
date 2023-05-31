@@ -82,9 +82,7 @@ export class AuthService {
   public async verifyAccessTokenPass(accessToken: string): Promise<response>{
 
     if(utils.verifyCond(accessToken)){
-      const verify = await this.verifyToken(accessToken, "access");
-      console.log(verify)
-          
+      const verify = await this.verifyToken(accessToken, "access");          
 
       if(verify.name === 'TokenExpiredError') {
           return {
@@ -104,7 +102,7 @@ export class AuthService {
       
       return {
           r: true, 
-          data: {msg: "AccessTokenOk!"}, 
+          data: {msg: "AccessTokenOk!", verify}, 
           status: HttpStatus.ACCEPTED
       };
     }

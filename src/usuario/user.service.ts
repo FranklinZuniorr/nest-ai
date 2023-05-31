@@ -36,7 +36,7 @@ export class UsuarioService extends AuthService {
                 return {r: false, data: `A senha precisa ter ao menos 8 caracteres!`, status: HttpStatus.BAD_REQUEST};
             }; */
             
-            const userFilter = {email: email.toLowerCase(), password: await this.setHash(password), username, coins: 0, validToken: ""};
+            const userFilter = {email: email.toLowerCase(), password: await this.setHash(password), username, coins: 0, validToken: "", img: ""};
             const createdUser = new this.userModel(userFilter);
             createdUser.save();
             console.log(userFilter);
@@ -129,10 +129,10 @@ export class UsuarioService extends AuthService {
             .then((doc) => doc?.toObject())
             .catch((err) => err);
 
-            const { email, password, username, _id } = userFound;
+            const { email, password, username, _id, img, coins } = userFound;
 
             const verification = await this.compareHashedPasswordAndPassword(usuario.password, password);
-            const userFilter = {email: email, username: username, id: _id};
+            const userFilter = {email: email, username: username, id: _id, img: img, coins: coins};
 
             if(!verification){
                 return {r: false, data: {msg: "Senha incorreta!"}, status: HttpStatus.BAD_REQUEST}
