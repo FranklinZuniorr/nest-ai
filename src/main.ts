@@ -20,7 +20,7 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization, accessToken',
   });
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT || 3001);
 
 /*   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
