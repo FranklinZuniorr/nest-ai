@@ -1,0 +1,12 @@
+OPENAI_API_KEY="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"
+DROPBOX_CLIENT_SECRET="gcgmjujbc3m2a80"
+DROPBOX_CLIENT_ID="bntd9ezkkyzc11o"
+DROPBOX_REDIRECT_URI="https://www.google.com.br/"
+ACCESS_TOKEN_SECRET="1344224"
+ACCESS_TOKEN_EXPIRATION=60000
+REFRESH_TOKEN_SECRET="34#434"
+REFRESH_TOKEN_EXPIRATION=90000
+MONGODB="mongodb+srv://aicorrige763:mqnOF4G8QL6U4pqK@cluster0.klnowuq.mongodb.net/ai_corrige?retryWrites=true&w=majority"
+BREVO_TOKEN="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"
+BREVO_EMAIL="aicorrige763@gmail.com"
+RABBIT_URL="amqps://grjyjmgc:z3Qm5gE2b3RmLSVV1HbNs1DoJDvd12El@hawk.rmq.cloudamqp.com/grjyjmgc"

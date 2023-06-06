@@ -22,7 +22,7 @@ export class FilterOfExceptionHttp implements ExceptionFilter {
                     r: false, 
                     data: {
                         error: exception.getResponse(), 
-                        msg: JSON.parse(JSON.stringify(exception.getResponse())).message.join('\n')
+                        msg: JSON.parse(JSON.stringify(exception.getResponse())).message
                     }, 
                     status: exception.getStatus()
                 }
