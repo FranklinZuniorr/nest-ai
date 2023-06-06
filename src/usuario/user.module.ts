@@ -11,9 +11,10 @@ import { User, UserSchema } from "src/mongoDb/user.schema";
 import { JwtMiddleware } from "src/core/http/verify-token-middleware";
 import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
 import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
+import { Access, AccessSchema } from "src/mongoDb/access.schema ";
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, {name: Access.name, schema: AccessSchema}]),
     ],
     controllers: [UsuarioController],
     providers: [

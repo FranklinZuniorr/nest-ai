@@ -17,12 +17,18 @@ import { UserEdit } from './user.entity.edit';
 import { Email } from './email.entity';
 import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 import { UserLogin } from './user.entity.login';
+import { Access } from 'src/mongoDb/access.schema ';
+import * as moment from "moment";
 
 const jwtService = new JwtService();
 @Injectable()
 export class UsuarioService extends AuthService {
     
-    constructor(@InjectModel(User.name) private userModel: Model<User>, private readonly rabbitMQService: RabbitMQService){
+    constructor(
+        @InjectModel(User.name) private userModel: Model<User>, 
+        private readonly rabbitMQService: RabbitMQService,
+        @InjectModel(Access.name) private accessModel: Model<Access>
+    ){
         super(jwtService)
     }
     
@@ -152,12 +158,49 @@ export class UsuarioService extends AuthService {
                 { new: true }
             ).exec()
 
-            if(utils.verifyCond(userEdit)){                
+            if(utils.verifyCond(userEdit)){   
+
+                const actualDateMonth = moment().format("MM/YYYY");
+                const actualDateDay = moment().format("DD/MM/YYYY");
+
+                const options = {
+                    upsert: true,
+                    new: true,
+                };
+
+                const dailyAccess = await this.accessModel.findOneAndUpdate(
+                    { date: actualDateMonth},
+                    { $addToSet: { [`access.${actualDateDay}`]: {
+                        _id,
+                        username,
+                        email,
+                        img,
+                        coins
+                    } } },
+                    options
+                ).exec().then(res => res).catch(err => err);
+
+                /* const countTotalElements = await this.accessModel.aggregate([
+                    { $match: { date: actualDateMonth } },
+                    {
+                        $project: {
+                        totalElements: {
+                            $reduce: {
+                            input: { $objectToArray: "$access" },
+                            initialValue: 0,
+                            in: { $add: ["$$value", { $size: "$$this.v" }] }
+                            }
+                        }
+                        }
+                    }
+                ]).exec().then(res => res).catch(err => err); */
+                  
+
                 return {
                     r: true, 
                     data: { 
                         token: newToken, 
-                        refreshToken: await this.generateRefreshToken({user: userFilter, type: "refresh"})
+                        refreshToken: await this.generateRefreshToken({user: userFilter, type: "refresh"}),
                     }, 
                     status: HttpStatus.ACCEPTED
                 };
