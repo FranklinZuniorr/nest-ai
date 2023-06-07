@@ -44,7 +44,7 @@ export class utils{
             const response = await transporter.sendMail(mailOptions);
             return {r: true, data: {response, msg: "E-mail enviado com sucesso!"}, status: HttpStatus.OK}
         } catch (error) {
-            return {r: false, data: {error: utils.errorExternalServicesTreatment(error), msg: "Erro ao enviar e-mail!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+            return {r: false, data: {error: utils.errorExternalServicesTreatment(error), msg: "Erro ao enviar e-mail, tente em outro momento!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
         };
     };
 };

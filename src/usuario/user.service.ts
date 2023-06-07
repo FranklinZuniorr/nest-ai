@@ -194,7 +194,6 @@ export class UsuarioService extends AuthService {
                         }
                     }
                 ]).exec().then(res => res).catch(err => err); */
-                  
 
                 return {
                     r: true, 
@@ -340,7 +339,7 @@ export class UsuarioService extends AuthService {
                     },
                     { new: true }
                 ).exec();
-                return await utils.sendEmail(`https://www.google.com.br/?accessToken=${newToken}`, "Alteração de senha.", emailInfo.email);
+                return await utils.sendEmail(`${process.env.URL_REDIRECT_EDIT_PASSWORD}?accessToken=${newToken}`, "Alteração de senha.", emailInfo.email);
             }else{
                 return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST}
             };
