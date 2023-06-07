@@ -18,6 +18,7 @@ export class VerifyTokenInterceptor implements NestInterceptor {
     console.log(dataVerify)
 
     if (!dataVerify.r) {
+      console.log("err1")
       const res = new NestResponseBuilder()
       .comStatus(dataVerify.status)
       .comHeaders({
@@ -29,6 +30,7 @@ export class VerifyTokenInterceptor implements NestInterceptor {
       return of(res)
     };
 
+    console.log("err2")
     return next.handle();
 
     /* ------------------------------------------- */
