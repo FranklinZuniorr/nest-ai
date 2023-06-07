@@ -19,6 +19,7 @@ import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 import { UserLogin } from './user.entity.login';
 import { Access } from 'src/mongoDb/access.schema ';
 import * as moment from "moment";
+import { error } from 'console';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -270,22 +271,21 @@ export class UsuarioService extends AuthService {
                     };
                     
                     if(result.status == 200){
+                        const userFilter = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
+                        
                         try {
-                            const userFilter = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
 
                             const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-                                path: result.result.path_display,
-                            }).catch(() => {
-                                throw {msg: "GENERATE"}
-                            })
+                                path: result.result.path_display
+                            }).catch(() => {throw {msg: "GENERATE"}})
                                                     
                             const user = await this.userModel.findByIdAndUpdate(verifyToken.user.id, 
                                 { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
                                 { new: true }).exec();
 
                             if(utils.verifyCond(user)){
-                                if("img" in userFilter){
-                                    const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+                                if("img" in userFilter && userFilter.img != ""){
+                                    const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.im });
                                     const filePath = metadata.result.path_lower;
                                     const response = await dropbox.filesGetMetadata({ path: filePath }).then(async () => {
                                         await dropbox.filesDeleteV2({ path: filePath });
@@ -296,7 +296,8 @@ export class UsuarioService extends AuthService {
                             };
                             return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};
                         } catch (error) {
-                            await this.rabbitMQService.sendToExchange("AICORRIGE", 'KEYAICORRIGE', 
+                            console.log(error)
+                            await this.rabbitMQService.sendToExchange("AICORRIGEAPI", 'KEYAICORRIGEAPI', 
                             {
                                 dropbox: {
                                 accessToken: response.data.access_token,
@@ -305,7 +306,8 @@ export class UsuarioService extends AuthService {
                                 },
                                 path: result.result.path_display,
                                 userId: verifyToken.user.id,
-                                msg: error.msg
+                                msg: error.msg,
+                                oldLinkImg: userFilter.img
                             });
                             return {r: false, data: {url: "", msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
                         };

@@ -50,9 +50,9 @@ export class RabbitMQService {
   async rabbitMqConsumeErrosUploadImage(){
     /* const userModel: ReturnModelType<typeof User> = getModelForClass(User);
     const rabbitMQService = new RabbitMQService(); */
-    const exchangeName = 'AICORRIGE';
-    const queueName = 'QUEUEAICORRIGE';
-    const routingKey = 'KEYAICORRIGE';
+    const exchangeName = 'AICORRIGEAPI';
+    const queueName = 'QUEUEAICORRIGEAPI';
+    const routingKey = 'KEYAICORRIGEAPI';
     const connection = await connect(process.env.RABBIT_URL);
     const channel = await connection.createChannel();
   
@@ -68,34 +68,37 @@ export class RabbitMQService {
       channel.ack(message);
   
       if (Object.keys(data.data.dropbox).length > 0) {
-  
         const dropbox = new Dropbox.Dropbox({
           accessToken: data.data.dropbox.accessToken,
           clientId: data.data.dropbox.clientId,
           clientSecret: data.data.dropbox.clientSecret
         });
 
-        const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
-          path: data.data.path,
-        });
-
-        const userFilter = await this.userModel.findById(data.data.userId).exec().then((doc) => doc?.toObject()).catch((err) => err);
-
-        const user = await this.userModel.findByIdAndUpdate(data.data.userId, 
-            { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
-            { new: true }).exec();
-
-        if(utils.verifyCond(user) && data.data.msg == "GENERATE"){
-          if("img" in userFilter){
-            const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
-            const filePath = metadata.result.path_lower;
-            await dropbox.filesDeleteV2({ path: filePath });
+        if(data.data.msg == "GENERATE"){
+  
+          const sharedLink = await dropbox.sharingCreateSharedLinkWithSettings({
+            path: data.data.path,
+          });
+  
+          const userFilter = await this.userModel.findById(data.data.userId).exec().then((doc) => doc?.toObject()).catch((err) => err);
+  
+          const user = await this.userModel.findByIdAndUpdate(data.data.userId, 
+              { $set: { img: sharedLink.result.url.replace("?dl=0", "?raw=1") } }, 
+              { new: true }).exec();
+  
+          if(utils.verifyCond(user)){
+            if("img" in userFilter && userFilter.img != ""){
+              const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+              const filePath = metadata.result.path_lower;
+              await dropbox.filesDeleteV2({ path: filePath });
+            };
           };
-        };
-
-          console.log("------------")
-          console.log(user)
-          console.log("------------")
+  
+            console.log("------------")
+            console.log(user)
+            console.log("------------")
+        }
+  
       };
     });
   }
