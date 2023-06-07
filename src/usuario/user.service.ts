@@ -328,20 +328,31 @@ export class UsuarioService extends AuthService {
             const userFound = await this.userModel.findOne({ "email":emailInfo.email.toLowerCase() })
             .exec();
 
-            const newToken = await this.generateAccessToken({msg: "Alteração de senha.", type: "access"});
+            const date = moment().format("DD/MM/YYYY");
 
-            if(userFound){
-                await this.userModel.findByIdAndUpdate(
-                    userFound._id,
-                    { $set: { 
-                        validToken: newToken
-                    }
-                    },
-                    { new: true }
-                ).exec();
-                return await utils.sendEmail(`${process.env.URL_REDIRECT_EDIT_PASSWORD}?accessToken=${newToken}`, "Alteração de senha.", emailInfo.email);
+            const {lastRequestForgotPassword, _id} = userFound;
+
+            if(lastRequestForgotPassword != date){
+
+                const newToken = await this.generateAccessToken({msg: "Alteração de senha.", type: "access"});
+
+                if(userFound){
+                    await this.userModel.findByIdAndUpdate(
+                        _id,
+                        { $set: { 
+                            validToken: newToken,
+                            lastRequestForgotPassword: date
+                        }
+                        },
+                        { new: true }
+                    ).exec();
+                    
+                    return await utils.sendEmail(`${process.env.URL_REDIRECT_EDIT_PASSWORD}?accessToken=${newToken}`, "Alteração de senha.", emailInfo.email);
+                }else{
+                    return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST}
+                };
             }else{
-                return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST}
+                return {r: false, data: {msg: "Limite de solicitações atingido, tente novamente em outro momento!"}, status: HttpStatus.BAD_REQUEST}
             };
 
         }else{

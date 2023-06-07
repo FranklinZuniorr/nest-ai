@@ -22,6 +22,9 @@ export class User {
 
   @Prop()
   validToken: string;
+
+  @Prop()
+  lastRequestForgotPassword?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
