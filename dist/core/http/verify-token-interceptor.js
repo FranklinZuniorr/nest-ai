@@ -22,7 +22,6 @@ let VerifyTokenInterceptor = class VerifyTokenInterceptor {
         const request = context.switchToHttp().getRequest();
         const accessToken = request.headers.accesstoken;
         const dataVerify = await this.UsuarioService.accessToken(accessToken);
-        console.log(dataVerify);
         if (!dataVerify.r) {
             const res = new nest_response_builder_1.NestResponseBuilder()
                 .comStatus(dataVerify.status)
