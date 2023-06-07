@@ -328,6 +328,8 @@ export class UsuarioService extends AuthService {
             const userFound = await this.userModel.findOne({ "email":emailInfo.email.toLowerCase() })
             .exec();
 
+            if(!userFound) return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST};
+
             const date = moment().format("DD/MM/YYYY");
 
             const {lastRequestForgotPassword, _id} = userFound;
@@ -336,27 +338,24 @@ export class UsuarioService extends AuthService {
 
                 const newToken = await this.generateAccessToken({msg: "Alteração de senha.", type: "access"});
 
-                if(userFound){
-                    await this.userModel.findByIdAndUpdate(
-                        _id,
-                        { $set: { 
-                            validToken: newToken,
-                            lastRequestForgotPassword: date
-                        }
-                        },
-                        { new: true }
-                    ).exec();
-                    
-                    return await utils.sendEmail(`${process.env.URL_REDIRECT_EDIT_PASSWORD}?accessToken=${newToken}`, "Alteração de senha.", emailInfo.email);
-                }else{
-                    return {r: false, data: {msg: "E-mail não foi encontrado!"}, status: HttpStatus.BAD_REQUEST}
-                };
+                await this.userModel.findByIdAndUpdate(
+                    _id,
+                    { $set: { 
+                        validToken: newToken,
+                        lastRequestForgotPassword: date
+                    }
+                    },
+                    { new: true }
+                ).exec();
+                
+                return await utils.sendEmail(`${process.env.URL_REDIRECT_EDIT_PASSWORD}?accessToken=${newToken}`, "Alteração de senha.", emailInfo.email);
+
             }else{
-                return {r: false, data: {msg: "Limite de solicitações atingido, tente novamente em outro momento!"}, status: HttpStatus.BAD_REQUEST}
+                return {r: false, data: {msg: "Limite de solicitações atingido, tente novamente amanhã!"}, status: HttpStatus.BAD_REQUEST};
             };
 
         }else{
-            return {r: false, data: {msg: "E-mail não foi enviado!"}, status: HttpStatus.BAD_REQUEST}
+            return {r: false, data: {msg: "E-mail não foi enviado!"}, status: HttpStatus.BAD_REQUEST};
         };
 
     };
