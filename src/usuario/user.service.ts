@@ -285,13 +285,15 @@ export class UsuarioService extends AuthService {
 
                             if(utils.verifyCond(user)){
                                 if("img" in userFilter && userFilter.img != ""){
-                                    const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.im });
-                                    const filePath = metadata.result.path_lower;
-                                    const response = await dropbox.filesGetMetadata({ path: filePath }).then(async () => {
-                                        await dropbox.filesDeleteV2({ path: filePath });
-                                    }).catch(() => {
+                                    try {
+                                        const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+                                        const filePath = metadata.result.path_lower;
+                                        const response = await dropbox.filesGetMetadata({ path: filePath }).then(async () => {
+                                            await dropbox.filesDeleteV2({ path: filePath });
+                                        })
+                                    } catch (error) {
                                         throw {msg: "DELETE"}
-                                    })
+                                    }
                                 };
                             };
                             return {r: true, data: {url: sharedLink.result.url.replace("?dl=0", "?raw=1"), msg: "Imagem enviada com sucesso!"}, status: HttpStatus.CREATED};

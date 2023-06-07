@@ -94,11 +94,18 @@ export class RabbitMQService {
             };
           };
   
-            console.log("------------")
+            console.log("Rabbit_fix------------")
             console.log(user)
-            console.log("------------")
+            console.log("Rabbit_fix------------")
+        }else if(data.data.msg == "DELETE"){
+          const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: data.data.oldLinkImg });
+          const filePath = metadata.result.path_lower;
+          const response = await dropbox.filesGetMetadata({ path: filePath }).then(async () => {
+              await dropbox.filesDeleteV2({ path: filePath });
+          })
+
+          console.log("Rabbit_fix_delete------------")
         }
-  
       };
     });
   }
