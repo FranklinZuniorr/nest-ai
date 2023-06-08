@@ -77,6 +77,16 @@ export class UsuarioService extends AuthService {
         (await this.buscaPorEmailDeUsuario(email)).exist? exist.email = true:false;
         (await this.buscaPorNomeDeUsuario(username)).exist? exist.username = true:false;
 
+        const userFound = await this.userModel.findOne({ "email":email.toLowerCase() })
+            .exec()
+            .then((doc) => doc?.toObject())
+            .catch((err) => err);
+
+        const verification = await this.compareHashedPasswordAndPassword(password, userFound.password);
+
+        if(verification){
+            return {r: false, data: {msg: `Coloque uma senha diferente da anterior!`}, status: HttpStatus.BAD_REQUEST};
+        };
 
         if(exist.email && exist.username){
             return {r: false, data: {msg: `E-mail e nome já existem na base de dados!`}, status: HttpStatus.BAD_REQUEST};
