@@ -77,7 +77,7 @@ export class UsuarioService extends AuthService {
         (await this.buscaPorEmailDeUsuario(email)).exist? exist.email = true:false;
         (await this.buscaPorNomeDeUsuario(username)).exist? exist.username = true:false;
 
-        const userFound = await this.userModel.findOne({ "email":email.toLowerCase() })
+        const userFound = await this.userModel.findOne({ "email": verifyToken.email.toLowerCase() })
             .exec()
             .then((doc) => doc?.toObject())
             .catch((err) => err);
@@ -346,11 +346,11 @@ export class UsuarioService extends AuthService {
 
             const date = moment().format("DD/MM/YYYY");
 
-            const {lastRequestForgotPassword, _id} = userFound;
+            const {lastRequestForgotPassword, _id, email} = userFound;
 
             if(lastRequestForgotPassword != date){
 
-                const newToken = await this.generateAccessToken({msg: "Alteração de senha.", type: "access", user: {id: _id}});
+                const newToken = await this.generateAccessToken({msg: "Alteração de senha.", type: "access", user: {id: _id, email}});
 
                 await this.userModel.findByIdAndUpdate(
                     _id,
