@@ -17,7 +17,7 @@ async function bootstrap() {
     preflightContinue: false,
     optionsSuccessStatus: 204,
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept, Authorization, accessToken, file, Access-Control-Allow-Origin',
+    allowedHeaders: 'Content-Type, Accept, Authorization, accessToken, file',
   });
 
   await app.listen(process.env.PORT || 3001);
