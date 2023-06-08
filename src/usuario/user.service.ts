@@ -340,7 +340,7 @@ export class UsuarioService extends AuthService {
 
             if(lastRequestForgotPassword != date){
 
-                const newToken = await this.generateAccessToken({msg: "Alteração de senha.", type: "access"});
+                const newToken = await this.generateAccessToken({msg: "Alteração de senha.", type: "access", id: _id});
 
                 await this.userModel.findByIdAndUpdate(
                     _id,
