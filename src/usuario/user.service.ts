@@ -77,7 +77,7 @@ export class UsuarioService extends AuthService {
         (await this.buscaPorEmailDeUsuario(email)).exist? exist.email = true:false;
         (await this.buscaPorNomeDeUsuario(username)).exist? exist.username = true:false;
 
-        const userFound = await this.userModel.findOne({ "email": verifyToken.email.toLowerCase() })
+        const userFound = await this.userModel.findOne({ "email": verifyToken.user.email.toLowerCase() })
             .exec()
             .then((doc) => doc?.toObject())
             .catch((err) => err);
