@@ -111,7 +111,16 @@ export class UsuarioService extends AuthService {
         ).exec();
     
         if (utils.verifyCond(user)) {
-            console.log(user);
+            if(verifyToken.msg == "Alteração de senha."){
+                await this.userModel.findByIdAndUpdate(
+                    verifyToken.user.id,
+                    { $set: { 
+                        validToken: ""
+                    }
+                    },
+                    { new: true }
+                ).exec();
+            };
             return { r: true, data: {msg: `${user.email} editado com sucesso!`}, status: HttpStatus.OK };
         }else{
             return { r: false, data: {msg: "Usuário não foi encontrado!"}, status: HttpStatus.BAD_REQUEST };
