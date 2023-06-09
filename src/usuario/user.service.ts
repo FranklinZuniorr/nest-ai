@@ -254,6 +254,9 @@ export class UsuarioService extends AuthService {
         console.log(code)
 
         if(code != undefined && code.length > 0){
+            if(file != null && !file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) return {r: false, data: {msg: "Só imagens são permitadas!"}, status: HttpStatus.BAD_REQUEST};
+            if(file == null) return {r: false, data: {msg: "Insira ao menos um arquivo!"}, status: HttpStatus.BAD_REQUEST};
+
             const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
 
             const url = 'https://api.dropboxapi.com/oauth2/token';
@@ -339,9 +342,6 @@ export class UsuarioService extends AuthService {
                 return {r: false, data: {info: utils.errorExternalServicesTreatment(error), dropBox: error.response.data, msg: "DropBox error."}, status: HttpStatus.BAD_REQUEST};
             };
         };
-        
-        if(file != null && !file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) return {r: false, data: {msg: "Só imagens são permitadas!"}, status: HttpStatus.BAD_REQUEST};
-        if(file == null) return {r: false, data: {msg: "Insira ao menos um arquivo!"}, status: HttpStatus.BAD_REQUEST};
         return {r: true, data: {msg: "O login no dropBox é necessário!", url: `https://www.dropbox.com/oauth2/authorize?client_id=${process.env.DROPBOX_CLIENT_ID}&response_type=code&redirect_uri=${process.env.DROPBOX_REDIRECT_URI}`}, status: HttpStatus.ACCEPTED};
 
     };
