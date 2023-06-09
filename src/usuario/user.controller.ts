@@ -171,7 +171,7 @@ export class UsuarioController {
     };
 
     @Post('upload-image')
-    @UseInterceptors(VerifyTokenInterceptor, FileInterceptor('file'))
+    @UseInterceptors(FileInterceptor('file'), VerifyTokenInterceptor)
     async upload(@UploadedFile() file, @Headers('accessToken') accessToken: string, @Query('code') code: string): Promise<NestResponse> {
 
         /* const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken); */
