@@ -171,14 +171,7 @@ export class UsuarioController {
     };
 
     @Post('upload-image')
-    @UseInterceptors(VerifyTokenInterceptor, FileInterceptor('file' , {
-        fileFilter: (req, file, callback) => {
-            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-                return callback(new Error('Só imagens são permitidas!'), false);
-            }
-            callback(null, true);
-        },
-    }))
+    @UseInterceptors(VerifyTokenInterceptor, FileInterceptor('file'))
     async upload(@UploadedFile() file, @Headers('accessToken') accessToken: string, @Query('code') code: string): Promise<NestResponse> {
 
         /* const dataVerifyAccessToken = await this.usuarioService.verifyAccessTokenPass(accessToken); */

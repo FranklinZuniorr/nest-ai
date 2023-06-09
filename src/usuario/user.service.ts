@@ -340,6 +340,7 @@ export class UsuarioService extends AuthService {
             };
         };
         
+        if(!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) return {r: false, data: {msg: "Só imagens são permitadas!"}, status: HttpStatus.BAD_REQUEST};
         if(file == null) return {r: false, data: {msg: "Insira ao menos um arquivo!"}, status: HttpStatus.BAD_REQUEST};
         return {r: true, data: {msg: "O login no dropBox é necessário!", url: `https://www.dropbox.com/oauth2/authorize?client_id=${process.env.DROPBOX_CLIENT_ID}&response_type=code&redirect_uri=${process.env.DROPBOX_REDIRECT_URI}`}, status: HttpStatus.ACCEPTED};
 
