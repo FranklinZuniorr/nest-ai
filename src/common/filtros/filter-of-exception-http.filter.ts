@@ -1,44 +1,48 @@
 import { Catch, ExceptionFilter, ArgumentsHost, HttpException, HttpStatus } from "@nestjs/common";
-import { Response } from "express";
+import { HttpAdapterHost, AbstractHttpAdapter } from "@nestjs/core";
 
 @Catch()
 export class FilterOfExceptionHttp implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
-    const contexto = host.switchToHttp();
-    const resposta = contexto.getResponse<Response>();
 
-    // Configurações do cabeçalho CORS
-    resposta.header('Access-Control-Allow-Origin', '*');
-    resposta.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-    resposta.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    private httpAdapter: AbstractHttpAdapter;
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    constructor(adapterHost: HttpAdapterHost) {
+        this.httpAdapter = adapterHost.httpAdapter;
+    }
 
-    const body =
-      exception instanceof HttpException
-        ? {
-            r: false,
-            data: {
-              error: exception.getResponse(),
-              msg: JSON.parse(JSON.stringify(exception.getResponse())).message,
-            },
-            status: exception.getStatus(),
-          }
-        : {
-            r: false,
-            data: {
-              statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-              timestamp: new Date().toISOString(),
-              message: exception.message,
-              path: contexto.getRequest().path,
-              msg: exception.message,
-            },
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-          };
+    catch(exception: Error, host: ArgumentsHost) {
+        const contexto = host.switchToHttp();
+        const requisicao = contexto.getRequest();
+        const resposta = contexto.getResponse();
 
-    resposta.status(status).json(body);
-  }
+        const { status, body } = exception instanceof HttpException 
+            ? {
+                status: exception.getStatus(),
+                body: {
+                    r: false, 
+                    data: {
+                        error: exception.getResponse(), 
+                        msg: JSON.parse(JSON.stringify(exception.getResponse())).message
+                    }, 
+                    status: exception.getStatus()
+                }
+            }
+            : {
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                body: {
+                    r: false,
+                    data: {
+                        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                        timestamp: new Date().toISOString(),
+                        message: exception.message,
+                        path: requisicao.path,
+                        msg: exception.message
+                    },
+                    status: HttpStatus.INTERNAL_SERVER_ERROR
+                }
+            };
+        
+        this.httpAdapter.reply(resposta, body, status);
+    }
+
 }
