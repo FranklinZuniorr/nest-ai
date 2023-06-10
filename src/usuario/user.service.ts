@@ -423,7 +423,7 @@ export class UsuarioService extends AuthService {
         console.log(user)
 
         if(user && user.validToken == accessToken){
-            return await this.verifyAccessTokenPass(accessToken);
+            return {r: false, data: {msg: "AccessTokenOk!", data: user}, status: HttpStatus.BAD_REQUEST};
         };
 
         return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
