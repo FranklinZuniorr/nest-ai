@@ -421,9 +421,10 @@ export class UsuarioService extends AuthService {
         const user = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
 
         console.log(user)
+        const { username, email, img, coins, validToken, _id } = user;
 
         if(user && user.validToken == accessToken){
-            return {r: false, data: {msg: "AccessTokenOk!", data: user}, status: HttpStatus.BAD_REQUEST};
+            return {r: false, data: {msg: "AccessTokenOk!", data: {username, email, img, coins, validToken, _id}}, status: HttpStatus.OK};
         };
 
         return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
