@@ -82,10 +82,12 @@ export class UsuarioService extends AuthService {
             .then((doc) => doc?.toObject())
             .catch((err) => err);
 
-        const verification = await this.compareHashedPasswordAndPassword(password, userFound.password);
-
-        if(verification){
-            return {r: false, data: {msg: `Coloque uma senha diferente da anterior!`}, status: HttpStatus.BAD_REQUEST};
+        if(utils.verifyCond(password)){
+            const verification = await this.compareHashedPasswordAndPassword(password, userFound.password);
+    
+            if(verification){
+                return {r: false, data: {msg: `Coloque uma senha diferente da anterior!`}, status: HttpStatus.BAD_REQUEST};
+            };
         };
 
         if(exist.email && exist.username){
