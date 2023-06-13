@@ -310,7 +310,8 @@ export class UsuarioService extends AuthService {
                             if(utils.verifyCond(user)){
                                 if("img" in userFilter && userFilter.img != ""){
                                     try {
-                                        const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img });
+                                        const metadata = await dropbox.sharingGetSharedLinkMetadata({ url: userFilter.img })
+                                        .then(res => res).catch(err => err);
                                         const filePath = metadata.result.path_lower;
                                         const response = await dropbox.filesGetMetadata({ path: filePath }).then(async () => {
                                             await dropbox.filesDeleteV2({ path: filePath });
