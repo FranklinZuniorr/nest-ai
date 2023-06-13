@@ -336,7 +336,7 @@ export class UsuarioService extends AuthService {
                                 msg: error.msg,
                                 oldLinkImg: userFilter.img
                             });
-                            return {r: false, data: {url: "", msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                            return {r: true, data: {url: "", msg: "Imagem armazenada, url em tratativa de erro!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
                         };
                     };
                 };
