@@ -10,3 +10,5 @@ MONGODB="mongodb+srv://aicorrige763:mqnOF4G8QL6U4pqK@cluster0.klnowuq.mongodb.ne
 BREVO_TOKEN="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"
 BREVO_EMAIL="aicorrige763@gmail.com"
 RABBIT_URL="amqps://grjyjmgc:z3Qm5gE2b3RmLSVV1HbNs1DoJDvd12El@hawk.rmq.cloudamqp.com/grjyjmgc"
+CLIENT_ID="AfcQf_V5kIqFNifqcaiOHG7YJIFAU5-Z5zluZT1SZfDSGGEUX3RJQFsgTWXXJNo8aSedIZf9zrO5-QvZ"
+APP_SECRET="EHy0BdvgqFAMMb28g3_ZE1Jr6Wta_e7pZKHTuPGRMdmtiEV5EKRivQXBIaAbwqQneUXaqh_wKblYamkv"
