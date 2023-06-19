@@ -13,7 +13,7 @@ export class PayPalController {
     @UseInterceptors(VerifyTokenInterceptor)
     public async postOrderIDCapture(@Param("orderID") orderID: string, @Headers('accessToken') accessToken: string): Promise <NestResponse> {
 
-        const response = await this.PayPalService.setPayPalOrderIdCapture(orderID);
+        const response = await this.PayPalService.setPayPalOrderIdCapture(orderID, accessToken);
         return new NestResponseBuilder()
         .comStatus(response.status)
         .comHeaders({

@@ -19,9 +19,12 @@ export class PayPalService extends AuthService{
         super(jwtService)
     }
 
-    public async setPayPalOrderIdCapture(orderID: string): Promise<any>{
+    public async setPayPalOrderIdCapture(orderID: string, accessToken: string): Promise<any>{
         try {
             const response = await capturePayment(orderID);
+
+            const verifyToken = this.verifyToken(accessToken, "access");
+
             return {r: true, data: {msg: "Pagamento capturado!", res: response}, status: HttpStatus.ACCEPTED};
         } catch (error){
             return {r: false, data: {msg: "Failed to capture order!", info: utils.errorExternalServicesTreatment(error)}, status: HttpStatus.INTERNAL_SERVER_ERROR};

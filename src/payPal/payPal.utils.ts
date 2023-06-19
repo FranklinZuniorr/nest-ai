@@ -33,7 +33,7 @@ export const createOrder = async () => {
           amount: {
           currency_code: "BRL",
           value: "5.00",
-          },
+          }
       },
       ],
   };
