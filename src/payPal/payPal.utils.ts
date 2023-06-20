@@ -36,6 +36,9 @@ export const createOrder = async () => {
           }
       },
       ],
+      /* application_context: {
+        return_url: "http://localhost:3000/",
+      }, */
   };
 
   const response = await fetch(url, {
