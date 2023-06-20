@@ -23,7 +23,17 @@ export class PayPalService extends AuthService{
         try {
             const response = await capturePayment(orderID);
 
-            const verifyToken = this.verifyToken(accessToken, "access");
+            const verifyToken = await this.verifyToken(accessToken, "access");
+
+            const { id } = verifyToken.user;
+            
+            const user = await this.userModel.findByIdAndUpdate(
+                id,
+                { $inc: {
+                    coins: 10
+                  }
+                }
+            ).exec();
 
             return {r: true, data: {msg: "Pagamento capturado!", res: response}, status: HttpStatus.ACCEPTED};
         } catch (error){
