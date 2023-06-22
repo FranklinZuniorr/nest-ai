@@ -58,6 +58,8 @@ export class PaymentService extends AuthService{
 
         const payload = request.body;
         const sig = request.headers['stripe-signature'];
+
+        console.log(request)
         
         let event;
       
