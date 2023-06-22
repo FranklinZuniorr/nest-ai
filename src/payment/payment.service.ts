@@ -39,9 +39,10 @@ export class PaymentService extends AuthService{
             mode: 'payment',
             success_url: `${YOUR_DOMAIN}?success=true`,
             cancel_url: `${YOUR_DOMAIN}?canceled=true`,
+            client_reference_id: id
         });
 
-        session = {...session, id_mongo: id}
+        session.metadata = {id_mongo: id}
 
         console.log(session)
         return {r: true, data: {msg: "Checkout criado!", res: session}, status: HttpStatus.ACCEPTED};
@@ -65,6 +66,7 @@ export class PaymentService extends AuthService{
       
         try {
             event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
+            console.log("event", event)
         } catch (err) {
             return {r: false, data: {msg: "Webhook Error!", res: err.message}, status: HttpStatus.BAD_REQUEST};
         }
