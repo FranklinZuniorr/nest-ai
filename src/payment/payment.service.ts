@@ -27,13 +27,13 @@ export class PaymentService extends AuthService{
 
         const { id } = verifyToken.user;
 
-        const YOUR_DOMAIN = 'http://localhost:3001';
+        const YOUR_DOMAIN = process.env.STRIPE_DOMAIN;
 
         let session = await stripe.checkout.sessions.create({
             line_items: [
               {
                 // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                price: 'price_1NLlRDCRHbMqiuoDsIAZWrdV',
+                price: process.env.STRIPE_PRICE,
                 quantity: 1,
               },
             ],
