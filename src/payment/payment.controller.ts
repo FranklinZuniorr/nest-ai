@@ -51,7 +51,6 @@ export class PaymentController {
     };
 
     @Post("webhook")
-    @UseInterceptors(VerifyTokenInterceptor)
     public async webHookStripe(@Req() req: Request): Promise<NestResponse> {
         const response = await this.PaymentService.newWebHookStripe(req);
         return new NestResponseBuilder()
