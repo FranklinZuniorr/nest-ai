@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
+import { AiJson } from './ai..json.entity';
 require("dotenv").config();
 
 const jwtService = new JwtService();
@@ -19,7 +20,7 @@ export class AiService extends AuthService{
         super(jwtService)
     }
 
-    public async solicitarAi(text: Ai, accessToken: string): Promise<any> {
+    public async callAi(text: Ai, accessToken: string): Promise<any> {
 
         const verifyToken = await this.verifyToken(accessToken, "access");
 
@@ -76,5 +77,49 @@ export class AiService extends AuthService{
             return {r: false, data: {msg: "Coins insuficientes!"}, status: HttpStatus.BAD_REQUEST};
         };
 
+    };
+
+    public async callAiJson(req: AiJson, accessToken: string): Promise<any>{
+        const verifyToken = await this.verifyToken(accessToken, "access");
+
+        const userFound = await this.userModel.findById(verifyToken.user.id)
+        .exec();
+
+        const { coins } = userFound.toObject();
+
+        if(coins > 0){
+            const apiKey = process.env.OPENAI_API_KEY;
+            const baseURL = "https://api.openai.com/v1/chat";
+    
+            const openai = axios.create({
+            baseURL,
+            headers: {
+                Authorization: `Bearer ${apiKey}`,
+                "Content-Type": "application/json",
+            },
+            });
+
+            const transactionParser = async (transactionAlert) => {
+            const payload = {
+                model: "gpt-3.5-turbo-0613",
+                messages: [
+                {
+                    role: "user",
+                    content: transactionAlert
+                },
+                ],
+                functions: [req.schema],
+            };
+
+            const response = await openai.post('/completions', JSON.stringify(payload));
+            const { choices } = response.data.json();
+            return choices[0].message.function_call.arguments;
+            };
+
+            transactionParser(req.msg);
+            
+        }else{
+            return {r: false, data: {msg: "Coins insuficientes!"}, status: HttpStatus.BAD_REQUEST};
+        };
     };
 };
