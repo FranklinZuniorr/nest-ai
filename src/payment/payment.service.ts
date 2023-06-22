@@ -89,7 +89,7 @@ export class PaymentService extends AuthService{
                 coins: 10
               },
               $push: {
-                event
+                shopping: event
               }
             }
             ).exec();
