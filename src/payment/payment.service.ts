@@ -56,7 +56,7 @@ export class PaymentService extends AuthService{
         console.log("Fulfilling order", lineItems);
         }
 
-        const payload = body;
+        const payload = JSON.stringify(body);
         const sig = stripeSignature;
 
         console.log({payload, sig})
@@ -64,7 +64,7 @@ export class PaymentService extends AuthService{
         let event;
       
         try {
-            event = stripe.webhooks.constructEvent(payload.toString(), sig, endpointSecret);
+            event = stripe.webhooks.constructEvent(payload, sig.toString(), endpointSecret);
         } catch (err) {
             return {r: false, data: {msg: "Webhook Error!", res: err.message}, status: HttpStatus.BAD_REQUEST};
         }
