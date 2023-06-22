@@ -48,7 +48,7 @@ export class PaymentService extends AuthService{
         
     };
 
-    public async newWebHookStripe(request: Request): Promise<any> {
+    public async newWebHookStripe(body, stripeSignature): Promise<any> {
 
         const endpointSecret = process.env.STRIPE_ENDPOINT_CONFIRM_PAYMENT_SECRET;
         const fulfillOrder = (lineItems) => {
@@ -56,10 +56,10 @@ export class PaymentService extends AuthService{
         console.log("Fulfilling order", lineItems);
         }
 
-        const payload = request.body;
-        const sig = request.headers['stripe-signature'];
+        const payload = body;
+        const sig = stripeSignature;
 
-        console.log(request)
+        console.log({payload, sig})
         
         let event;
       

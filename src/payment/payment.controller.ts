@@ -3,7 +3,7 @@ import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
 import { PaymentService } from './payment.service';
-import bodyParser from 'body-parser';
+import bodyParser, { BodyParser } from 'body-parser';
 
 @Controller('stripe')
 export class PaymentController {
@@ -52,8 +52,8 @@ export class PaymentController {
     };
 
     @Post("webhook")
-    public async webHookStripe(@Req() req: Request): Promise<NestResponse> {
-        const response = await this.PaymentService.newWebHookStripe(req);
+    public async webHookStripe(@Body() body, @Headers('stripe-signature') stripeSignature: string): Promise<NestResponse> {
+        const response = await this.PaymentService.newWebHookStripe(body, stripeSignature);
         return new NestResponseBuilder()
         .comStatus(response.status)
         .comHeaders({
