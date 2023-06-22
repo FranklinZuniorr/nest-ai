@@ -37,9 +37,9 @@ export class PaymentService extends AuthService{
             cancel_url: `${YOUR_DOMAIN}?canceled=true`,
         });
 
-        return {r: true, data: {msg: "Pagamento capturado!", res: session}, status: HttpStatus.ACCEPTED};
-        
         console.log(session)
+        return {r: true, data: {msg: "Checkout criado!", res: session}, status: HttpStatus.ACCEPTED};
+        
     };
 
     public async newWebHookStripe(request: Request): Promise<any> {
@@ -50,7 +50,7 @@ export class PaymentService extends AuthService{
         console.log("Fulfilling order", lineItems);
         }
 
-        const payload = request.body;
+        const payload = JSON.stringify(request.body);
         const sig = request.headers['stripe-signature'];
       
         let event;
