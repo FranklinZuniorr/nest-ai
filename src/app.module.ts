@@ -7,6 +7,8 @@ import { AiModule } from './gpt/ai.module';
 import { DatabaseModule } from './mongoDb/dataBase.module';
 import { PaymentModule } from './payment/payment.module';
 import * as bodyParser from 'body-parser';
+import { RawBodyMiddleware } from './core/http/raw-body.middleware';
+import { JsonBodyMiddleware } from './core/http/json-body.middleware';
 @Module({
   imports: [UsuarioModule, AiModule, DatabaseModule, PaymentModule],
   controllers: [],
@@ -26,9 +28,14 @@ import * as bodyParser from 'body-parser';
   ],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
+  public configure(consumer: MiddlewareConsumer): void {
     consumer
-      .apply(bodyParser.raw({ type: 'application/json' }))
-      .forRoutes({ path: "/stripe/webhook", method: RequestMethod.POST });
+        .apply(RawBodyMiddleware)
+        .forRoutes({
+            path: '/stripe/webhook',
+            method: RequestMethod.POST,
+        })
+        .apply(JsonBodyMiddleware)
+        .forRoutes('*');
   }
 }
