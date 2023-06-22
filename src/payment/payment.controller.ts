@@ -10,34 +10,6 @@ export class PaymentController {
 
     constructor(private PaymentService: PaymentService) {};
 
-    /* @Post(":orderID/capture")
-    @UseInterceptors(VerifyTokenInterceptor)
-    public async postOrderIDCapture(@Param("orderID") orderID: string, @Headers('accessToken') accessToken: string): Promise <NestResponse> {
-
-        const response = await this.PayPalService.setPayPalOrderIdCapture(orderID, accessToken);
-        return new NestResponseBuilder()
-        .comStatus(response.status)
-        .comHeaders({
-            'Info': response.r
-        })
-        .comBody(response)
-        .build();
-    };
-
-    @Post()
-    @UseInterceptors(VerifyTokenInterceptor)
-    public async postOrders(@Headers('accessToken') accessToken: string): Promise <NestResponse> {
-
-        const response = await this.PayPalService.setPayPalOrders();
-        return new NestResponseBuilder()
-        .comStatus(response.status)
-        .comHeaders({
-            'Info': response.r
-        })
-        .comBody(response)
-        .build();
-    }; */
-
     @Post("create-checkout-session")
     @UseInterceptors(VerifyTokenInterceptor)
     public async createCheckoutSession(@Headers('accessToken') accessToken: string): Promise<NestResponse> {

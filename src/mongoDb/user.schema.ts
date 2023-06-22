@@ -25,6 +25,9 @@ export class User {
 
   @Prop()
   lastRequestForgotPassword?: string;
+
+  @Prop()
+  shopping?: []
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

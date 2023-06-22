@@ -87,6 +87,9 @@ export class PaymentService extends AuthService{
             event.data.object.client_reference_id,
             { $inc: {
                 coins: 10
+              },
+              $push: {
+                event
               }
             }
             ).exec();
@@ -94,37 +97,4 @@ export class PaymentService extends AuthService{
       
         return {r: true, data: {msg: "Webhook ok!"}, status: HttpStatus.OK};
     };
-
-    /* public async setPayPalOrderIdCapture(orderID: string, accessToken: string): Promise<any>{
-        try {
-            const response = await capturePayment(orderID);
-
-            const verifyToken = await this.verifyToken(accessToken, "access");
-
-            const { id } = verifyToken.user;
-            
-            const user = await this.userModel.findByIdAndUpdate(
-                id,
-                { $inc: {
-                    coins: 10
-                  }
-                }
-            ).exec();
-
-            return {r: true, data: {msg: "Pagamento capturado!", res: response}, status: HttpStatus.ACCEPTED};
-        } catch (error){
-            return {r: false, data: {msg: "Failed to capture order!", info: utils.errorExternalServicesTreatment(error)}, status: HttpStatus.INTERNAL_SERVER_ERROR};
-        };
-    };
-
-    public async setPayPalOrders(): Promise<any> {
-
-        try{
-            const response = await createOrder();
-            return {r: true, data: {msg: "Ordem criada!", res: response}, status: HttpStatus.ACCEPTED};
-        } catch(error) {
-            return {r: false, data: {msg: "Failed to create order!", info: utils.errorExternalServicesTreatment(error)}, status: HttpStatus.INTERNAL_SERVER_ERROR};
-        }
-
-    }; */
 };
