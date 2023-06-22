@@ -9,7 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { capturePayment, createOrder } from './payment.utils';
-const stripe = require('stripe')('pk_test_51NLXcZCRHbMqiuoDinXEX12d5tF5i7lTGwJ3dKyKlpRdZt2PdltWY8EyIDu4oZ5zzlSTyY7tGuJ1XvMQ7QHFE6Bc009ZlLVWli');
+const stripe = require('stripe')('sk_test_51NLXcZCRHbMqiuoDKuhCBqxz2tyrCXcvhzQNDENNIDcT8TZwDHcKjTMmrcT5G6GKs5OcISf2x9btKdu1JBvuaaQS005bVUh6j1');
 require("dotenv").config();
 
 const jwtService = new JwtService();
@@ -48,7 +48,7 @@ export class PaymentService extends AuthService{
         
     };
 
-    public async newWebHookStripe(body, stripeSignature): Promise<any> {
+    public async newWebHookStripe(request): Promise<any> {
 
         const endpointSecret = process.env.STRIPE_ENDPOINT_CONFIRM_PAYMENT_SECRET;
         const fulfillOrder = (lineItems) => {
@@ -56,8 +56,8 @@ export class PaymentService extends AuthService{
         console.log("Fulfilling order", lineItems);
         }
 
-        const payload = JSON.stringify(body);
-        const sig = stripeSignature;
+        const payload = request.body;
+        const sig = request.headers['stripe-signature'];
 
         console.log({payload, sig})
         

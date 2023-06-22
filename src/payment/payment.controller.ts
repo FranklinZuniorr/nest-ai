@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Query, Header, Headers, UseInterceptors, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Query, Header, Headers, UseInterceptors, Req, RawBodyRequest } from '@nestjs/common';
 import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
@@ -52,8 +52,8 @@ export class PaymentController {
     };
 
     @Post("webhook")
-    public async webHookStripe(@Body() body, @Headers('stripe-signature') stripeSignature: string): Promise<NestResponse> {
-        const response = await this.PaymentService.newWebHookStripe(body, stripeSignature);
+    public async webHookStripe(@Req() req: RawBodyRequest<Request>): Promise<NestResponse> {
+        const response = await this.PaymentService.newWebHookStripe(req);
         return new NestResponseBuilder()
         .comStatus(response.status)
         .comHeaders({
