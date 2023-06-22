@@ -5,9 +5,9 @@ import { FilterOfExceptionHttp } from './common/filtros/filter-of-exception-http
 import { TransformResponseInterceptor } from './core/http/transform-response.interceptor';
 import { AiModule } from './gpt/ai.module';
 import { DatabaseModule } from './mongoDb/dataBase.module';
-import { PayPalModule } from './payPal/paypal.module';
+import { PaymentModule } from './payment/payment.module';
 @Module({
-  imports: [UsuarioModule, AiModule, DatabaseModule, PayPalModule],
+  imports: [UsuarioModule, AiModule, DatabaseModule, PaymentModule],
   controllers: [],
   providers: [
     {

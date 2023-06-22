@@ -8,14 +8,14 @@ import { AuthService } from "src/usuario/accessTokenAndRefreshToken/AuthService"
 import { JwtService } from "@nestjs/jwt";
 import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
 import { Access, AccessSchema } from "src/mongoDb/access.schema ";
-import { PayPalService } from "./paypal.service";
-import { PayPalController } from "./paypal.controller";
+import { PaymentService } from "./payment.service";
+import { PaymentController } from "./payment.controller";
 
 @Module({
     imports: [UsuarioModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, {name: Access.name, schema: AccessSchema}])],
-    controllers: [PayPalController],
+    controllers: [PaymentController],
     providers: [
-        PayPalService,
+        PaymentService,
         UsuarioService,
         AuthService,
         JwtService,
@@ -23,4 +23,4 @@ import { PayPalController } from "./paypal.controller";
         RabbitMQService
     ]
 })
-export class PayPalModule {}
+export class PaymentModule {}
