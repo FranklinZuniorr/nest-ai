@@ -39,8 +39,8 @@ export class PaymentController {
 
     @Post("create-checkout-session")
     @UseInterceptors(VerifyTokenInterceptor)
-    public async createCheckoutSession(): Promise<NestResponse> {
-        const response = await this.PaymentService.newCheckoutSession();
+    public async createCheckoutSession(@Headers('accessToken') accessToken: string): Promise<NestResponse> {
+        const response = await this.PaymentService.newCheckoutSession(accessToken);
         return new NestResponseBuilder()
         .comStatus(response.status)
         .comHeaders({

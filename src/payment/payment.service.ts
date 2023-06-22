@@ -20,11 +20,15 @@ export class PaymentService extends AuthService{
         super(jwtService)
     }
 
-    public async newCheckoutSession(): Promise<any> {
+    public async newCheckoutSession(accessToken: string): Promise<any> {
+
+        const verifyToken = await this.verifyToken(accessToken, "access");
+
+        const { id } = verifyToken.user;
 
         const YOUR_DOMAIN = 'http://localhost:3001';
 
-        const session = await stripe.checkout.sessions.create({
+        let session = await stripe.checkout.sessions.create({
             line_items: [
               {
                 // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
@@ -36,6 +40,8 @@ export class PaymentService extends AuthService{
             success_url: `${YOUR_DOMAIN}?success=true`,
             cancel_url: `${YOUR_DOMAIN}?canceled=true`,
         });
+
+        session = {...session, id_mongo: id}
 
         console.log(session)
         return {r: true, data: {msg: "Checkout criado!", res: session}, status: HttpStatus.ACCEPTED};
@@ -50,7 +56,7 @@ export class PaymentService extends AuthService{
         console.log("Fulfilling order", lineItems);
         }
 
-        const payload = JSON.stringify(request.body);
+        const payload = request.body;
         const sig = request.headers['stripe-signature'];
       
         let event;
