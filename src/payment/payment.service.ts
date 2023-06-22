@@ -44,7 +44,7 @@ export class PaymentService extends AuthService{
 
     public async newWebHookStripe(request: Request): Promise<any> {
 
-        const endpointSecret = 'whsec_...';
+        const endpointSecret = process.env.STRIPE_ENDPOINT_CONFIRM_PAYMENT_SECRET;
         const fulfillOrder = (lineItems) => {
         // TODO: fill me in
         console.log("Fulfilling order", lineItems);
