@@ -10,7 +10,7 @@ import { User } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { capturePayment, createOrder } from './payment.utils';
 import * as moment from "moment";
-const stripe = require('stripe')('sk_test_51NLXcZCRHbMqiuoDKuhCBqxz2tyrCXcvhzQNDENNIDcT8TZwDHcKjTMmrcT5G6GKs5OcISf2x9btKdu1JBvuaaQS005bVUh6j1');
+const stripe = require('stripe')(process.env.STRIPE_SK);
 require("dotenv").config();
 
 const jwtService = new JwtService();
