@@ -42,8 +42,6 @@ export class PaymentService extends AuthService{
             client_reference_id: id
         });
 
-        session.metadata = {id_mongo: id}
-
         console.log(session)
         return {r: true, data: {msg: "Checkout criado!", res: session}, status: HttpStatus.ACCEPTED};
         
@@ -84,6 +82,14 @@ export class PaymentService extends AuthService{
       
           // Fulfill the purchase...
           fulfillOrder(lineItems);
+
+          const user = await this.userModel.findByIdAndUpdate(
+            event.data.object.client_reference_id,
+            { $inc: {
+                coins: 10
+              }
+            }
+            ).exec();
         }
       
         return {r: true, data: {msg: "Webhook ok!"}, status: HttpStatus.OK};
