@@ -76,7 +76,7 @@ export class PaymentService extends AuthService{
           fulfillOrder(lineItems);
         }
       
-        return {r: false, data: {msg: "Webhook ok!"}, status: HttpStatus.OK};
+        return {r: true, data: {msg: "Webhook ok!"}, status: HttpStatus.OK};
     };
 
     /* public async setPayPalOrderIdCapture(orderID: string, accessToken: string): Promise<any>{
