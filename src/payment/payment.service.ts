@@ -9,7 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { capturePayment, createOrder } from './payment.utils';
-const stripe = require('stripe')('sk_test_51NLXcZCRHbMqiuoDKuhCBqxz2tyrCXcvhzQNDENNIDcT8TZwDHcKjTMmrcT5G6GKs5OcISf2x9btKdu1JBvuaaQS005bVUh6j1');
+const stripe = require('stripe')('pk_test_51NLXcZCRHbMqiuoDinXEX12d5tF5i7lTGwJ3dKyKlpRdZt2PdltWY8EyIDu4oZ5zzlSTyY7tGuJ1XvMQ7QHFE6Bc009ZlLVWli');
 require("dotenv").config();
 
 const jwtService = new JwtService();
