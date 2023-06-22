@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { capturePayment, createOrder } from './payment.utils';
+import * as moment from "moment";
 const stripe = require('stripe')('sk_test_51NLXcZCRHbMqiuoDKuhCBqxz2tyrCXcvhzQNDENNIDcT8TZwDHcKjTMmrcT5G6GKs5OcISf2x9btKdu1JBvuaaQS005bVUh6j1');
 require("dotenv").config();
 
@@ -89,7 +90,7 @@ export class PaymentService extends AuthService{
                 coins: 10
               },
               $push: {
-                shopping: event
+                shopping: {...event, createdAt: moment().toISOString()}
               }
             }
             ).exec();
