@@ -3,6 +3,7 @@ import { NestResponse } from '../core/http/nest-response';
 import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
 import { PaymentService } from './payment.service';
+import bodyParser from 'body-parser';
 
 @Controller('stripe')
 export class PaymentController {

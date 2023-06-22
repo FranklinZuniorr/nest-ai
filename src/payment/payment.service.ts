@@ -62,7 +62,7 @@ export class PaymentService extends AuthService{
         let event;
       
         try {
-            event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
+            event = stripe.webhooks.constructEvent(payload.toString(), sig, endpointSecret);
         } catch (err) {
             return {r: false, data: {msg: "Webhook Error!", res: err.message}, status: HttpStatus.BAD_REQUEST};
         }
