@@ -30,7 +30,7 @@ export class AiController {
     @UseInterceptors(VerifyTokenInterceptor)
     public async getAiResponseJson(@Body() req: AiJson, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
-        const response = await this.aiService.callAi(req, accessToken);
+        const response = await this.aiService.callAiJson(req, accessToken);
         return new NestResponseBuilder()
         .comStatus(response.status)
         .comHeaders({

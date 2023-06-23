@@ -44,7 +44,7 @@ export class AiService extends AuthService{
             let prompt = text.msg;
     
             const model = "text-davinci-003";
-            const maxTokens = 500;
+            const maxTokens = 2000;
             const temperature = 1;
     
             const data = {
@@ -74,12 +74,13 @@ export class AiService extends AuthService{
     
             return dataRes;
         }else{
-            return {r: false, data: {msg: "Coins insuficientes!"}, status: HttpStatus.BAD_REQUEST};
+            return {r: false, data: {msg: "Tickets insuficientes!"}, status: HttpStatus.BAD_REQUEST};
         };
 
     };
 
     public async callAiJson(req: AiJson, accessToken: string): Promise<any>{
+        console.log(req)
         const verifyToken = await this.verifyToken(accessToken, "access");
 
         const userFound = await this.userModel.findById(verifyToken.user.id)
@@ -97,29 +98,44 @@ export class AiService extends AuthService{
                 Authorization: `Bearer ${apiKey}`,
                 "Content-Type": "application/json",
             },
+            timeout: 6000000
             });
 
-            const transactionParser = async (transactionAlert) => {
             const payload = {
                 model: "gpt-3.5-turbo-0613",
+                temperature: 1,
                 messages: [
                 {
                     role: "user",
-                    content: transactionAlert
+                    content: req.msg
                 },
                 ],
                 functions: [req.schema],
             };
 
-            const response = await openai.post('/completions', JSON.stringify(payload));
-            const { choices } = response.data.json();
-            return choices[0].message.function_call.arguments;
-            };
-
-            transactionParser(req.msg);
+            const dataRes = openai
+            .post("/completions", JSON.stringify(payload))
+            .then(async (response) => {
+                console.log(response.data.choices[0].message)
+                const answer = "function_call" in response.data.choices[0].message? JSON.parse(response.data.choices[0].message.function_call.arguments):"";
+                const user = await this.userModel.findByIdAndUpdate(
+                    verifyToken.user.id,
+                    { $inc: {
+                        coins: -1
+                      }
+                    },
+                    { new: true }
+                ).exec();
+                return {r: true, data: {usage: response.data.usage, answer: answer}, status: HttpStatus.OK};
+            })
+            .catch((error) => {
+                return {r: false, data: {info: utils.errorExternalServicesTreatment(error), msg: "OpenAi error."}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+            });
+    
+            return dataRes;
             
         }else{
-            return {r: false, data: {msg: "Coins insuficientes!"}, status: HttpStatus.BAD_REQUEST};
+            return {r: false, data: {msg: "Tickets insuficientes!"}, status: HttpStatus.BAD_REQUEST};
         };
     };
 };
