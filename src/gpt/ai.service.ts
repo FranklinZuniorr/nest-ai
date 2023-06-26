@@ -108,7 +108,7 @@ export class AiService extends AuthService{
                     temperature: 0,
                     messages: [
                     {
-                        role: "user",
+                        role: "assistant",
                         content: req.msg
                     },
                     ],
@@ -119,7 +119,7 @@ export class AiService extends AuthService{
                 .post("/completions", JSON.stringify(payload))
                 .then(async (response) => {
                     const answer = "function_call" in response.data.choices[0].message? JSON.parse(response.data.choices[0].message.function_call.arguments):
-                    response.data.choices[0].message.content;
+                    response.data;
                     if("function_call" in response.data.choices[0].message){
                         return {r: true, data: {usage: response.data.usage, answer: answer}, status: HttpStatus.OK};
                     };
