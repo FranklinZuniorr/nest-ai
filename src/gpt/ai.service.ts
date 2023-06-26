@@ -104,7 +104,7 @@ export class AiService extends AuthService{
                 });
     
                 const payload = {
-                    model: "gpt-3-5-turbo-snap-0613",
+                    model: "gpt-3.5-turbo-0613",
                     temperature: 0,
                     messages: [
                     {
