@@ -91,6 +91,7 @@ export class AiService extends AuthService{
         if(coins > 0){
             const apiKey = process.env.OPENAI_API_KEY;
             const baseURL = "https://api.openai.com/v1/chat";
+            const criteria = "* Competência 5: Elaborar proposta de intervenção para o problema abordado, respeitando os direitos humanos, no final da redação. => 200: Consegue apresentar proposta detalhada, coerente e relacionada à argumentação desenvolvida na redação. 160: Apresenta proposta relacionada ao tema e articulada com a argumentação desenvolvida. 120: Proposta de intervenção mediana, mas articulada com a argumentação desenvolvida no texto. 80: Proposta insatisfatória ou não articulada com a argumentação desenvolvida. 40: Proposição vaga ou simplesmente citada. 0: Ausência de proposta de intervenção ou sem relação com o tema. ENTRE ESSAS NOTAS, QUAL NOTA PODE SER ATRIBUIDA A CONCLUSÃO (parágrafo final, último elemento entre introdução, desenvolvimento e conclusão) DA REDAÇÃO A SEGUIR?";
     
             const openai = axios.create({
             baseURL,
@@ -116,17 +117,21 @@ export class AiService extends AuthService{
             const dataRes = openai
             .post("/completions", JSON.stringify(payload))
             .then(async (response) => {
-                console.log(response.data.choices[0].message)
-                const answer = "function_call" in response.data.choices[0].message? JSON.parse(response.data.choices[0].message.function_call.arguments):"";
-                const user = await this.userModel.findByIdAndUpdate(
-                    verifyToken.user.id,
-                    { $inc: {
-                        coins: -1
-                      }
-                    },
-                    { new: true }
-                ).exec();
-                return {r: true, data: {usage: response.data.usage, answer: answer}, status: HttpStatus.OK};
+                const answer = "function_call" in response.data.choices[0].message? JSON.parse(response.data.choices[0].message.function_call.arguments):
+                response.data.choices[0].message.content;
+                if("function_call" in response.data.choices[0].message){
+                    const user = await this.userModel.findByIdAndUpdate(
+                        verifyToken.user.id,
+                        { $inc: {
+                            coins: -1
+                          }
+                        },
+                        { new: true }
+                    ).exec();
+                    return {r: true, data: {usage: response.data.usage, answer: answer, msg: "OpenAi ok!"}, status: HttpStatus.OK};
+                };
+                return {r: false, data: {usage: response.data.usage, answer: answer, msg: "OpenAi error."}, status: HttpStatus.BAD_REQUEST};
+
             })
             .catch((error) => {
                 return {r: false, data: {info: utils.errorExternalServicesTreatment(error), msg: "OpenAi error."}, status: HttpStatus.INTERNAL_SERVER_ERROR};
