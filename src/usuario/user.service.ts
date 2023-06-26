@@ -433,6 +433,26 @@ export class UsuarioService extends AuthService {
         return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
     };
 
+    public async subtractCoins(accessToken: string): Promise<response>{
+
+        const verifyToken = await this.verifyToken(accessToken, "access");
+
+        const user = await this.userModel.findByIdAndUpdate(
+            verifyToken.user.id,
+            { $inc: {
+                coins: -1
+              }
+            },
+            { new: true }
+        ).exec();
+
+        if(utils.verifyCond(user)){
+            return {r: true, data: {msg: "10 coins subtraídos!"}, status: HttpStatus.ACCEPTED};
+        }
+
+        return {r: false, data: {msg: "Erro ao subtrair coins!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+    }
+
     //-------------------------------------------------------
 
     private async setHash(password){

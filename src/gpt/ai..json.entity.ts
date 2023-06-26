@@ -10,6 +10,7 @@ export class AiJson {
         name: 'msg'
     })
     msg: string;
+    
 
     @IsNotEmpty({
         message: 'Esquema é obrigatório.'

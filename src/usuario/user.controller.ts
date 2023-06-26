@@ -225,9 +225,18 @@ export class UsuarioController {
         .build();
     };
 
-    @Post('verify-purchase-coins')
-    async verifyPurchaseCoins(){
+    @Post('subtract-coins')
+    @UseInterceptors(VerifyTokenInterceptor)
+    async subtractCoins(@Headers('accessToken') accessToken: string): Promise<NestResponse>{
+        const data = await this.usuarioService.subtractCoins(accessToken);
 
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
     };
 
     /* @UseInterceptors(FileInterceptor('file', {
