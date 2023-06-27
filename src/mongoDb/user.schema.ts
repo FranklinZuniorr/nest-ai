@@ -28,6 +28,9 @@ export class User {
 
   @Prop()
   shopping?: []
+
+  @Prop()
+  queries?: []
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

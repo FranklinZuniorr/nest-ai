@@ -11,6 +11,7 @@ import { JwtMiddleware } from 'src/core/http/verify-token-middleware';
 import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
 import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { UserLogin } from './user.entity.login';
+import { UserQueries } from './user.entity.queries';
 
 @Controller('/')
 export class UsuarioController {
@@ -225,10 +226,10 @@ export class UsuarioController {
         .build();
     };
 
-    @Post('subtract-coins')
+    @Post('upload-queries')
     @UseInterceptors(VerifyTokenInterceptor)
-    async subtractCoins(@Headers('accessToken') accessToken: string): Promise<NestResponse>{
-        const data = await this.usuarioService.subtractCoins(accessToken);
+    async subtractCoins(@Headers('accessToken') accessToken: string, @Body() body: UserQueries): Promise<NestResponse>{
+        const data = await this.usuarioService.uploadQueries(accessToken, body);
 
         return new NestResponseBuilder()
         .comStatus(data.status)

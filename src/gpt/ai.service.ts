@@ -159,6 +159,10 @@ export class AiService extends AuthService{
                 { new: true }
             ).exec();
 
+            if(!utils.verifyCond(user)){
+                return {r: false, data: {msg: "OpenAi error."}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+            }
+
             return {r: true, data: {reqs: reqs, msg: "OpenAi ok."}, status: HttpStatus.ACCEPTED};
             
         }else{

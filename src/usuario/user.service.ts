@@ -17,9 +17,10 @@ import { UserEdit } from './user.entity.edit';
 import { Email } from './email.entity';
 import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 import { UserLogin } from './user.entity.login';
-import { Access } from 'src/mongoDb/access.schema ';
+import { Access } from 'src/mongoDb/access.schema';
 import * as moment from "moment";
 import { error } from 'console';
+import { UserQueries } from './user.entity.queries';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -72,7 +73,7 @@ export class UsuarioService extends AuthService {
             username: undefined,
             email: undefined
         };
-        const { username, email, password, coins } = body;
+        const { username, email, password } = body;
 
         (await this.buscaPorEmailDeUsuario(email)).exist? exist.email = true:false;
         (await this.buscaPorNomeDeUsuario(username)).exist? exist.username = true:false;
@@ -433,25 +434,26 @@ export class UsuarioService extends AuthService {
         return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
     };
 
-    public async subtractCoins(accessToken: string): Promise<response>{
+    public async uploadQueries(accessToken: string, body: UserQueries): Promise<response>{
 
         const verifyToken = await this.verifyToken(accessToken, "access");
+        const bodyCustom = {...body, date: moment().toISOString()}
 
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
-            { $inc: {
-                coins: -1
+            { $push: {
+                queries: bodyCustom
               }
             },
             { new: true }
         ).exec();
 
-        if(utils.verifyCond(user)){
-            return {r: true, data: {msg: "10 coins subtraídos!"}, status: HttpStatus.ACCEPTED};
+        if(!utils.verifyCond(user)){
+            return {r: true, data: {msg: "Erro ao salvar sua busca no histórico!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
         }
 
-        return {r: false, data: {msg: "Erro ao subtrair coins!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
-    }
+        return {r: true, data: {msg: "Busca salva com sucesso!"}, status: HttpStatus.ACCEPTED};
+    };
 
     //-------------------------------------------------------
 

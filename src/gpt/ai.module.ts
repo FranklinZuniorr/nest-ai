@@ -9,7 +9,7 @@ import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
 import { AuthService } from "src/usuario/accessTokenAndRefreshToken/AuthService";
 import { JwtService } from "@nestjs/jwt";
 import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
-import { Access, AccessSchema } from "src/mongoDb/access.schema ";
+import { Access, AccessSchema } from "src/mongoDb/access.schema";
 
 @Module({
     imports: [UsuarioModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, {name: Access.name, schema: AccessSchema}])],

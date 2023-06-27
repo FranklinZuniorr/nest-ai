@@ -30,11 +30,4 @@ export class UserEdit {
     })
     @IsOptional()
     password?: string | Promise<string>;
-    
-
-    @Expose({
-        name: 'coins'
-    })
-    @IsOptional()
-    coins?: number;
 };
