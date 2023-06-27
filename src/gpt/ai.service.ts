@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
-import { AiJson } from './ai..json.entity';
+import { AiJson, AiJsonArray } from './ai..json.entity';
 import { env } from 'process';
 require("dotenv").config();
 
@@ -80,7 +80,7 @@ export class AiService extends AuthService{
 
     };
 
-    public async callAiJson(req: Array<any>, accessToken: string): Promise<any>{
+    public async callAiJson(req: AiJsonArray, accessToken: string): Promise<any>{
         console.log(req)
         const verifyToken = await this.verifyToken(accessToken, "access");
 
@@ -130,19 +130,18 @@ export class AiService extends AuthService{
                 });
         
                 return dataRes;
-            }
+            };
 
             const reqs = [];
             let delayTime = 60000/parseInt(process.env.RPM_OPENAI);
             const delay = (ms) => {
-                
                 return new Promise(resolve => setTimeout(resolve, ms));
             };
 
-            for(var x = 0; x < req.length; x++){
+            for(var x = 0; x < req.array.length; x++){
                 
                 await delay(delayTime);
-                const response = await callApiOpenAi(req[x]); 
+                const response = await callApiOpenAi(req.array[x]); 
 
                 if(response.r == false){
                     return response

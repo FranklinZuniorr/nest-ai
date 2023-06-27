@@ -4,7 +4,7 @@ import { NestResponseBuilder } from '../core/http/nest-response-builder';
 import { AiService } from './ai.service';
 import { Ai } from './ai.entity';
 import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
-import { AiJson } from './ai..json.entity';
+import { AiJson, AiJsonArray } from './ai..json.entity';
 
 @Controller('ai')
 export class AiController {
@@ -28,7 +28,7 @@ export class AiController {
 
     @Get("json")
     @UseInterceptors(VerifyTokenInterceptor)
-    public async getAiResponseJson(@Body() req: Array<any>, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
+    public async getAiResponseJson(@Body() req: AiJsonArray, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
         const response = await this.aiService.callAiJson(req, accessToken);
         return new NestResponseBuilder()

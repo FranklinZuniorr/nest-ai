@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsString, IsEmail, IsObject } from 'class-validator';
-import { Exclude, Expose } from 'class-transformer';
+import { IsNotEmpty, IsString, IsEmail, IsObject, IsArray, ValidateNested } from 'class-validator';
+import { Exclude, Expose, Type } from 'class-transformer';
 
 export class AiJson {
 
@@ -32,4 +32,21 @@ export class AiJson {
     })
     schema: object
 
+};
+
+export class AiJsonArray {
+
+    @IsNotEmpty({
+        message: 'Esquema é obrigatório.'
+    })
+    @IsArray({
+        message: "Array é um []!"
+    })
+    @Expose({
+        name: 'array'
+    })
+    @ValidateNested({ each: true })
+    @Type(() => AiJson)
+    array: AiJson[];
+    
 };
