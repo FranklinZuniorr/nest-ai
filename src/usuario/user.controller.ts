@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpStatus, NotFoundException, Header, Headers, UseInterceptors, UploadedFile, Query, Put, Delete, UseGuards, Patch } from '@nestjs/common';
 import { UsuarioService } from './user.service';
 import { UserDto } from './user.entity';
 import { NestResponse } from '../core/http/nest-response';
@@ -47,7 +47,7 @@ export class UsuarioController {
 
     };
 
-    @Put('edit-user')
+    @Patch('edit-user')
     @UseInterceptors(VerifyTokenInterceptor)
     public async editUser(@Body() usuario: UserEdit, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
