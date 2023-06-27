@@ -191,8 +191,48 @@ export class UsuarioService extends AuthService {
                     new: true,
                 };
 
-                const dailyAccess = await this.accessModel.findOneAndUpdate(
-                    { date: actualDateMonth},
+                const findMounth = await (await this.accessModel.findOne({date: actualDateMonth}).exec()).toObject().access
+
+                if(findMounth){
+                    const arr = [...JSON.parse(JSON.stringify(findMounth))];
+
+                    if(arr[0][actualDateDay]){
+                        const day = [...arr[0][actualDateDay]];
+                        const findId = day.find(day => day._id == _id);
+
+                        if(!findId){
+                            console.log("Não achou!");
+                            await this.accessModel.findOneAndUpdate(
+                                { date: actualDateMonth },
+                                { $addToSet: { [`access.${actualDateDay}`]: {
+                                    _id,
+                                    username,
+                                    email,
+                                    img
+                                } } },
+                                options
+                            ).exec().then(res => res).catch(err => err);
+                            console.log("Criou!")
+                        }else{
+                            console.log("Achou!");
+                            console.log(findId)
+                        };
+                    }else{
+                        await this.accessModel.findOneAndUpdate(
+                            { date: actualDateMonth },
+                            { $addToSet: { [`access.${actualDateDay}`]: {
+                                _id,
+                                username,
+                                email,
+                                img
+                            } } },
+                            options
+                        ).exec().then(res => res).catch(err => err);
+                    };
+                };
+
+                /* const dailyAccess = await this.accessModel.findOneAndUpdate(
+                    { date: actualDateMonth },
                     { $addToSet: { [`access.${actualDateDay}`]: {
                         _id,
                         username,
@@ -201,7 +241,7 @@ export class UsuarioService extends AuthService {
                         coins
                     } } },
                     options
-                ).exec().then(res => res).catch(err => err);
+                ).exec().then(res => res).catch(err => err); */
 
                 /* const countTotalElements = await this.accessModel.aggregate([
                     { $match: { date: actualDateMonth } },
