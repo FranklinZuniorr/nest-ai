@@ -28,7 +28,7 @@ export class AiController {
 
     @Get("json")
     @UseInterceptors(VerifyTokenInterceptor)
-    public async getAiResponseJson(@Body() req: AiJson[], @Headers('accessToken') accessToken: string): Promise<NestResponse>{
+    public async getAiResponseJson(@Body() req: Array<any>, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
         const response = await this.aiService.callAiJson(req, accessToken);
         return new NestResponseBuilder()

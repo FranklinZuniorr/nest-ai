@@ -4,12 +4,21 @@ import { Exclude, Expose } from 'class-transformer';
 export class AiJson {
 
     @IsNotEmpty({
-        message: 'Texto é obrigatório.'
+        message: 'Msg é obrigatório.'
     })
     @Expose({
         name: 'msg'
     })
     msg: string;
+
+
+    @IsNotEmpty({
+        message: 'Title é obrigatório.'
+    })
+    @Expose({
+        name: 'title'
+    })
+    title: string;
     
 
     @IsNotEmpty({

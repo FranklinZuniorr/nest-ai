@@ -80,7 +80,7 @@ export class AiService extends AuthService{
 
     };
 
-    public async callAiJson(req: AiJson[], accessToken: string): Promise<any>{
+    public async callAiJson(req: Array<any>, accessToken: string): Promise<any>{
         console.log(req)
         const verifyToken = await this.verifyToken(accessToken, "access");
 
@@ -91,7 +91,7 @@ export class AiService extends AuthService{
 
         if(coins > 0){
 
-            const callApiOpenAi = async (req) => {
+            const callApiOpenAi = async (req: AiJson) => {
                 const apiKey = process.env.OPENAI_API_KEY;
                 const baseURL = "https://api.openai.com/v1/chat";
         
@@ -105,10 +105,10 @@ export class AiService extends AuthService{
     
                 const payload = {
                     model: "gpt-3.5-turbo-0613",
-                    temperature: 0,
+                    temperature: 0.5,
                     messages: [
                     {
-                        role: "assistant",
+                        role: "user",
                         content: req.msg
                     },
                     ],
@@ -121,10 +121,9 @@ export class AiService extends AuthService{
                     const answer = "function_call" in response.data.choices[0].message? JSON.parse(response.data.choices[0].message.function_call.arguments):
                     response.data;
                     if("function_call" in response.data.choices[0].message){
-                        return {r: true, data: {usage: response.data.usage, answer: answer}, status: HttpStatus.OK};
+                        return {r: true, data: {usage: response.data.usage, answer: answer, title: req.title}, status: HttpStatus.OK};
                     };
-                    return {r: false, data: {usage: response.data.usage, answer: answer}, status: HttpStatus.BAD_REQUEST};
-    
+                    return {r: false, data: {usage: response.data.usage, answer: answer, title: req.title}, status: HttpStatus.BAD_REQUEST};
                 })
                 .catch((error) => {
                     return {r: false, data: {info: utils.errorExternalServicesTreatment(error)}, status: HttpStatus.INTERNAL_SERVER_ERROR};
