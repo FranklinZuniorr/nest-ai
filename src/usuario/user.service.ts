@@ -236,7 +236,19 @@ export class UsuarioService extends AuthService {
                             options
                         ).exec().then(res => res).catch(err => err);
                     };
-                };
+                }else{
+                    console.log("ooooooooo")
+                    await this.accessModel.findOneAndUpdate(
+                        { date: actualDateMonth },
+                        { $addToSet: { [`access.${actualDateDay}`]: {
+                            _id,
+                            username,
+                            email,
+                            img
+                        } } },
+                        options
+                    ).exec().then(res => res).catch(err => err);
+                }
 
                 /* const dailyAccess = await this.accessModel.findOneAndUpdate(
                     { date: actualDateMonth },
