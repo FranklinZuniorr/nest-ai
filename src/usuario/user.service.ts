@@ -197,7 +197,7 @@ export class UsuarioService extends AuthService {
 
                 console.log(findMounth)
 
-                if(findMounth){
+                if(findMounth != undefined){
                     console.log(JSON.parse(JSON.stringify(findMounth)))
                     const arr = [...(JSON.parse(JSON.stringify(findMounth)))];
                     console.log(arr[0][actualDateDay])
@@ -224,6 +224,7 @@ export class UsuarioService extends AuthService {
                             console.log(findId)
                         };
                     }else{
+                        console.log("ooooooooo")
                         await this.accessModel.findOneAndUpdate(
                             { date: actualDateMonth },
                             { $addToSet: { [`access.${actualDateDay}`]: {
