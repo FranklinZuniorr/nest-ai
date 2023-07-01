@@ -223,7 +223,7 @@ export class UsuarioService extends AuthService {
                     }else{
                         await this.accessModel.findOneAndUpdate(
                             { date: actualDateMonth },
-                            { $addToSet: { [`access.${actualDateDay}`]: {
+                            { $addToSet: { access: {
                                 _id,
                                 username,
                                 email,
