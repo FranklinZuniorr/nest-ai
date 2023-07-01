@@ -191,7 +191,9 @@ export class UsuarioService extends AuthService {
                     new: true,
                 };
 
-                const findMounth = await (await this.accessModel.findOne({date: actualDateMonth}).exec()).toObject().access
+                const findMounth = await this.accessModel.findOne({date: actualDateMonth}).exec()
+                .then((doc) => doc?.toObject().access)
+                .catch((err) => err);
 
                 if(findMounth){
                     const arr = [...JSON.parse(JSON.stringify(findMounth))];
