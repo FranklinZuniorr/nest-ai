@@ -207,7 +207,7 @@ export class UsuarioService extends AuthService {
                             console.log("Não achou!");
                             await this.accessModel.findOneAndUpdate(
                                 { date: actualDateMonth },
-                                { $addToSet: { [`access.${actualDateDay}`]: {
+                                { $push: { [`access.${actualDateDay}`]: {
                                     _id,
                                     username,
                                     email,
