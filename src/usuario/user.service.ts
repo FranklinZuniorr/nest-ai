@@ -213,7 +213,7 @@ export class UsuarioService extends AuthService {
                                     email,
                                     img
                                 } } },
-                                options
+                                {new: true}
                             ).exec().then(res => res).catch(err => err);
                             console.log("Criou!")
                         }else{
@@ -223,13 +223,13 @@ export class UsuarioService extends AuthService {
                     }else{
                         await this.accessModel.findOneAndUpdate(
                             { date: actualDateMonth },
-                            { $addToSet: { access: {
+                            { $push: { access: {
                                 _id,
                                 username,
                                 email,
                                 img
                             } } },
-                            options
+                            {new: true}
                         ).exec().then(res => res).catch(err => err);
                     };
                 };
