@@ -196,6 +196,7 @@ export class UsuarioService extends AuthService {
                 .catch((err) => err);
 
                 if(findMounth){
+                    console.log("achouuuuuuuuuuuuuuuuuuuuuuu")
                     const arr = [...JSON.parse(JSON.stringify(findMounth))];
 
                     if(arr[0][actualDateDay]){
