@@ -187,15 +187,17 @@ export class UsuarioService extends AuthService {
                 const actualDateDay = moment().format("DD/MM/YYYY");
 
                 const options = {
-                    upsert: true,
                     new: true,
                 };
 
-                const findMounth = (await this.accessModel.findOne({date: actualDateMonth}).exec()).toObject();
+                const findMounth = await this.accessModel.findOne({date: actualDateMonth}).exec()
+                .then((doc) => doc?.toObject().access)
+                .catch((err) => err);
 
                 if(findMounth){
-                    console.log("achouuuuuuuuuuuuuuuuuuuuuuu")
-                    const arr = [...JSON.parse(JSON.stringify(findMounth))];
+                    console.log(JSON.parse(JSON.stringify(findMounth)))
+                    const arr = [...(JSON.parse(JSON.stringify(findMounth)))];
+                    console.log(arr[0][actualDateDay])
 
                     if(arr[0][actualDateDay]){
                         const day = [...arr[0][actualDateDay]];
