@@ -187,12 +187,15 @@ export class UsuarioService extends AuthService {
                 const actualDateDay = moment().format("DD/MM/YYYY");
 
                 const options = {
+                    upsert: true,
                     new: true,
                 };
 
                 const findMounth = await this.accessModel.findOne({date: actualDateMonth}).exec()
                 .then((doc) => doc?.toObject().access)
                 .catch((err) => err);
+
+                console.log(findMounth)
 
                 if(findMounth){
                     console.log(JSON.parse(JSON.stringify(findMounth)))
@@ -207,13 +210,13 @@ export class UsuarioService extends AuthService {
                             console.log("Não achou!");
                             await this.accessModel.findOneAndUpdate(
                                 { date: actualDateMonth },
-                                { $push: { [`access.${actualDateDay}`]: {
+                                { $addToSet: { [`access.${actualDateDay}`]: {
                                     _id,
                                     username,
                                     email,
                                     img
                                 } } },
-                                {new: true}
+                                options
                             ).exec().then(res => res).catch(err => err);
                             console.log("Criou!")
                         }else{
@@ -223,13 +226,13 @@ export class UsuarioService extends AuthService {
                     }else{
                         await this.accessModel.findOneAndUpdate(
                             { date: actualDateMonth },
-                            { $push: { access: {
+                            { $addToSet: { [`access.${actualDateDay}`]: {
                                 _id,
                                 username,
                                 email,
                                 img
                             } } },
-                            {new: true}
+                            options
                         ).exec().then(res => res).catch(err => err);
                     };
                 };
