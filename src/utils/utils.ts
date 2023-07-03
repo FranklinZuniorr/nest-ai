@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 const sendinblueTransport = require('nodemailer-sendinblue-transport');
 export class utils{
     static errorExternalServicesTreatment(error: any): object{
-        return {serviceErrorName: error.name, typeError: error.toString().split(":")[1].trim(), pureError: JSON.stringify(error)};
+        return {serviceErrorName: error.name, typeError: error.toString().split(":")[1].trim(), pureError: JSON.stringify(error), msg: error.name};
     };
 
     static verifyCond = (data) => {
