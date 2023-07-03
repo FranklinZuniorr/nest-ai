@@ -520,7 +520,7 @@ export class UsuarioService extends AuthService {
             { $match: { [`queries.${body.prop}.totalNote`]: { $exists: true } } },
             { $sort: { [`queries.${body.prop}.totalNote`]: -1 } },
             { $limit: 10 },
-            { $project: { username: 1, email: 1, img: 1 } },
+            { $project: { username: 1, email: 1, img: 1, [`queries.${body.prop}.totalNote`]: 1} },
         ]);
 
         return {r: true, data: {msg: "Top10 obtido!", list: data}, status: HttpStatus.ACCEPTED};
