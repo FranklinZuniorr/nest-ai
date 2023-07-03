@@ -497,7 +497,10 @@ export class UsuarioService extends AuthService {
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
             { $addToSet: {
-                [`queries.${body.theme}`]: {...bodyCustom}
+                [`queries.${body.theme}.arr`]: {...bodyCustom},
+              },
+              $inc: {
+                [`queries.${body.theme}.totalNote`]: parseInt(bodyCustom.note)
               }
             },
             { new: true }
