@@ -12,6 +12,7 @@ import { VerifyTokenInterceptor } from 'src/core/http/verify-token-interceptor';
 import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
 import { UserLogin } from './user.entity.login';
 import { UserQueries } from './user.entity.queries';
+import { UserTop10 } from './user.entity.top10';
 
 @Controller('/')
 export class UsuarioController {
@@ -228,8 +229,22 @@ export class UsuarioController {
 
     @Post('upload-queries')
     @UseInterceptors(VerifyTokenInterceptor)
-    async subtractCoins(@Headers('accessToken') accessToken: string, @Body() body: UserQueries): Promise<NestResponse>{
+    async uploadQueries(@Headers('accessToken') accessToken: string, @Body() body: UserQueries): Promise<NestResponse>{
         const data = await this.usuarioService.uploadQueries(accessToken, body);
+
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
+    };
+
+    @Get('get-top-10')
+    @UseInterceptors(VerifyTokenInterceptor)
+    async getTop10(@Body() body: UserTop10): Promise<NestResponse>{
+        const data = await this.usuarioService.getTop10(body);
 
         return new NestResponseBuilder()
         .comStatus(data.status)

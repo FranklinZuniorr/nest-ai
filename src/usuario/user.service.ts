@@ -21,6 +21,7 @@ import { Access } from 'src/mongoDb/access.schema';
 import * as moment from "moment";
 import { error } from 'console';
 import { UserQueries } from './user.entity.queries';
+import { UserTop10 } from './user.entity.top10';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -511,6 +512,19 @@ export class UsuarioService extends AuthService {
         }
 
         return {r: true, data: {msg: "Busca salva com sucesso!"}, status: HttpStatus.ACCEPTED};
+    };
+
+    public async getTop10(body: UserTop10): Promise<response>{
+
+        const data = await this.userModel.aggregate([
+            { $match: { [`queries.${body.prop}.totalNote`]: { $exists: true } } },
+            { $sort: { [`queries.${body.prop}.totalNote`]: -1 } },
+            { $limit: 10 },
+            { $project: { username: 1, email: 1, img: 1 } },
+        ]);
+
+        return {r: true, data: {msg: "Top10 obtido!", list: data}, status: HttpStatus.ACCEPTED};
+
     };
 
     //-------------------------------------------------------
