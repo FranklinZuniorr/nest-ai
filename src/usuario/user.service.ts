@@ -198,9 +198,7 @@ export class UsuarioService extends AuthService {
                 console.log(findMounth)
 
                 if(findMounth != undefined){
-                    console.log(JSON.parse(JSON.stringify(findMounth)))
                     const arr = [...(JSON.parse(JSON.stringify(findMounth)))];
-                    console.log(arr[0][actualDateDay])
 
                     if(arr[0][actualDateDay]){
                         const day = [...arr[0][actualDateDay]];
@@ -224,7 +222,6 @@ export class UsuarioService extends AuthService {
                             console.log(findId)
                         };
                     }else{
-                        console.log("ooooooooo")
                         await this.accessModel.findOneAndUpdate(
                             { date: actualDateMonth },
                             { $addToSet: { [`access.${actualDateDay}`]: {
@@ -237,7 +234,6 @@ export class UsuarioService extends AuthService {
                         ).exec().then(res => res).catch(err => err);
                     };
                 }else{
-                    console.log("ooooooooo")
                     await this.accessModel.findOneAndUpdate(
                         { date: actualDateMonth },
                         { $addToSet: { [`access.${actualDateDay}`]: {
@@ -500,8 +496,8 @@ export class UsuarioService extends AuthService {
 
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
-            { $push: {
-                queries: bodyCustom
+            { $addToSet: {
+                [`queries.${body.theme}`]: {...bodyCustom}
               }
             },
             { new: true }

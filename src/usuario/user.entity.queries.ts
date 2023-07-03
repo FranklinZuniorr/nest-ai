@@ -38,16 +38,4 @@ export class UserQueries {
         message: "Nota é uma string!"
     })
     note: string;
-
-
-    @Expose({
-        name: 'essay'
-    })
-    @IsNotEmpty({
-        message: 'Redação é obrigatório.'
-    })
-    @IsString({
-        message: "Redação é uma string!"
-    })
-    essay: string;
 };
