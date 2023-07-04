@@ -54,7 +54,7 @@ export class AiService extends AuthService{
             max_tokens: maxTokens,
             temperature,
             };
-    
+
             const dataRes = openai
             .post("/completions", data)
             .then(async (response) => {
@@ -74,6 +74,7 @@ export class AiService extends AuthService{
             });
     
             return dataRes;
+    
         }else{
             return {r: false, data: {msg: "Tickets insuficientes!"}, status: HttpStatus.BAD_REQUEST};
         };
