@@ -15,7 +15,6 @@ export class VerifyTokenInterceptor implements NestInterceptor {
     const accessToken = request.headers.accesstoken;
 
     const dataVerify = await this.UsuarioService.accessToken(accessToken);
-    console.log(dataVerify)
 
     if (!dataVerify.r) {
       const res = new NestResponseBuilder()

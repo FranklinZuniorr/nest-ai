@@ -472,7 +472,6 @@ export class UsuarioService extends AuthService {
     public async accessToken(accessToken: string): Promise<response>{
 
         const verifyToken = await this.verifyToken(accessToken, "access");
-        console.log(verifyToken)
         
         if(verifyToken instanceof Error){
             return await this.verifyAccessTokenPass(accessToken);
@@ -480,7 +479,6 @@ export class UsuarioService extends AuthService {
 
         const user = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
 
-        console.log(user)
         const { username, email, img, coins, validToken, _id } = user;
 
         if(user && user.validToken == accessToken){

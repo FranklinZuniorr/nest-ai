@@ -11,13 +11,14 @@ import { User } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { AiJson, AiJsonArray } from './ai..json.entity';
 import { env } from 'process';
+import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 require("dotenv").config();
 
 const jwtService = new JwtService();
 @Injectable()
 export class AiService extends AuthService{
 
-    constructor(public usuarioService: UsuarioService, @InjectModel(User.name) private userModel: Model<User>){
+    constructor(public usuarioService: UsuarioService, @InjectModel(User.name) private userModel: Model<User>, private rabbitMQService: RabbitMQService){
         super(jwtService)
     }
 
@@ -170,4 +171,73 @@ export class AiService extends AuthService{
             return {r: false, data: {msg: "Tickets insuficientes!"}, status: HttpStatus.BAD_REQUEST};
         };
     };
+
+    public async callAiJsonAmqp(req: AiJson, accessToken: string): Promise<any>{
+        const verifyToken = await this.verifyToken(accessToken, "access");
+
+        const userFound = await this.userModel.findById(verifyToken.user.id)
+        .exec();
+
+        const { coins, _id } = userFound.toObject();
+
+        if(coins > 0){
+
+            this.callAmqp(coins, req, accessToken, verifyToken, _id);
+
+            return {r: true, data: {msg: "A questão está sendo desenvolvida. (:"}, status: HttpStatus.ACCEPTED};
+
+        }else{
+            return {r: false, data: {msg: "Tickets insuficientes!"}, status: HttpStatus.BAD_REQUEST};
+        };
+    };
+
+    async callAmqp(coins, req, accessToken, verifyToken, _id){
+        const apiKey = process.env.OPENAI_API_KEY;
+        const baseURL = "https://api.openai.com/v1/chat";
+
+        const openai = axios.create({
+        baseURL,
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+        }
+        });
+
+        const payload = {
+            model: "gpt-3.5-turbo-0613",
+            temperature: 1,
+            messages: [
+            {
+                role: "user",
+                content: req.msg
+            },
+            ],
+            functions: [req.schema],
+        };
+
+        const dataRes = await openai
+        .post("/completions", JSON.stringify(payload))
+        .then(async (response) => {
+            const answer = "function_call" in response.data.choices[0].message? JSON.parse(response.data.choices[0].message.function_call.arguments):
+            response.data;
+            if("function_call" in response.data.choices[0].message){
+                return {r: true, data: {usage: response.data.usage, answer: answer, title: req.title}, status: HttpStatus.OK};
+            };
+            return {r: false, data: {usage: response.data.usage, answer: answer, title: req.title}, msg: "OpenAi error!", status: HttpStatus.BAD_REQUEST};
+        })
+        .catch((error) => {
+            return {r: false, data: {info: utils.errorExternalServicesTreatment(error), msg: "OpenAi error!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+        });
+
+        const user = await this.userModel.findByIdAndUpdate(
+            verifyToken.user.id,
+            { $inc: {
+                coins: -1
+              }
+            },
+            { new: true }
+        ).exec();
+
+        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, dataRes);
+    }
 };

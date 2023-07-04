@@ -41,4 +41,19 @@ export class AiController {
 
     };
 
+    @Get("json-amqp")
+    @UseInterceptors(VerifyTokenInterceptor)
+    public async getAiResponseJsonAmqp(@Body() req: AiJson, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
+
+        const response = await this.aiService.callAiJsonAmqp(req, accessToken);
+        return new NestResponseBuilder()
+        .comStatus(response.status)
+        .comHeaders({
+            'Info': response.r
+        })
+        .comBody(response)
+        .build();
+
+    };
+
 };
