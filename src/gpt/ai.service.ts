@@ -249,5 +249,5 @@ export class AiService extends AuthService{
         ).exec();
 
         this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {data: dataRes, createdAt: moment().toISOString()});
-    }
+    };
 };
