@@ -505,6 +505,16 @@ export class UsuarioService extends AuthService {
             { new: true }
         ).exec();
 
+        const userRemove = await this.userModel.findByIdAndUpdate(
+            verifyToken.user.id,
+            { 
+              $pull: {
+                questions: {createdAt: body.query["createdAt"]}
+              }
+            },
+            { new: true }
+        ).exec();
+
         if(!utils.verifyCond(user)){
             return {r: true, data: {msg: "Erro ao salvar sua busca no histórico!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
         }

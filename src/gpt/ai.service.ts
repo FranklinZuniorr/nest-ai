@@ -12,6 +12,7 @@ import { Model } from 'mongoose';
 import { AiJson, AiJsonArray } from './ai..json.entity';
 import { env } from 'process';
 import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
+import * as moment from "moment";
 require("dotenv").config();
 
 const jwtService = new JwtService();
@@ -238,6 +239,15 @@ export class AiService extends AuthService{
             { new: true }
         ).exec();
 
-        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, dataRes);
+        const user2 = await this.userModel.findByIdAndUpdate(
+        verifyToken.user.id,
+            { 
+                $push: {
+                questions: {data: dataRes, createdAt: moment().toISOString()}
+                }
+            }
+        ).exec();
+
+        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {data: dataRes, createdAt: moment().toISOString()});
     }
 };

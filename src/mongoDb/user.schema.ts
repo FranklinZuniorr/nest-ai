@@ -31,6 +31,9 @@ export class User {
 
   @Prop()
   queries?: []
+
+  @Prop()
+  questions?: []
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
