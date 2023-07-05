@@ -231,8 +231,13 @@ export class AiService extends AuthService{
         });
 
         if(!dataRes.r){
-            this.callAmqp(req, verifyToken, _id);
+            console.log("error, nó.");
+            this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {r: false, msg: "OpenAi error!", data: dataRes.data, createdAt: moment().toISOString()});
+            /* this.callAmqp(req, verifyToken, _id); */
+            return
         };
+
+        console.log("Nó passou.")
 
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
@@ -252,6 +257,6 @@ export class AiService extends AuthService{
             }
         ).exec();
 
-        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {data: dataRes, createdAt: moment().toISOString()});
+        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {r: true, msg: "OpenAi ok!", data: dataRes, createdAt: moment().toISOString()});
     };
 };
