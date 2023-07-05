@@ -123,6 +123,7 @@ export class RabbitMQService {
     await channel.bindQueue(queueName, exchangeName, routingKey);
   
     await channel.consume(queueName, async (message) => {
+      console.log("Consumiu")
       const data = JSON.parse(message.content.toString());
       console.log(data.data);
   

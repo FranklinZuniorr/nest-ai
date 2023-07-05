@@ -183,7 +183,7 @@ export class AiService extends AuthService{
 
         if(coins > 0){
 
-            this.callAmqp(coins, req, accessToken, verifyToken, _id);
+            this.callAmqp(req, verifyToken, _id);
 
             return {r: true, data: {msg: "A questão está sendo desenvolvida. (:"}, status: HttpStatus.ACCEPTED};
 
@@ -192,7 +192,7 @@ export class AiService extends AuthService{
         };
     };
 
-    async callAmqp(coins, req, accessToken, verifyToken, _id){
+    async callAmqp(req, verifyToken, _id){
         const apiKey = process.env.OPENAI_API_KEY;
         const baseURL = "https://api.openai.com/v1/chat";
 
@@ -229,6 +229,10 @@ export class AiService extends AuthService{
         .catch((error) => {
             return {r: false, data: {info: utils.errorExternalServicesTreatment(error), msg: "OpenAi error!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
         });
+
+        /* if(!dataRes.r){
+            this.callAmqp(req, verifyToken, _id);
+        }; */
 
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
