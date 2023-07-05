@@ -232,7 +232,7 @@ export class AiService extends AuthService{
 
         if(!dataRes.r){
             console.log("error, nó.");
-            this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {r: false, msg: "OpenAi error!", data: dataRes.data, createdAt: moment().toISOString()});
+            this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()});
             /* this.callAmqp(req, verifyToken, _id); */
             return
         };
