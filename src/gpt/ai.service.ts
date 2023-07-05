@@ -230,9 +230,9 @@ export class AiService extends AuthService{
             return {r: false, data: {info: utils.errorExternalServicesTreatment(error), msg: "OpenAi error!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
         });
 
-        /* if(!dataRes.r){
+        if(!dataRes.r){
             this.callAmqp(req, verifyToken, _id);
-        }; */
+        };
 
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
