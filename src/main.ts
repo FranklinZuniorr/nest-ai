@@ -2,9 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { startWs } from './ws/ws';
-import { spawn } from 'child_process';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
@@ -22,8 +20,9 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization, accessToken, file, stripe-signature',
   });
   
-  startWs();
   await app.listen(process.env.PORT || 3001);
+  startWs();
+  
 
 /*   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,

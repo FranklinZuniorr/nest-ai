@@ -14,7 +14,7 @@ export const sendMessage = (userId, message) => {
 };
 
 export const startWs = () => {
-  const wss = new WebSocket.Server({ port });
+  const wss = new WebSocket.Server({ port: process.env.PORT || 3000 });
 
   wss.on('connection', (ws: WebSocket, req) => {
 
