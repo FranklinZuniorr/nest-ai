@@ -7,7 +7,6 @@ import { startWs } from './ws/ws';
 import { spawn } from 'child_process';
 
 async function bootstrap() {
-  startWs();
   const app = await NestFactory.create(AppModule, { rawBody: true });
   app.useGlobalPipes(new ValidationPipe({
     transform: true
@@ -22,7 +21,8 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization, accessToken, file, stripe-signature',
   });
-
+  
+  startWs();
   await app.listen(process.env.PORT || 3001);
 
 /*   await app.connectMicroservice<MicroserviceOptions>({
