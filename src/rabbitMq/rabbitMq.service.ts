@@ -111,26 +111,6 @@ export class RabbitMQService {
     });
   };
 
-  async rabbitMqConsumeReqsAi(){
-    const exchangeName = 'AICORRIGEAPIAI';
-    const queueName = 'QUEUEAICORRIGEAPIAI';
-    const routingKey = 'KEYAICORRIGEAPIAI.6490a11e3de055198a68be54';
-    const connection = await connect(process.env.RABBIT_URL);
-    const channel = await connection.createChannel();
-  
-    await channel.assertExchange(exchangeName, 'direct', { durable: true });
-    await channel.assertQueue(queueName, { durable: true });
-    await channel.bindQueue(queueName, exchangeName, routingKey);
-  
-    await channel.consume(queueName, async (message) => {
-      console.log("Consumiu")
-      const data = JSON.parse(message.content.toString());
-      console.log(data.data);
-  
-      channel.ack(message);
-    });
-  };
-
 }
 
 /* async function consumeFromExchange() {
