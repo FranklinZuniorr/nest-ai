@@ -34,7 +34,6 @@ export class RabbitMQService {
 
   constructor(@InjectModel(User.name) private userModel: Model<User>) {
     this.rabbitMqConsumeErrosUploadImage();
-    this.rabbitMqConsumeReqsAi();
   };
 
   async sendToExchange(exchangeName: string, routingKey: string, message: object) {
