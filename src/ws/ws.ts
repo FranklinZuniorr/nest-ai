@@ -39,3 +39,5 @@ export const startWs = () => {
   
   console.log('Servidor WebSocket iniciado na porta 8080');
 };
+
+startWs();
