@@ -482,7 +482,7 @@ export class UsuarioService extends AuthService {
         const { username, email, img, coins, validToken, _id, queries, questions, shopping } = user;
 
         if(user && user.validToken == accessToken){
-            return {r: true, data: {msg: "AccessTokenOk!", user: {username, email, img, coins, validToken, queries, questions, shopping }}, status: HttpStatus.OK};
+            return {r: true, data: {msg: "AccessTokenOk!", user: {username, email, img, coins, validToken, queries, questions, shopping, _id }}, status: HttpStatus.OK};
         };
 
         return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
