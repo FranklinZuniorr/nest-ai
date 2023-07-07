@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { startWs } from './ws/ws';
+import { spawn } from 'child_process';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
