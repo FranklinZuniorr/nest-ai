@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { startWs } from './ws/ws';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
@@ -21,6 +22,8 @@ async function bootstrap() {
   });
 
   await app.listen(process.env.PORT || 3001);
+
+  startWs();
 
 /*   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,

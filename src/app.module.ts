@@ -7,6 +7,7 @@ import { AiModule } from './gpt/ai.module';
 import { DatabaseModule } from './mongoDb/dataBase.module';
 import { PaymentModule } from './payment/payment.module';
 import * as bodyParser from 'body-parser';
+
 @Module({
   imports: [UsuarioModule, AiModule, DatabaseModule, PaymentModule],
   controllers: [],
@@ -22,7 +23,7 @@ import * as bodyParser from 'body-parser';
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformResponseInterceptor
-    }
+    },
   ],
 })
 export class AppModule {}
