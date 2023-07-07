@@ -13,7 +13,7 @@ export const sendMessage = (userId, message) => {
 };
 
 export const startWs = () => {
-  const wss = new WebSocket.Server({ port: process.env.PORT || 3002 });
+  const wss = new WebSocket.Server({ port: 3002 });
 
   wss.on('connection', (ws: WebSocket, req) => {
 
