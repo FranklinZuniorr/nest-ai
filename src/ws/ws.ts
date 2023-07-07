@@ -13,7 +13,7 @@ export const sendMessage = (userId, message) => {
 };
 
 export const startWs = () => {
-  const wss = new WebSocket.Server({ port: 3002 });
+  const wss = new WebSocket.Server({ port: 8080 });
 
   wss.on('connection', (ws: WebSocket, req) => {
 
@@ -36,5 +36,5 @@ export const startWs = () => {
     });
   });
   
-  console.log('Servidor WebSocket iniciado na porta 3002');
+  console.log('Servidor WebSocket iniciado na porta 8080');
 };
