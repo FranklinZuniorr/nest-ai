@@ -3,9 +3,11 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { startWs } from './ws/ws';
 import { spawn } from 'child_process';
 
 async function bootstrap() {
+  startWs();
   const app = await NestFactory.create(AppModule, { rawBody: true });
   app.useGlobalPipes(new ValidationPipe({
     transform: true
