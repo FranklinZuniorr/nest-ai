@@ -13,33 +13,31 @@ export const sendMessage = (userId, message) => {
   }
 };
 
-export const startWs = (server) => {
-  server.listen(process.env.PORT || 8080, () => {
-    const wss = new WebSocket.Server({ server });
+export const startWs = () => {
+  const wss = new WebSocket.Server({ port: 3002 });
+
+  wss.on('connection', (ws: WebSocket, req) => {
+
+    const userId = new URL(req.url, 'http://seu-servidor.com').searchParams.get('userId');
+
+    clients.set(userId, ws);
+    console.log(userId);
+
+    ws.on('message', (message: any) => {
+
+      console.log('Mensagem recebida: ' + message);
   
-    wss.on('connection', (ws: WebSocket, req) => {
-  
-      const userId = new URL(req.url, 'http://seu-servidor.com').searchParams.get('userId');
-  
-      clients.set(userId, ws);
-      console.log(userId);
-  
-      ws.on('message', (message: any) => {
-  
-        console.log('Mensagem recebida: ' + message);
-    
-        sendMessage(userId, `Olá ${userId}`)
-      });
-    
-      ws.on('close', () => {
-        console.log('Conexão fechada');
-  
-        clients.delete(userId);
-      });
+      sendMessage(userId, `Olá ${userId}`)
     });
-    
-    console.log(`Servidor WebSocket iniciado na porta ${port}`);
-  })
+  
+    ws.on('close', () => {
+      console.log('Conexão fechada');
+
+      clients.delete(userId);
+    });
+  });
+  
+  console.log(`Servidor WebSocket iniciado na porta ${port}`);
 };
 
 

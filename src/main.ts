@@ -22,9 +22,7 @@ async function bootstrap() {
   });
   
   await app.listen(process.env.PORT || 3001);
-
-  const server = http.createServer(app.getHttpAdapter().getInstance());
-  startWs(server);
+  startWs();
   
 
 /*   await app.connectMicroservice<MicroserviceOptions>({
