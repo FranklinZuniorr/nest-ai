@@ -2,7 +2,7 @@ import * as WebSocket from 'ws';
 
 // Armazene as conexões WebSocket dos usuários
 const clients = new Map();
-const port = 8080;
+const port = process.env.PORT || 9090;
 
 export const sendMessage = (userId, message) => {
   const client = clients.get(userId);
@@ -14,7 +14,7 @@ export const sendMessage = (userId, message) => {
 };
 
 export const startWs = () => {
-  const wss = new WebSocket.Server({ port: process.env.PORT || 3000 });
+  const wss = new WebSocket.Server({ port: port });
 
   wss.on('connection', (ws: WebSocket, req) => {
 
