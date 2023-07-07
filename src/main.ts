@@ -7,6 +7,7 @@ import { startWs } from './ws/ws';
 import { spawn } from 'child_process';
 
 async function bootstrap() {
+  startWs();
   const app = await NestFactory.create(AppModule, { rawBody: true });
   app.useGlobalPipes(new ValidationPipe({
     transform: true
@@ -23,8 +24,6 @@ async function bootstrap() {
   });
 
   await app.listen(process.env.PORT || 3001);
-
-  startWs();
 
 /*   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
