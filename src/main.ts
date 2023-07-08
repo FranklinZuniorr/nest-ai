@@ -20,7 +20,7 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization, accessToken, file, stripe-signature',
   });
   
-  await app.listen(process.env.PORT);
+  await app.listen(process.env.PORT || 3001);
   
 
 /*   await app.connectMicroservice<MicroserviceOptions>({
