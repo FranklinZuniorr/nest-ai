@@ -194,6 +194,7 @@ export class AiService extends AuthService{
     };
 
     async callWs(req, verifyToken, _id){
+        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {r: true, msg: "OpenAi ok!", createdAt: moment().toISOString()});
         const apiKey = process.env.OPENAI_API_KEY;
         const baseURL = "https://api.openai.com/v1/chat";
 
@@ -234,7 +235,7 @@ export class AiService extends AuthService{
         if(!dataRes.r){
             console.log("error, nó.");
             /* sendMessage(_id, JSON.stringify({r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()})); */
-            this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI`, {r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()});
+            this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()});
             /* this.callAmqp(req, verifyToken, _id); */
             return
         };
@@ -259,6 +260,6 @@ export class AiService extends AuthService{
             }
         ).exec();
 
-        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI`, {r: true, msg: "OpenAi ok!", data: dataRes, createdAt: moment().toISOString()});
+        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {r: true, msg: "OpenAi ok!", data: dataRes, createdAt: moment().toISOString()});
     };
 };
