@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
-import { startWs } from './ws/ws';
 import * as http from 'http';
 
 async function bootstrap() {
@@ -22,7 +21,6 @@ async function bootstrap() {
   });
   
   await app.listen(process.env.PORT);
-  startWs();
   
 
 /*   await app.connectMicroservice<MicroserviceOptions>({

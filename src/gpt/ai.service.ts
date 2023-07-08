@@ -13,7 +13,6 @@ import { AiJson, AiJsonArray } from './ai..json.entity';
 import { env } from 'process';
 import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 import * as moment from "moment";
-import { sendMessage } from 'src/ws/ws';
 require("dotenv").config();
 
 const jwtService = new JwtService();
@@ -195,7 +194,6 @@ export class AiService extends AuthService{
     };
 
     async callWs(req, verifyToken, _id){
-        sendMessage(_id, "Gerando")
         const apiKey = process.env.OPENAI_API_KEY;
         const baseURL = "https://api.openai.com/v1/chat";
 
@@ -235,8 +233,8 @@ export class AiService extends AuthService{
 
         if(!dataRes.r){
             console.log("error, nó.");
-            sendMessage(_id, JSON.stringify({r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()}));
-            /* this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()}) */
+            /* sendMessage(_id, JSON.stringify({r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()})); */
+            this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()});
             /* this.callAmqp(req, verifyToken, _id); */
             return
         };
@@ -261,8 +259,6 @@ export class AiService extends AuthService{
             }
         ).exec();
 
-        sendMessage(_id, JSON.stringify({r: true, msg: "OpenAi ok!", data: dataRes, createdAt: moment().toISOString()}));
-
-        /* this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {r: true, msg: "OpenAi ok!", data: dataRes, createdAt: moment().toISOString()}); */
+        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI", `KEYAICORRIGEAPIAI.${_id}`, {r: true, msg: "OpenAi ok!", data: dataRes, createdAt: moment().toISOString()});
     };
 };

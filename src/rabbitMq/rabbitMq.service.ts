@@ -34,7 +34,7 @@ export class RabbitMQService {
 
   constructor(@InjectModel(User.name) private userModel: Model<User>) {
     this.rabbitMqConsumeErrosUploadImage();
-    this.rabbitMqConsumeReqsAi();
+    /* this.rabbitMqConsumeReqsAi(); */
   };
 
   async sendToExchange(exchangeName: string, routingKey: string, message: object) {
@@ -111,7 +111,7 @@ export class RabbitMQService {
     });
   };
 
-  async rabbitMqConsumeReqsAi(){
+  /* async rabbitMqConsumeReqsAi(){
     const exchangeName = 'AICORRIGEAPIAI';
     const queueName = 'QUEUEAICORRIGEAPIAI';
     const routingKey = 'KEYAICORRIGEAPIAI.6490a11e3de055198a68be54';
@@ -129,7 +129,7 @@ export class RabbitMQService {
   
       channel.ack(message);
     });
-  };
+  }; */
 
 }
 
