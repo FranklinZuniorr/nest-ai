@@ -21,7 +21,7 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization, accessToken, file, stripe-signature',
   });
   
-  await app.listen(process.env.PORT_NEST);
+  await app.listen(process.env.PORT);
   startWs();
   
 
