@@ -2,7 +2,7 @@ import * as WebSocket from 'ws';
 
 // Armazene as conexões WebSocket dos usuários
 const clients = new Map();
-const port = process.env.PORT_WS;
+const port = process.env.PORT;
 
 export const sendMessage = (userId, message) => {
   const client = clients.get(userId);
