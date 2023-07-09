@@ -245,7 +245,8 @@ export class AiService extends AuthService{
                 msg: `OpenAi error - ${req.title}`, 
                 data: dataRes.data, 
                 createdAt: moment().toISOString(),
-                id: _id
+                id: _id,
+                event: "open-ai-error"
             });
             /* this.callAmqp(req, verifyToken, _id); */
             return
@@ -276,7 +277,8 @@ export class AiService extends AuthService{
             msg: "OpenAi ok!", 
             data: dataRes, 
             createdAt: moment().toISOString(),
-            id: _id
+            id: _id,
+            event: "open-ai-ok"
         });
     };
 };
