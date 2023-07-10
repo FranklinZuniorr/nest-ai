@@ -194,12 +194,6 @@ export class AiService extends AuthService{
     };
 
     async callWs(req, verifyToken, _id){
-        this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
-            r: true, 
-            msg: "OpenAi ok!", 
-            createdAt: moment().toISOString(),
-            id: _id
-        });
         const apiKey = process.env.OPENAI_API_KEY;
         const baseURL = "https://api.openai.com/v1/chat";
 
@@ -271,6 +265,14 @@ export class AiService extends AuthService{
                 }
             }
         ).exec();
+
+        const filter:any = {...dataRes.data}
+        delete filter.answer.questao1.alternativa_correta;
+        delete filter.answer.questao2.alternativa_correta;
+        delete filter.answer.questao3.alternativa_correta;
+        delete filter.answer.questao4.alternativa_correta;
+        delete filter.answer.questao5.alternativa_correta;
+        dataRes.data = {answer: filter.answer, title: filter.title, usage: filter.usage};
 
         this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
             r: true, 
