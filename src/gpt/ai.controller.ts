@@ -11,7 +11,7 @@ export class AiController {
 
     constructor(private aiService: AiService) {};
 
-    @Get()
+    @Post()
     @UseInterceptors(VerifyTokenInterceptor)
     public async getAiResponse(@Body() text: Ai, @Headers('accessToken') accessToken: string): Promise <NestResponse> {
 
@@ -26,7 +26,7 @@ export class AiController {
         
     };
 
-    @Get("json")
+    @Post("json")
     @UseInterceptors(VerifyTokenInterceptor)
     public async getAiResponseJson(@Body() req: AiJsonArray, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
@@ -41,7 +41,7 @@ export class AiController {
 
     };
 
-    @Get("json-amqp")
+    @Post("json-amqp")
     @UseInterceptors(VerifyTokenInterceptor)
     public async getAiResponseJsonAmqp(@Body() req: AiJson, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
 
