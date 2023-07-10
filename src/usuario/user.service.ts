@@ -481,8 +481,52 @@ export class UsuarioService extends AuthService {
 
         const { username, email, img, coins, validToken, _id, queries, questions, shopping } = user;
 
+        let questionsFilter = questions;
+        
+        questions.forEach((question, index)=> {
+            questionsFilter[index].data.data.answer =
+            {
+                questao1: {
+                    A: question.data.data.answer.questao1.A,
+                    B: question.data.data.answer.questao1.B,
+                    C: question.data.data.answer.questao1.C,
+                    D: question.data.data.answer.questao1.D,
+                    pergunta: question.data.data.answer.questao1.pergunta
+                },
+                questao2: {
+                    A: question.data.data.answer.questao2.A,
+                    B: question.data.data.answer.questao2.B,
+                    C: question.data.data.answer.questao2.C,
+                    D: question.data.data.answer.questao2.D,
+                    pergunta: question.data.data.answer.questao2.pergunta
+                },
+                questao3: {
+                    A: question.data.data.answer.questao3.A,
+                    B: question.data.data.answer.questao3.B,
+                    C: question.data.data.answer.questao3.C,
+                    D: question.data.data.answer.questao3.D,
+                    pergunta: question.data.data.answer.questao3.pergunta
+                },
+                questao4: {
+                    A: question.data.data.answer.questao4.A,
+                    B: question.data.data.answer.questao4.B,
+                    C: question.data.data.answer.questao4.C,
+                    D: question.data.data.answer.questao4.D,
+                    pergunta: question.data.data.answer.questao4.pergunta
+                },
+                questao5: {
+                    A: question.data.data.answer.questao5.A,
+                    B: question.data.data.answer.questao5.B,
+                    C: question.data.data.answer.questao5.C,
+                    D: question.data.data.answer.questao5.D,
+                    pergunta: question.data.data.answer.questao5.pergunta
+                },
+                resumo: question.data.data.answer.resumo
+            };
+        });
+
         if(user && user.validToken == accessToken){
-            return {r: true, data: {msg: "AccessTokenOk!", user: {username, email, img, coins, validToken, queries, questions, shopping, _id: _id.toString() }}, status: HttpStatus.OK};
+            return {r: true, data: {msg: "AccessTokenOk!", user: {username, email, img, coins, validToken, queries, questions: questionsFilter, shopping, _id: _id.toString() }}, status: HttpStatus.OK};
         };
 
         return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
