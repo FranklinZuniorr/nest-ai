@@ -537,35 +537,73 @@ export class UsuarioService extends AuthService {
     public async uploadQueries(accessToken: string, body: UserQueries): Promise<response>{
 
         const verifyToken = await this.verifyToken(accessToken, "access");
-        const bodyCustom = {...body, date: moment().toISOString()}
+        const bodyCustom:any = {...body, date: moment().toISOString()};
+        let totalNote = 0;
 
-        const user = await this.userModel.findByIdAndUpdate(
+        const userDefault = await this.userModel.findById(
             verifyToken.user.id,
-            { $addToSet: {
-                [`queries.${body.theme}.arr`]: {...bodyCustom},
-              },
-              $inc: {
-                [`queries.${body.theme}.totalNote`]: parseInt(bodyCustom.note)
-              }
-            },
-            { new: true }
-        ).exec();
+            {
+                questions: 1
+            }
+        );
 
-        const userRemove = await this.userModel.findByIdAndUpdate(
-            verifyToken.user.id,
-            { 
-              $pull: {
-                questions: {createdAt: body.query["createdAt"]}
-              }
-            },
-            { new: true }
-        ).exec();
+        const questions:any = userDefault.questions;
 
-        if(!utils.verifyCond(user)){
-            return {r: true, data: {msg: "Erro ao salvar sua busca no histórico!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
-        }
+        const questionFind = questions.find(question => question.createdAt == bodyCustom.query.createdAt);
 
-        return {r: true, data: {msg: "Busca salva com sucesso!"}, status: HttpStatus.ACCEPTED};
+        if(questionFind){
+            const newQuery = {...questionFind.data.data.answer};
+    
+            Object.keys(questionFind).forEach(item => {
+                if(item.includes("questao")){
+                    newQuery[item] = {
+                        A: newQuery[item]["A"],
+                        B: newQuery[item]["B"],
+                        C: newQuery[item]["C"],
+                        D: newQuery[item]["D"],
+                        alternativa_correta: newQuery[item]["alternativa_correta"],
+                        alternativa_marcada: bodyCustom.query.data[item],
+                        r: questionFind[item]["alternativa_correta"] == bodyCustom.query.data[item]? true:false
+                    };
+    
+                    if(questionFind[item]["alternativa_correta"] == bodyCustom.query.data[item]){
+                        totalNote+=parseInt(bodyCustom.note);
+                    };
+                };
+            });
+    
+            bodyCustom.query = newQuery;
+    
+            const user = await this.userModel.findByIdAndUpdate(
+                verifyToken.user.id,
+                { $addToSet: {
+                    [`queries.${body.theme}.arr`]: {...bodyCustom},
+                  },
+                  $inc: {
+                    [`queries.${body.theme}.totalNote`]: totalNote
+                  }
+                },
+                { new: true }
+            ).exec();
+    
+            const userRemove = await this.userModel.findByIdAndUpdate(
+                verifyToken.user.id,
+                { 
+                  $pull: {
+                    questions: {createdAt: body.query["createdAt"]}
+                  }
+                },
+                { new: true }
+            ).exec();
+    
+            if(!utils.verifyCond(user)){
+                return {r: false, data: {msg: "Erro ao salvar sua busca no histórico!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+            };
+    
+            return {r: true, data: {msg: "Busca salva com sucesso!"}, status: HttpStatus.ACCEPTED};
+        };
+
+        return {r: false, data: {msg: "Atividade não existe!"}, status: HttpStatus.BAD_REQUEST};
     };
 
     public async getTop10(body: UserTop10): Promise<response>{
