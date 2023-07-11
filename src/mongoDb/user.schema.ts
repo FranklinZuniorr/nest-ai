@@ -26,14 +26,14 @@ export class User {
   @Prop()
   lastRequestForgotPassword?: string;
 
-  @Prop()
-  shopping?: []
+  @Prop({ type: [Object] }) // Campo como um array de objetos
+  shopping?: object[];
 
-  @Prop()
-  queries?: []
+  @Prop({ type: Object }) // Campo como um objeto
+  queries?: object;
 
-  @Prop()
-  questions?: []
+  @Prop({ type: [Object] }) // Campo como um array de objetos
+  questions?: object[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

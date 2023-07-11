@@ -238,7 +238,7 @@ export class AiService extends AuthService{
                 r: false, 
                 msg: `OpenAi error - ${req.title}`, 
                 data: dataRes.data, 
-                createdAt: moment().toISOString(),
+                createdAt: moment().subtract(3, 'hours').toISOString(),
                 id: _id,
                 event: "open-ai-error"
             });
@@ -261,7 +261,7 @@ export class AiService extends AuthService{
         verifyToken.user.id,
             { 
                 $push: {
-                questions: {data: dataRes, createdAt: moment().toISOString()}
+                questions: {data: dataRes, createdAt: moment().subtract(3, 'hours').toISOString()}
                 }
             }
         ).exec();
@@ -278,7 +278,7 @@ export class AiService extends AuthService{
             r: true, 
             msg: "OpenAi ok!", 
             data: dataRes, 
-            createdAt: moment().toISOString(),
+            createdAt: moment().subtract(3, 'hours').toISOString(),
             id: _id,
             event: "open-ai-ok"
         });

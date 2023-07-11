@@ -55,7 +55,7 @@ export class UsuarioService extends AuthService {
             };
             const createdUser = new this.userModel(userFilter);
             createdUser.save();
-            console.log(userFilter);
+            console.log(createdUser);
             
             return {r: true, data: {msg: "Registrado com sucesso!"}, status: HttpStatus.CREATED};
         }else{
@@ -548,7 +548,7 @@ export class UsuarioService extends AuthService {
     public async uploadQueries(accessToken: string, body: UserQueries): Promise<response>{
 
         const verifyToken = await this.verifyToken(accessToken, "access");
-        const bodyCustom:any = {...body, date: moment().toISOString()};
+        const bodyCustom:any = {...body, createdAt: moment().subtract(3, 'hours').toISOString()};
         let totalNote = 0;
 
         const userDefault = await this.userModel.findById(
@@ -563,9 +563,10 @@ export class UsuarioService extends AuthService {
         const questionFind = questions.find(question => question.createdAt == bodyCustom.query.createdAt);
 
         if(questionFind){
+            const qFindFilter = questionFind.data.data.answer;
             const newQuery = {...questionFind.data.data.answer};
     
-            Object.keys(questionFind).forEach(item => {
+            Object.keys(qFindFilter).forEach(item => {
                 if(item.includes("questao")){
                     newQuery[item] = {
                         A: newQuery[item]["A"],
@@ -574,10 +575,10 @@ export class UsuarioService extends AuthService {
                         D: newQuery[item]["D"],
                         alternativa_correta: newQuery[item]["alternativa_correta"],
                         alternativa_marcada: bodyCustom.query.data[item],
-                        r: questionFind[item]["alternativa_correta"] == bodyCustom.query.data[item]? true:false
+                        r: qFindFilter[item]["alternativa_correta"] == bodyCustom.query.data[item]? true:false
                     };
     
-                    if(questionFind[item]["alternativa_correta"] == bodyCustom.query.data[item]){
+                    if(qFindFilter[item]["alternativa_correta"] == bodyCustom.query.data[item]){
                         totalNote+=parseInt(bodyCustom.note);
                     };
                 };

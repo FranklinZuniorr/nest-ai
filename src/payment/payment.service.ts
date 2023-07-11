@@ -90,7 +90,7 @@ export class PaymentService extends AuthService{
                 coins: 10
               },
               $push: {
-                shopping: {...event, createdAt: moment().toISOString()}
+                shopping: {...event, createdAt: moment().subtract(3, 'hours').toISOString()}
               }
             }
             ).exec();
