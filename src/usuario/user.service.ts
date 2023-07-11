@@ -51,10 +51,7 @@ export class UsuarioService extends AuthService {
                 username, 
                 coins: 0, 
                 validToken: "", 
-                img: "",
-                questions: [],
-                queries: [],
-                shopping: []
+                img: ""
             };
             const createdUser = new this.userModel(userFilter);
             createdUser.save();
@@ -488,6 +485,10 @@ export class UsuarioService extends AuthService {
         };
 
         const user = await this.userModel.findById(verifyToken.user.id).exec().then((doc) => doc?.toObject()).catch((err) => err);
+
+        if(!user){
+            return {r: false, data: {msg: "Usuário do accessToken não existe!"}, status: HttpStatus.BAD_REQUEST};
+        };
 
         const { username, email, img, coins, validToken, _id, queries, questions, shopping } = user;
 
