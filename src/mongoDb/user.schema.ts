@@ -34,6 +34,9 @@ export class User {
 
   @Prop({ type: [Object] }) // Campo como um array de objetos
   questions?: object[];
+
+  @Prop()
+  externalUrl?: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

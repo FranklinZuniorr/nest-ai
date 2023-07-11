@@ -22,6 +22,7 @@ import * as moment from "moment";
 import { error } from 'console';
 import { UserQueries } from './user.entity.queries';
 import { UserTop10 } from './user.entity.top10';
+import { ExternalUrl } from './user.entity.externalUrl';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -629,6 +630,24 @@ export class UsuarioService extends AuthService {
 
         return {r: true, data: {msg: "Top10 obtido!", list: data}, status: HttpStatus.ACCEPTED};
 
+    };
+
+    public async setExternalUrl(accessToken: string, body: ExternalUrl): Promise<response>{
+
+        const verifyToken = await this.verifyToken(accessToken, "access");
+
+        const user = await this.userModel.findByIdAndUpdate(
+            verifyToken.user.id,
+            {
+                $set: {
+                    externalUrl: body.externalUrl
+                }
+            }
+        );
+
+        if(utils.verifyCond(user)){
+            return {r: true, data: {msg: "Url adicionada com sucesso!"}, status: HttpStatus.ACCEPTED}
+        };
     };
 
     //-------------------------------------------------------

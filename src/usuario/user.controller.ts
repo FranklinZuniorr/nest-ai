@@ -13,6 +13,7 @@ import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/
 import { UserLogin } from './user.entity.login';
 import { UserQueries } from './user.entity.queries';
 import { UserTop10 } from './user.entity.top10';
+import { ExternalUrl } from './user.entity.externalUrl';
 
 @Controller('/')
 export class UsuarioController {
@@ -245,6 +246,20 @@ export class UsuarioController {
     @UseInterceptors(VerifyTokenInterceptor)
     async getTop10(@Body() body: UserTop10): Promise<NestResponse>{
         const data = await this.usuarioService.getTop10(body);
+
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
+    };
+
+    @Post('set-external-url')
+    @UseInterceptors(VerifyTokenInterceptor)
+    async setExternalUrl(@Body() body: ExternalUrl, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
+        const data = await this.usuarioService.setExternalUrl(accessToken, body);
 
         return new NestResponseBuilder()
         .comStatus(data.status)
