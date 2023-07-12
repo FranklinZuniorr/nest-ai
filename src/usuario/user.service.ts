@@ -586,6 +586,7 @@ export class UsuarioService extends AuthService {
             });
     
             bodyCustom.query = newQuery;
+            bodyCustom.totalNote = totalNote;
     
             const user = await this.userModel.findByIdAndUpdate(
                 verifyToken.user.id,
@@ -613,7 +614,7 @@ export class UsuarioService extends AuthService {
                 return {r: false, data: {msg: "Erro ao salvar sua busca no histórico!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
             };
     
-            return {r: true, data: {msg: "Busca salva com sucesso!"}, status: HttpStatus.ACCEPTED};
+            return {r: true, data: {msg: "Atividade respondida com sucesso!"}, status: HttpStatus.ACCEPTED};
         };
 
         return {r: false, data: {msg: "Atividade não existe!"}, status: HttpStatus.BAD_REQUEST};
