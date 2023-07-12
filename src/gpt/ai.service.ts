@@ -257,11 +257,13 @@ export class AiService extends AuthService{
             { new: true }
         ).exec();
 
+        const createdAtDate = moment().subtract(3, 'hours').toISOString();
+
         const user2 = await this.userModel.findByIdAndUpdate(
         verifyToken.user.id,
             { 
                 $push: {
-                questions: {data: dataRes, createdAt: moment().subtract(3, 'hours').toISOString()}
+                questions: {data: dataRes, createdAt: createdAtDate}
                 }
             }
         ).exec();
@@ -278,7 +280,7 @@ export class AiService extends AuthService{
             r: true, 
             msg: "OpenAi ok!", 
             data: dataRes, 
-            createdAt: moment().subtract(3, 'hours').toISOString(),
+            createdAt: createdAtDate,
             id: _id,
             event: "open-ai-ok"
         });
