@@ -19,6 +19,15 @@ export class AiJson {
         name: 'title'
     })
     title: string;
+
+
+    @IsNotEmpty({
+        message: 'Note é obrigatório.'
+    })
+    @Expose({
+        name: 'note'
+    })
+    note: string;
     
 
     @IsNotEmpty({

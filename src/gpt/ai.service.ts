@@ -263,7 +263,7 @@ export class AiService extends AuthService{
         verifyToken.user.id,
             { 
                 $push: {
-                questions: {data: dataRes, createdAt: createdAtDate}
+                questions: {data: dataRes, createdAt: createdAtDate, note: req.note}
                 }
             }
         ).exec();
@@ -281,6 +281,7 @@ export class AiService extends AuthService{
             msg: "OpenAi ok!", 
             data: dataRes, 
             createdAt: createdAtDate,
+            note: req.note,
             id: _id,
             event: "open-ai-ok"
         });
