@@ -253,7 +253,7 @@ export class UsuarioService extends AuthService {
                         } } },
                         options
                     ).exec().then(res => res).catch(err => err);
-                }
+                };
 
                 /* const dailyAccess = await this.accessModel.findOneAndUpdate(
                     { date: actualDateMonth },

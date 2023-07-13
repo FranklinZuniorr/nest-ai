@@ -10,9 +10,10 @@ import { AuthService } from "src/usuario/accessTokenAndRefreshToken/AuthService"
 import { JwtService } from "@nestjs/jwt";
 import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
 import { Access, AccessSchema } from "src/mongoDb/access.schema";
+import { Spending, SpendingSchema } from "src/mongoDb/spending.schema";
 
 @Module({
-    imports: [UsuarioModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, {name: Access.name, schema: AccessSchema}])],
+    imports: [UsuarioModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, {name: Access.name, schema: AccessSchema}, {name: Spending.name, schema: SpendingSchema}])],
     controllers: [AiController],
     providers: [
         AiService,

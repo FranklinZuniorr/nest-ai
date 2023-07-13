@@ -13,13 +13,19 @@ import { AiJson, AiJsonArray } from './ai..json.entity';
 import { env } from 'process';
 import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 import * as moment from "moment";
+import { Spending } from 'src/mongoDb/spending.schema';
 require("dotenv").config();
 
 const jwtService = new JwtService();
 @Injectable()
 export class AiService extends AuthService{
 
-    constructor(public usuarioService: UsuarioService, @InjectModel(User.name) private userModel: Model<User>, private rabbitMQService: RabbitMQService){
+    constructor(
+        public usuarioService: UsuarioService, 
+        @InjectModel(User.name) private userModel: Model<User>, 
+        private rabbitMQService: RabbitMQService,
+        @InjectModel(Spending.name) private spendingModel: Model<Spending>
+    ){
         super(jwtService)
     }
 
@@ -285,5 +291,45 @@ export class AiService extends AuthService{
             id: _id,
             event: "open-ai-ok"
         });
+
+        const actualDateMonth = moment().format("MM/YYYY");
+        const actualDateDay = moment().format("DD/MM/YYYY");
+
+        const options = {
+            upsert: true,
+            new: true,
+        };
+
+        const findMounth = await this.spendingModel.findOne({date: actualDateMonth}).exec()
+        .then((doc) => doc?.toObject().spending)
+        .catch((err) => err);
+
+        console.log(findMounth)
+
+        if(findMounth != undefined){
+            const arr = [...(JSON.parse(JSON.stringify(findMounth)))];
+
+            if(arr[0][actualDateDay]){
+
+                await this.spendingModel.findOneAndUpdate(
+                    { date: actualDateMonth },
+                    { $inc: { [`spending.${actualDateDay}.totalSpending`]: 0.01, totalSpending: 0.01 } },
+                    options
+                ).exec();
+
+            }else{
+                await this.spendingModel.findOneAndUpdate(
+                    { date: actualDateMonth },
+                    { $inc: { [`spending.${actualDateDay}.totalSpending`]: 0.01, totalSpending: 0.01 } },
+                    options
+                ).exec();
+            };
+        }else{
+            await this.spendingModel.findOneAndUpdate(
+                { date: actualDateMonth },
+                { $inc: { [`spending.${actualDateDay}.totalSpending`]: 0.01, totalSpending: 0.01 } },
+                options
+            ).exec();
+        };
     };
 };
