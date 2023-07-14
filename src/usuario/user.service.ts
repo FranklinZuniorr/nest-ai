@@ -492,7 +492,7 @@ export class UsuarioService extends AuthService {
             return {r: false, data: {msg: "Usuário do accessToken não existe!"}, status: HttpStatus.BAD_REQUEST};
         };
 
-        const { username, email, img, coins, validToken, _id, queries, questions, shopping } = user;
+        const { username, email, img, coins, validToken, _id, queries, questions, shopping, externalUrl } = user;
 
         if(questions != undefined){
             let questionsFilter = questions;
@@ -541,7 +541,7 @@ export class UsuarioService extends AuthService {
         };
 
         if(user && user.validToken == accessToken){
-            return {r: true, data: {msg: "AccessTokenOk!", user: {username, email, img, coins, validToken, queries, questions, shopping, _id: _id.toString() }}, status: HttpStatus.OK};
+            return {r: true, data: {msg: "AccessTokenOk!", user: {username, email, img, coins, validToken, queries, questions, shopping, _id: _id.toString(), externalUrl }}, status: HttpStatus.OK};
         };
 
         return {r: false, data: {msg: "Token inválido!"}, status: HttpStatus.BAD_REQUEST};
