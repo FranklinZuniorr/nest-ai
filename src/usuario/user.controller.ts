@@ -242,7 +242,7 @@ export class UsuarioController {
         .build();
     };
 
-    @Get('get-top-10')
+    @Post('get-top-10')
     @UseInterceptors(VerifyTokenInterceptor)
     async getTop10(@Body() body: UserTop10): Promise<NestResponse>{
         const data = await this.usuarioService.getTop10(body);
