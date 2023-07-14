@@ -637,20 +637,25 @@ export class UsuarioService extends AuthService {
 
     public async setExternalUrl(accessToken: string, body: ExternalUrl): Promise<response>{
 
-        const verifyToken = await this.verifyToken(accessToken, "access");
-
-        const user = await this.userModel.findByIdAndUpdate(
-            verifyToken.user.id,
-            {
-                $set: {
-                    externalUrl: body.externalUrl
+        if(utils.isLinkValid(body.externalUrl)){
+            const verifyToken = await this.verifyToken(accessToken, "access");
+    
+            const user = await this.userModel.findByIdAndUpdate(
+                verifyToken.user.id,
+                {
+                    $set: {
+                        externalUrl: body.externalUrl
+                    }
                 }
-            }
-        );
-
-        if(utils.verifyCond(user)){
-            return {r: true, data: {msg: "Url adicionada com sucesso!"}, status: HttpStatus.ACCEPTED}
+            );
+    
+            if(utils.verifyCond(user)){
+                return {r: true, data: {msg: "Url adicionada com sucesso!"}, status: HttpStatus.ACCEPTED}
+            };
         };
+
+        return {r: false, data: {msg: "Precisa ser um link!"}, status: HttpStatus.BAD_REQUEST}
+
     };
 
     //-------------------------------------------------------

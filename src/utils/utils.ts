@@ -17,6 +17,11 @@ export class utils{
         return false;
     };
 
+    static isLinkValid = (link) => {
+        const linkRegex = /^(http(s)?:\/\/)?(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+([/#?].*)?$/;
+        return linkRegex.test(link);
+    };
+
     static sendEmail = async (text, subject, to): Promise<response> => {
 
         const transporter = new nodemailer.createTransport(
