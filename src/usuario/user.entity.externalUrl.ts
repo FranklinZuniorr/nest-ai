@@ -7,7 +7,7 @@ export class ExternalUrl {
         name: 'externalUrl'
     })
     @IsNotEmpty({
-        message: 'ExternalUrl é obrigatório.'
+        message: 'Link é obrigatório.'
     })
     @IsString({
         message: "ExternalUrl é uma string!"
