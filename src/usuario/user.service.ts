@@ -52,7 +52,8 @@ export class UsuarioService extends AuthService {
                 username, 
                 coins: 0, 
                 validToken: "", 
-                img: ""
+                img: "",
+                externalUrl: ""
             };
             const createdUser = new this.userModel(userFilter);
             createdUser.save();
@@ -627,7 +628,7 @@ export class UsuarioService extends AuthService {
             { $match: { [`queries.${body.prop}.totalNote`]: { $exists: true } } },
             { $sort: { [`queries.${body.prop}.totalNote`]: -1 } },
             { $limit: 10 },
-            { $project: { username: 1, email: 1, img: 1, [`queries.${body.prop}.totalNote`]: 1} },
+            { $project: { username: 1, email: 1, img: 1, [`queries.${body.prop}.totalNote`]: 1, externalUrl: 1} },
         ]);
 
         return {r: true, data: {msg: "Top10 obtido!", list: data}, status: HttpStatus.ACCEPTED};
