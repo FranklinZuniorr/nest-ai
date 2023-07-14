@@ -636,6 +636,7 @@ export class UsuarioService extends AuthService {
     };
 
     public async setExternalUrl(accessToken: string, body: ExternalUrl): Promise<response>{
+        console.log(utils.isLinkValid(body.externalUrl))
 
         if(utils.isLinkValid(body.externalUrl)){
             const verifyToken = await this.verifyToken(accessToken, "access");
