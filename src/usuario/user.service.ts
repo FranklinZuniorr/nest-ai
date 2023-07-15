@@ -578,6 +578,7 @@ export class UsuarioService extends AuthService {
                         pergunta: newQuery[item]["pergunta"],
                         alternativa_correta: newQuery[item]["alternativa_correta"],
                         alternativa_marcada: bodyCustom.query.data[item],
+                        motivo_alternativa: newQuery[item]["motivo_alternativa"],
                         r: qFindFilter[item]["alternativa_correta"] == bodyCustom.query.data[item]? true:false
                     };
     
