@@ -587,6 +587,8 @@ export class UsuarioService extends AuthService {
                     };
                 };
             });
+
+            console.log(newQuery)
     
             bodyCustom.query = newQuery;
             bodyCustom.totalNote = totalNote;

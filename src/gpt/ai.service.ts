@@ -280,6 +280,11 @@ export class AiService extends AuthService{
         delete filter.answer.questao3.alternativa_correta;
         delete filter.answer.questao4.alternativa_correta;
         delete filter.answer.questao5.alternativa_correta;
+        delete filter.answer.questao1.motivo_alternativa;
+        delete filter.answer.questao2.motivo_alternativa;
+        delete filter.answer.questao3.motivo_alternativa;
+        delete filter.answer.questao4.motivo_alternativa;
+        delete filter.answer.questao5.motivo_alternativa;
         dataRes.data = {answer: filter.answer, title: filter.title, usage: filter.usage};
 
         this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
