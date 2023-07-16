@@ -619,7 +619,7 @@ export class UsuarioService extends AuthService {
                 return {r: false, data: {msg: "Erro ao salvar sua busca no histórico!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
             };
     
-            return {r: true, data: {msg: "Atividade respondida com sucesso!"}, status: HttpStatus.ACCEPTED};
+            return {r: true, data: {msg: "Atividade respondida com sucesso!", querie: bodyCustom }, status: HttpStatus.ACCEPTED};
         };
 
         return {r: false, data: {msg: "Atividade não existe!"}, status: HttpStatus.BAD_REQUEST};
