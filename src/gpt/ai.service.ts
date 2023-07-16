@@ -299,6 +299,9 @@ export class AiService extends AuthService{
 
         const actualDateMonth = moment().format("MM/YYYY");
         const actualDateDay = moment().format("DD/MM/YYYY");
+        const totalSpendingInput = (dataRes.data.usage.prompt_tokens/1000)*parseFloat(process.env.OPENAI_API_PRICE_INPUT);
+        const totalSpendingOutput = (dataRes.data.usage.completion_tokens/1000)*parseFloat(process.env.OPENAI_API_PRICE_OUTPUT);
+        const totalSpendingInputAndOutput = totalSpendingInput + totalSpendingOutput;
 
         const options = {
             upsert: true,
@@ -318,21 +321,21 @@ export class AiService extends AuthService{
 
                 await this.spendingModel.findOneAndUpdate(
                     { date: actualDateMonth },
-                    { $inc: { [`spending.${actualDateDay}.totalSpending`]: 0.01, totalSpending: 0.01 } },
+                    { $inc: { [`spending.${actualDateDay}.totalSpending`]: totalSpendingInputAndOutput, totalSpending: totalSpendingInputAndOutput } },
                     options
                 ).exec();
 
             }else{
                 await this.spendingModel.findOneAndUpdate(
                     { date: actualDateMonth },
-                    { $inc: { [`spending.${actualDateDay}.totalSpending`]: 0.01, totalSpending: 0.01 } },
+                    { $inc: { [`spending.${actualDateDay}.totalSpending`]: totalSpendingInputAndOutput, totalSpending: totalSpendingInputAndOutput } },
                     options
                 ).exec();
             };
         }else{
             await this.spendingModel.findOneAndUpdate(
                 { date: actualDateMonth },
-                { $inc: { [`spending.${actualDateDay}.totalSpending`]: 0.01, totalSpending: 0.01 } },
+                { $inc: { [`spending.${actualDateDay}.totalSpending`]: totalSpendingInputAndOutput, totalSpending: totalSpendingInputAndOutput } },
                 options
             ).exec();
         };
