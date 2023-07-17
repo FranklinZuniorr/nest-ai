@@ -229,41 +229,26 @@ export class AiService extends AuthService{
             const answer = "function_call" in response.data.choices[0].message? JSON.parse(response.data.choices[0].message.function_call.arguments):
             response.data;
             if("function_call" in response.data.choices[0].message){
-                return {r: true, data: {usage: response.data.usage, answer: answer, title: req.title}, status: HttpStatus.OK, stop: false};
+                return {r: true, data: {usage: response.data.usage, answer: answer, title: req.title}, status: HttpStatus.OK};
             };
-            return {r: false, data: {usage: response.data.usage, answer: answer, title: req.title}, msg: "OpenAi error!", status: HttpStatus.BAD_REQUEST, stop: true};
+            return {r: false, data: {usage: response.data.usage, answer: answer, title: req.title}, msg: "OpenAi error!", status: HttpStatus.BAD_REQUEST};
         })
         .catch((error) => {
-            return {r: false, data: {info: utils.errorExternalServicesTreatment(error), msg: "OpenAi error!"}, status: HttpStatus.INTERNAL_SERVER_ERROR, stop: false};
+            return {r: false, data: {info: utils.errorExternalServicesTreatment(error), msg: "OpenAi error!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
         });
 
         if(!dataRes.r){
-            const filterDataRes: any = {...dataRes};
             console.log("error, nó.");
             /* sendMessage(_id, JSON.stringify({r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()})); */
             this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
                 r: false, 
-                msg: filterDataRes.data.answer.choices[0]["message"]["content"], 
+                msg: `OpenAi error - ${req.title}`, 
                 data: dataRes.data, 
                 createdAt: moment().subtract(3, 'hours').toISOString(),
                 id: _id,
                 event: "open-ai-error"
             });
             /* this.callAmqp(req, verifyToken, _id); */
-
-            if(dataRes.stop){
-                const user = await this.userModel.findByIdAndUpdate(
-                    verifyToken.user.id,
-                    { $inc: {
-                        coins: -1
-                      }
-                    },
-                    { new: true }
-                ).exec();
-        
-                this.callSpending(dataRes);
-            ;}
-
             return
         };
 
@@ -277,8 +262,6 @@ export class AiService extends AuthService{
             },
             { new: true }
         ).exec();
-
-        this.callSpending(dataRes);
 
         const createdAtDate = moment().subtract(3, 'hours').toISOString();
 
@@ -313,9 +296,7 @@ export class AiService extends AuthService{
             id: _id,
             event: "open-ai-ok"
         });
-    };
 
-    async callSpending(dataRes){
         const actualDateMonth = moment().format("MM/YYYY");
         const actualDateDay = moment().format("DD/MM/YYYY");
         const totalSpendingInput = (dataRes.data.usage.prompt_tokens/1000)*parseFloat(process.env.OPENAI_API_PRICE_INPUT);
