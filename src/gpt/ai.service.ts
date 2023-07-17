@@ -192,7 +192,7 @@ export class AiService extends AuthService{
 
             this.callWs(req, verifyToken, _id.toString());
 
-            return {r: true, data: {msg: "A questão está sendo desenvolvida. (:"}, status: HttpStatus.ACCEPTED};
+            return {r: true, data: {msg: "A atividade está sendo desenvolvida. (:"}, status: HttpStatus.ACCEPTED};
 
         }else{
             return {r: false, data: {msg: "Tickets insuficientes!"}, status: HttpStatus.BAD_REQUEST};
