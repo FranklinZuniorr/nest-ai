@@ -14,6 +14,7 @@ import { UserLogin } from './user.entity.login';
 import { UserQueries } from './user.entity.queries';
 import { UserTop10 } from './user.entity.top10';
 import { ExternalUrl } from './user.entity.externalUrl';
+import { Themes } from './user.entity.themes';
 
 @Controller('/')
 export class UsuarioController {
@@ -260,6 +261,20 @@ export class UsuarioController {
     @UseInterceptors(VerifyTokenInterceptor)
     async setExternalUrl(@Body() body: ExternalUrl, @Headers('accessToken') accessToken: string): Promise<NestResponse>{
         const data = await this.usuarioService.setExternalUrl(accessToken, body);
+
+        return new NestResponseBuilder()
+        .comStatus(data.status)
+        .comHeaders({
+            'Info': data.r
+        })
+        .comBody(data)
+        .build();
+    };
+
+    @Post('themes')
+    @UseInterceptors(VerifyTokenInterceptor)
+    async getThemes(@Body() body: Themes): Promise<NestResponse>{
+        const data = await this.usuarioService.getThemes(body);
 
         return new NestResponseBuilder()
         .comStatus(data.status)

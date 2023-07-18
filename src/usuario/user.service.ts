@@ -23,6 +23,7 @@ import { error } from 'console';
 import { UserQueries } from './user.entity.queries';
 import { UserTop10 } from './user.entity.top10';
 import { ExternalUrl } from './user.entity.externalUrl';
+import { Themes } from './user.entity.themes';
 
 const jwtService = new JwtService();
 @Injectable()
@@ -31,7 +32,8 @@ export class UsuarioService extends AuthService {
     constructor(
         @InjectModel(User.name) private userModel: Model<User>, 
         private readonly rabbitMQService: RabbitMQService,
-        @InjectModel(Access.name) private accessModel: Model<Access>
+        @InjectModel(Access.name) private accessModel: Model<Access>,
+        @InjectModel(Themes.name) private themesModel: Model<Themes>
     ){
         super(jwtService)
     }
@@ -660,7 +662,23 @@ export class UsuarioService extends AuthService {
         };
 
         return {r: false, data: {msg: "Precisa ser um link!"}, status: HttpStatus.BAD_REQUEST}
+    };
 
+    public async getThemes(body: Themes): Promise<response>{
+        const pageNumber = body.page; 
+        const pageSize = 2;
+
+        const skip = (pageNumber - 1) * pageSize;
+
+        const themes = await this.themesModel.aggregate([
+        { $skip: skip },
+        { $limit: pageSize }
+        ]);
+
+        const totalDocuments = await this.themesModel.countDocuments().exec();
+        const pages = (totalDocuments/pageSize).toFixed();
+
+        return {r: true, data: {msg: "Temas obtidos!", data: themes, totalDocuments, pages}, status: HttpStatus.ACCEPTED}
     };
 
     //-------------------------------------------------------

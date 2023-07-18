@@ -12,9 +12,15 @@ import { JwtMiddleware } from "src/core/http/verify-token-middleware";
 import { VerifyTokenInterceptor } from "src/core/http/verify-token-interceptor";
 import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
 import { Access, AccessSchema } from "src/mongoDb/access.schema";
+import { Themes } from "./user.entity.themes";
+import { ThemesSchema } from "src/mongoDb/themes.schema";
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, {name: Access.name, schema: AccessSchema}]),
+        MongooseModule.forFeature([
+            { name: User.name, schema: UserSchema }, 
+            {name: Access.name, schema: AccessSchema},
+            {name: Themes.name, schema: ThemesSchema}
+        ]),
     ],
     controllers: [UsuarioController],
     providers: [

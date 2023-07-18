@@ -10,9 +10,11 @@ import { RabbitMQService } from "src/rabbitMq/rabbitMq.service";
 import { Access, AccessSchema } from "src/mongoDb/access.schema";
 import { PaymentService } from "./payment.service";
 import { PaymentController } from "./payment.controller";
+import { Themes } from "src/usuario/user.entity.themes";
+import { ThemesSchema } from "src/mongoDb/themes.schema";
 
 @Module({
-    imports: [UsuarioModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, {name: Access.name, schema: AccessSchema}])],
+    imports: [UsuarioModule, MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, {name: Access.name, schema: AccessSchema}, {name: Themes.name, schema: ThemesSchema}])],
     controllers: [PaymentController],
     providers: [
         PaymentService,
