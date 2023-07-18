@@ -286,7 +286,7 @@ export class AiService extends AuthService{
         ).exec();
 
         const theme = await this.themesModel.findOneAndUpdate(
-            { theme: req.title },
+            { theme: req.title.replace(/\s/g, "_").toLowerCase() },
             { $inc: { total: 1 } },
             options
         ).exec();
