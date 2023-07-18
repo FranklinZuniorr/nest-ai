@@ -599,8 +599,9 @@ export class UsuarioService extends AuthService {
                     [`queries.${body.theme}.arr`]: {...bodyCustom},
                   },
                   $inc: {
-                    [`queries.${body.theme}.totalNote`]: totalNote
-                  }
+                    [`queries.${body.theme}.totalNote`]: totalNote,
+                    queriesTotal: totalNote
+                  },
                 },
                 { new: true }
             ).exec();
@@ -616,7 +617,7 @@ export class UsuarioService extends AuthService {
             ).exec();
     
             if(!utils.verifyCond(user)){
-                return {r: false, data: {msg: "Erro ao salvar sua busca no histórico!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
+                return {r: false, data: {msg: "Erro ao salvar atividade no histórico!"}, status: HttpStatus.INTERNAL_SERVER_ERROR};
             };
     
             return {r: true, data: {msg: "Atividade respondida com sucesso!", query: bodyCustom }, status: HttpStatus.ACCEPTED};
@@ -628,10 +629,10 @@ export class UsuarioService extends AuthService {
     public async getTop10(body: UserTop10): Promise<response>{
 
         const data = await this.userModel.aggregate([
-            { $match: { [`queries.${body.prop}.totalNote`]: { $exists: true } } },
-            { $sort: { [`queries.${body.prop}.totalNote`]: -1 } },
+            { $match: { queriesTotal: { $exists: true } } },
+            { $sort: { queriesTotal: -1 } },
             { $limit: 10 },
-            { $project: { username: 1, email: 1, img: 1, [`queries.${body.prop}.totalNote`]: 1, externalUrl: 1} },
+            { $project: { username: 1, email: 1, img: 1, queriesTotal: 1, externalUrl: 1} },
         ]);
 
         return {r: true, data: {msg: "Top10 obtido!", list: data}, status: HttpStatus.ACCEPTED};

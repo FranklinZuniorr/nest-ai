@@ -32,6 +32,9 @@ export class User {
   @Prop({ type: Object }) // Campo como um objeto
   queries?: object;
 
+  @Prop()
+  queriesTotal?: number;
+
   @Prop({ type: [Object] }) // Campo como um array de objetos
   questions?: object[];
 

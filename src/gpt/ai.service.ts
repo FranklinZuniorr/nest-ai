@@ -14,6 +14,7 @@ import { env } from 'process';
 import { RabbitMQService } from 'src/rabbitMq/rabbitMq.service';
 import * as moment from "moment";
 import { Spending } from 'src/mongoDb/spending.schema';
+import { Themes } from 'src/mongoDb/themes.schema';
 require("dotenv").config();
 
 const jwtService = new JwtService();
@@ -24,7 +25,8 @@ export class AiService extends AuthService{
         public usuarioService: UsuarioService, 
         @InjectModel(User.name) private userModel: Model<User>, 
         private rabbitMQService: RabbitMQService,
-        @InjectModel(Spending.name) private spendingModel: Model<Spending>
+        @InjectModel(Spending.name) private spendingModel: Model<Spending>,
+        @InjectModel(Themes.name) private themesModel: Model<Themes>
     ){
         super(jwtService)
     }
@@ -269,6 +271,11 @@ export class AiService extends AuthService{
 
         console.log("Nó passou.")
 
+        const options = {
+            upsert: true,
+            new: true,
+        };
+
         const user = await this.userModel.findByIdAndUpdate(
             verifyToken.user.id,
             { $inc: {
@@ -276,6 +283,12 @@ export class AiService extends AuthService{
               }
             },
             { new: true }
+        ).exec();
+
+        const theme = await this.themesModel.findOneAndUpdate(
+            { theme: req.title },
+            { $inc: { total: 1 } },
+            options
         ).exec();
 
         this.callSpending(dataRes);
