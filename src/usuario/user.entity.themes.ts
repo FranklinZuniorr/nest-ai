@@ -9,8 +9,8 @@ export class Themes {
     @IsNotEmpty({
         message: 'Page é obrigatório.'
     })
-    @IsString({
-        message: "Page é um number!"
+    @IsNumber(undefined, {
+        message: "Page é um number."
     })
     page: number;
 };
