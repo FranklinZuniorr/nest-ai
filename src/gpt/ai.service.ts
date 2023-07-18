@@ -243,7 +243,7 @@ export class AiService extends AuthService{
             /* sendMessage(_id, JSON.stringify({r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()})); */
             this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
                 r: false, 
-                msg: filterDataRes.data.answer.choices[0]["message"]["content"].slice(0, filterDataRes.data.answer.choices[0]["message"]["content"].length*0.2), 
+                msg: `${filterDataRes.data.answer.choices[0]["message"]["content"].slice(0, filterDataRes.data.answer.choices[0]["message"]["content"].length*0.3)}...`, 
                 data: dataRes.data, 
                 createdAt: moment().subtract(3, 'hours').toISOString(),
                 id: _id,
