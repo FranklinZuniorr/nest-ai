@@ -242,10 +242,10 @@ export class UsuarioController {
         .build();
     };
 
-    @Post('get-top-10')
+    @Get('get-top-10')
     @UseInterceptors(VerifyTokenInterceptor)
-    async getTop10(@Body() body: UserTop10): Promise<NestResponse>{
-        const data = await this.usuarioService.getTop10(body);
+    async getTop10(): Promise<NestResponse>{
+        const data = await this.usuarioService.getTop10();
 
         return new NestResponseBuilder()
         .comStatus(data.status)

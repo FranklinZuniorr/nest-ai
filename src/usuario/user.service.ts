@@ -626,7 +626,7 @@ export class UsuarioService extends AuthService {
         return {r: false, data: {msg: "Atividade não existe!"}, status: HttpStatus.BAD_REQUEST};
     };
 
-    public async getTop10(body: UserTop10): Promise<response>{
+    public async getTop10(): Promise<response>{
 
         const data = await this.userModel.aggregate([
             { $match: { queriesTotal: { $exists: true } } },
@@ -635,7 +635,7 @@ export class UsuarioService extends AuthService {
             { $project: { username: 1, email: 1, img: 1, queriesTotal: 1, externalUrl: 1} },
         ]);
 
-        return {r: true, data: {msg: "Top10 obtido!", list: data}, status: HttpStatus.ACCEPTED};
+        return {r: true, data: {msg: "Ranking obtido!", list: data}, status: HttpStatus.ACCEPTED};
 
     };
 
