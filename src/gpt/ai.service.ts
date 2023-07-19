@@ -287,7 +287,7 @@ export class AiService extends AuthService{
         ).exec();
 
         const theme = await this.themesModel.findOneAndUpdate(
-            { theme: req.title.replace(/\s/g, "_").toLowerCase(), createdAt: createdAtDate },
+            { theme: req.title.trim().replace(/\s/g, "_").toLowerCase(), createdAt: createdAtDate },
             { $inc: { total: 1 } },
             options
         ).exec();
