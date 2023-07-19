@@ -12,6 +12,9 @@ export class Themes {
   @Prop()
   total: number;
 
+  @Prop()
+  createdAt: string;
+
 }
 
 export const ThemesSchema = SchemaFactory.createForClass(Themes);

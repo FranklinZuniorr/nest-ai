@@ -270,6 +270,7 @@ export class AiService extends AuthService{
         };
 
         console.log("Nó passou.")
+        const createdAtDate = moment().subtract(3, 'hours').toISOString();
 
         const options = {
             upsert: true,
@@ -286,14 +287,12 @@ export class AiService extends AuthService{
         ).exec();
 
         const theme = await this.themesModel.findOneAndUpdate(
-            { theme: req.title.replace(/\s/g, "_").toLowerCase() },
+            { theme: req.title.replace(/\s/g, "_").toLowerCase(), createdAt: createdAtDate },
             { $inc: { total: 1 } },
             options
         ).exec();
 
         this.callSpending(dataRes);
-
-        const createdAtDate = moment().subtract(3, 'hours').toISOString();
 
         const user2 = await this.userModel.findByIdAndUpdate(
         verifyToken.user.id,

@@ -666,13 +666,13 @@ export class UsuarioService extends AuthService {
 
     public async getThemes(body: Themes): Promise<response>{
         const pageNumber = body.page; 
-        const pageSize = 2;
+        const pageSize = 10;
 
         const skip = (pageNumber - 1) * pageSize;
 
         const themes = await this.themesModel.aggregate([
         { $skip: skip },
-        { $limit: pageSize }
+        { $limit: pageSize}
         ]);
 
         const totalDocuments = await this.themesModel.countDocuments().exec();
