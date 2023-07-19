@@ -677,7 +677,7 @@ export class UsuarioService extends AuthService {
         ]);
 
         const totalDocuments = await this.themesModel.countDocuments().exec();
-        const pages = (totalDocuments/pageSize).toFixed();
+        const pages = Math.ceil(totalDocuments/pageSize);
 
         return {r: true, data: {msg: "Temas obtidos!", data: themes, totalDocuments, pages}, status: HttpStatus.ACCEPTED}
     };
