@@ -672,7 +672,8 @@ export class UsuarioService extends AuthService {
 
         const themes = await this.themesModel.aggregate([
         { $skip: skip },
-        { $limit: pageSize}
+        { $limit: pageSize},
+        { $sort: { createdAt: 1 }}
         ]);
 
         const totalDocuments = await this.themesModel.countDocuments().exec();
