@@ -286,11 +286,21 @@ export class AiService extends AuthService{
             { new: true }
         ).exec();
 
-        const theme = await this.themesModel.findOneAndUpdate(
-            { theme: req.title.trim().replace(/\s/g, "_").toLowerCase(), createdAt: createdAtDate },
-            { $inc: { total: 1 } },
-            options
-        ).exec();
+        const findTheme = await this.themesModel.findOne({theme: req.title.trim().replace(/\s/g, "_").toLowerCase()}).exec();
+
+        if(findTheme){
+            await this.themesModel.findOneAndUpdate(
+                { theme: req.title.trim().replace(/\s/g, "_").toLowerCase() },
+                { $inc: { total: 1 } },
+                options
+            ).exec();
+        }else{
+            await this.themesModel.findOneAndUpdate(
+                { theme: req.title.trim().replace(/\s/g, "_").toLowerCase(), createdAt: createdAtDate },
+                { $inc: { total: 1 } },
+                options
+            ).exec();
+        };
 
         this.callSpending(dataRes);
 
