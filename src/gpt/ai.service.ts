@@ -241,20 +241,21 @@ export class AiService extends AuthService{
         });
 
         if(!dataRes.r){
-            const filterDataRes: any = {...dataRes};
-            console.log("error, nó.");
-            /* sendMessage(_id, JSON.stringify({r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()})); */
-            this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
-                r: false, 
-                msg: `${filterDataRes.data.answer.choices[0]["message"]["content"].slice(0, filterDataRes.data.answer.choices[0]["message"]["content"].length*0.3)}...`, 
-                data: dataRes.data, 
-                createdAt: moment().subtract(3, 'hours').toISOString(),
-                id: _id,
-                event: "open-ai-error"
-            });
-            /* this.callAmqp(req, verifyToken, _id); */
-
+            
             if(dataRes.stop){
+                const filterDataRes: any = {...dataRes};
+                console.log("error, nó.");
+                /* sendMessage(_id, JSON.stringify({r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()})); */
+                this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
+                    r: false, 
+                    msg: `${filterDataRes.data.answer.choices[0]["message"]["content"].slice(0, filterDataRes.data.answer.choices[0]["message"]["content"].length*0.3)}...`, 
+                    data: dataRes.data, 
+                    createdAt: moment().subtract(3, 'hours').toISOString(),
+                    id: _id,
+                    event: "open-ai-error"
+                });
+                /* this.callAmqp(req, verifyToken, _id); */
+                
                 const user = await this.userModel.findByIdAndUpdate(
                     verifyToken.user.id,
                     { $inc: {
@@ -265,7 +266,16 @@ export class AiService extends AuthService{
                 ).exec();
         
                 this.callSpending(dataRes);
-            ;}
+            }else{
+                this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
+                    r: false, 
+                    msg: `Não foi possível gerar a atividade no momento.`, 
+                    data: dataRes.data, 
+                    createdAt: moment().subtract(3, 'hours').toISOString(),
+                    id: _id,
+                    event: "open-ai-error"
+                });
+            };
 
             return
         };
