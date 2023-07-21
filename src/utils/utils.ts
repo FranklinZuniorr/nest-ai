@@ -38,11 +38,16 @@ export class utils{
             }
         }); */
 
+        let html = `
+            <span h3>Alterar senha:</span>
+            <a href="${text}">Clique aqui para alterar!</a>
+        `;
+
         let mailOptions = {
             from: process.env.BREVO_EMAIL,
             to: to.toLowerCase(),
             subject: subject,
-            text: text
+            html
         };
 
         try {
