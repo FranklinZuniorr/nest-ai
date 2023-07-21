@@ -39,7 +39,7 @@ export class utils{
         }); */
 
         let html = `
-            <span h3>Alterar senha:</span>
+            <span h3>Alterar senha:</span> <br/>
             <a href="${text}">Clique aqui para alterar!</a>
         `;
 
@@ -47,7 +47,8 @@ export class utils{
             from: process.env.BREVO_EMAIL,
             to: to.toLowerCase(),
             subject: subject,
-            text: text
+            text: text,
+            html: html
         };
 
         try {
