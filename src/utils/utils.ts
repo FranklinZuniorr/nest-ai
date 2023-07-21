@@ -39,17 +39,74 @@ export class utils{
             }
         }); */
 
-        let html = `
-            <img src="https://aicorrige.com/static/media/logo.cd0acc27eda99a75f1d9.png" width="64px" height="64px"> <br/>
-            <span h3>Alterar senha:</span> <br/>
-            <a href="${text}">Clique aqui para alterar!</a>
-        `;
+        let html = `<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset='utf-8'>
+            <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+            <title>Alterar senha</title>
+            <meta name='viewport' content='width=device-width, initial-scale=1'>
+        </head>
+        <body>
+            <header style="
+                border: 1px solid #d6d6d6;
+                padding: 1rem;
+            ">
+                <div style="
+                    display: flex;
+                ">
+                    <img src="https://aicorrige.com/static/media/blackLogo.220c916b113fc9049dd8.png" style="
+                        width: 64px;
+                        height: 64px;
+                        margin-right: 1rem;
+                    "/>
+                    <br/>
+                    <div style="
+                        text-align: left;
+                        margin-top: 10px;
+                    ">
+                        <span style="
+                            font-style: normal;
+                            font-size: 1.3rem;
+                            font-variant-caps: small-caps;
+                        ">
+                            Ai corrige
+                        </span>
+                        <br/>
+                        <span style="
+                            font-style: normal;
+                            font-size: 0.7rem;
+                            font-variant-caps: small-caps;
+                        ">
+                            Plataforma de aprendizado virtual com o uso de inteligência artificial.
+                        </span>
+                    </div>
+                </div>
+            </header>
+            <section style="
+                border: 1px solid #d6d6d6;
+                margin-top: 0.4rem;
+                padding: 1rem;
+            ">
+                <div style="
+                    margin-bottom: 0.5rem;
+                    font-size: 20px;
+                ">
+                    Alteração de senha:
+                </div>
+                <a href="${text}" style="
+                    font-size: 14px;
+                ">
+                    Alterar agora
+                </a>
+            </section>
+        </body>
+        </html>`;
 
         let mailOptions = {
             from: process.env.BREVO_EMAIL,
             to: to.toLowerCase(),
             subject: subject,
-            text: text,
             html: html
         };
 
