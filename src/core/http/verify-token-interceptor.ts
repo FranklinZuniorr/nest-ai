@@ -11,7 +11,20 @@ export class VerifyTokenInterceptor implements NestInterceptor {
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<NestResponse>> {
     const request = context.switchToHttp().getRequest();
-    /* console.log(request) */
+    const isNavigator = request.rawHeaders.find(item => item.includes("https://aicorrige.com") || item.includes("http://localhost"))? true:false;
+
+    if(!isNavigator){
+      const res = new NestResponseBuilder()
+      .comStatus(HttpStatus.BAD_REQUEST)
+      .comHeaders({
+          'Info': false
+      })
+      .comBody({msg: "REQ_ONLY_NAVIGATOR"})
+      .build();
+
+      return of(res)
+    };
+
     const accessToken = request.headers.accesstoken;
 
     const dataVerify = await this.UsuarioService.accessToken(accessToken);
