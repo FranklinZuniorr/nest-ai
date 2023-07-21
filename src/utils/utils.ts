@@ -47,8 +47,7 @@ export class utils{
             from: process.env.BREVO_EMAIL,
             to: to.toLowerCase(),
             subject: subject,
-            text: text,
-            html: html
+            text: text
         };
 
         try {
