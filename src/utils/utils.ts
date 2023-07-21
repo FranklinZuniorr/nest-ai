@@ -1,6 +1,7 @@
 import { HttpStatus } from "@nestjs/common";
 import { response } from "src/core/http/responseDto/response";
-
+import * as fs from 'fs';
+import { promisify } from 'util';
 
 const nodemailer = require('nodemailer');
 const sendinblueTransport = require('nodemailer-sendinblue-transport');
@@ -39,6 +40,7 @@ export class utils{
         }); */
 
         let html = `
+            <img src="https://aicorrige.com/static/media/logo.cd0acc27eda99a75f1d9.png" width="64px" height="64px"> <br/>
             <span h3>Alterar senha:</span> <br/>
             <a href="${text}">Clique aqui para alterar!</a>
         `;
