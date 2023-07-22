@@ -500,44 +500,55 @@ export class UsuarioService extends AuthService {
             let questionsFilter = questions;
             
             questions.forEach((question, index)=> {
+                questionsFilter[index].data.data.title = utils.verifyQuestion(question.data.data, "title");
                 questionsFilter[index].data.data.answer =
                 {
                     questao1: {
-                        A: question.data.data.answer.questao1.A,
-                        B: question.data.data.answer.questao1.B,
-                        C: question.data.data.answer.questao1.C,
-                        D: question.data.data.answer.questao1.D,
-                        pergunta: question.data.data.answer.questao1.pergunta
+                        A: utils.verifyQuestion(question.data.data.answer, "questao1.A"),
+                        B: utils.verifyQuestion(question.data.data.answer, "questao1.B"),
+                        C: utils.verifyQuestion(question.data.data.answer, "questao1.C"),
+                        D: utils.verifyQuestion(question.data.data.answer, "questao1.D"),
+                        pergunta: utils.verifyQuestion(question.data.data.answer, "questao1.pergunta"),
+                        alternativa_correta: utils.verifyQuestion(question.data.data.answer, "questao1.alternativa_correta"),
+                        motivo_alternativa: utils.verifyQuestion(question.data.data.answer, "questao1.motivo_alternativa")
                     },
                     questao2: {
-                        A: question.data.data.answer.questao2.A,
-                        B: question.data.data.answer.questao2.B,
-                        C: question.data.data.answer.questao2.C,
-                        D: question.data.data.answer.questao2.D,
-                        pergunta: question.data.data.answer.questao2.pergunta
+                        A: utils.verifyQuestion(question.data.data.answer, "questao2.A"),
+                        B: utils.verifyQuestion(question.data.data.answer, "questao2.B"),
+                        C: utils.verifyQuestion(question.data.data.answer, "questao2.C"),
+                        D: utils.verifyQuestion(question.data.data.answer, "questao2.D"),
+                        pergunta: utils.verifyQuestion(question.data.data.answer, "questao2.pergunta"),
+                        alternativa_correta: utils.verifyQuestion(question.data.data.answer, "questao2.alternativa_correta"),
+                        motivo_alternativa: utils.verifyQuestion(question.data.data.answer, "questao2.motivo_alternativa")
                     },
                     questao3: {
-                        A: question.data.data.answer.questao3.A,
-                        B: question.data.data.answer.questao3.B,
-                        C: question.data.data.answer.questao3.C,
-                        D: question.data.data.answer.questao3.D,
-                        pergunta: question.data.data.answer.questao3.pergunta
+                        A: utils.verifyQuestion(question.data.data.answer, "questao3.A"),
+                        B: utils.verifyQuestion(question.data.data.answer, "questao3.B"),
+                        C: utils.verifyQuestion(question.data.data.answer, "questao3.C"),
+                        D: utils.verifyQuestion(question.data.data.answer, "questao3.D"),
+                        pergunta: utils.verifyQuestion(question.data.data.answer, "questao3.pergunta"),
+                        alternativa_correta: utils.verifyQuestion(question.data.data.answer, "questao3.alternativa_correta"),
+                        motivo_alternativa: utils.verifyQuestion(question.data.data.answer, "questao3.motivo_alternativa")
                     },
                     questao4: {
-                        A: question.data.data.answer.questao4.A,
-                        B: question.data.data.answer.questao4.B,
-                        C: question.data.data.answer.questao4.C,
-                        D: question.data.data.answer.questao4.D,
-                        pergunta: question.data.data.answer.questao4.pergunta
+                        A: utils.verifyQuestion(question.data.data.answer, "questao4.A"),
+                        B: utils.verifyQuestion(question.data.data.answer, "questao4.B"),
+                        C: utils.verifyQuestion(question.data.data.answer, "questao4.C"),
+                        D: utils.verifyQuestion(question.data.data.answer, "questao4.D"),
+                        pergunta: utils.verifyQuestion(question.data.data.answer, "questao4.pergunta"),
+                        alternativa_correta: utils.verifyQuestion(question.data.data.answer, "questao4.alternativa_correta"),
+                        motivo_alternativa: utils.verifyQuestion(question.data.data.answer, "questao4.motivo_alternativa")
                     },
                     questao5: {
-                        A: question.data.data.answer.questao5.A,
-                        B: question.data.data.answer.questao5.B,
-                        C: question.data.data.answer.questao5.C,
-                        D: question.data.data.answer.questao5.D,
-                        pergunta: question.data.data.answer.questao5.pergunta
+                        A: utils.verifyQuestion(question.data.data.answer, "questao5.A"),
+                        B: utils.verifyQuestion(question.data.data.answer, "questao5.B"),
+                        C: utils.verifyQuestion(question.data.data.answer, "questao5.C"),
+                        D: utils.verifyQuestion(question.data.data.answer, "questao5.D"),
+                        pergunta: utils.verifyQuestion(question.data.data.answer, "questao5.pergunta"),
+                        alternativa_correta: utils.verifyQuestion(question.data.data.answer, "questao5.alternativa_correta"),
+                        motivo_alternativa: utils.verifyQuestion(question.data.data.answer, "questao5.motivo_alternativa")
                     },
-                    resumo: question.data.data.answer.resumo
+                    resumo: utils.verifyQuestion(question.data.data.answer, "resumo")
                 };
             });
         };
