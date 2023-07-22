@@ -211,7 +211,7 @@ export class AiService extends AuthService{
             Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
         },
-        timeout: 60000
+        timeout: 120000
         });
 
         const payload = {

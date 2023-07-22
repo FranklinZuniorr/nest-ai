@@ -41,6 +41,8 @@ export class FilterOfExceptionHttp implements ExceptionFilter {
                     status: HttpStatus.INTERNAL_SERVER_ERROR
                 }
             };
+
+            console.log(resposta)
         
         this.httpAdapter.reply(resposta, body, status);
     }
