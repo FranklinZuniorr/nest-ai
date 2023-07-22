@@ -244,7 +244,7 @@ export class AiService extends AuthService{
             
             if(dataRes.stop){
                 const filterDataRes: any = {...dataRes};
-                console.log("error, nó.");
+                console.log("error, nó, stop.");
                 /* sendMessage(_id, JSON.stringify({r: false, msg: `OpenAi error - ${req.title}`, data: dataRes.data, createdAt: moment().toISOString()})); */
                 this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
                     r: false, 
@@ -257,17 +257,21 @@ export class AiService extends AuthService{
                 });
                 /* this.callAmqp(req, verifyToken, _id); */
                 
-                const user = await this.userModel.findByIdAndUpdate(
+                /* const user = await this.userModel.findByIdAndUpdate(
                     verifyToken.user.id,
                     { $inc: {
                         coins: -1
                       }
                     },
                     { new: true }
-                ).exec();
+                ).exec(); */
         
                 this.callSpending(dataRes);
+
+                return
             }else{
+                console.log("error, nó.");
+
                 this.rabbitMQService.sendToExchange("AICORRIGEAPIAI_WS", `KEY.AI.CORRIGE.WS`, {
                     r: false, 
                     msg: `Não foi possível gerar a atividade no momento.`, 
@@ -276,9 +280,9 @@ export class AiService extends AuthService{
                     id: _id,
                     event: "open-ai-error"
                 });
-            };
 
-            return
+                return
+            };
         };
 
         console.log("Nó passou.")
