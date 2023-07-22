@@ -18,15 +18,13 @@ export class utils{
         return false;
     };
 
-    static verifyQuestion = (data, textProp, textProp2) => {
+    static verifyQuestion = (data, textProp = "", textProp2 = "") => {
 
         const dataFilter = textProp2 !== ""? data[textProp][textProp2]:data[textProp];
 
         if(dataFilter != undefined && dataFilter != "" && dataFilter != null){
-            console.log(true)
             return dataFilter
         }else{
-            console.log(false)
             return "-"
         }
 
