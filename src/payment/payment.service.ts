@@ -87,7 +87,7 @@ export class PaymentService extends AuthService{
           const user = await this.userModel.findByIdAndUpdate(
             event.data.object.client_reference_id,
             { $inc: {
-                coins: 10
+                coins: 20
               },
               $push: {
                 shopping: {...event, createdAt: moment().subtract(3, 'hours').toISOString()}
