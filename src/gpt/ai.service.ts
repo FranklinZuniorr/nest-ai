@@ -257,14 +257,14 @@ export class AiService extends AuthService{
                 });
                 /* this.callAmqp(req, verifyToken, _id); */
                 
-                const user = await this.userModel.findByIdAndUpdate(
+                /* const user = await this.userModel.findByIdAndUpdate(
                     verifyToken.user.id,
                     { $inc: {
                         coins: -1
                       }
                     },
                     { new: true }
-                ).exec();
+                ).exec(); */
         
                 this.callSpending(dataRes);
 
