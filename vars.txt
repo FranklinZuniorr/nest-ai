@@ -12,9 +12,11 @@ MONGODB="mongodb+srv://aicorrige763:mqnOF4G8QL6U4pqK@cluster0.klnowuq.mongodb.ne
 BREVO_TOKEN="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"
 BREVO_EMAIL="aicorrige763@gmail.com"
 RABBIT_URL="amqps://grjyjmgc:z3Qm5gE2b3RmLSVV1HbNs1DoJDvd12El@hawk.rmq.cloudamqp.com/grjyjmgc"
-STRIPE_ENDPOINT_CONFIRM_PAYMENT_SECRET="whsec_8X2ZCZpxo1kT83E3MlbF47vQbhH7sVVL"
-STRIPE_SK="pk_live_51NLXcZCRHbMqiuoDVHeJyPgVHHa36FkiKoi10PY2MTK0GgfThl7f8YI7DQ6m6qxs4NstjpUyd1J4OpBkumkwxmB500fl9o8ShJ"
+
+STRIPE_ENDPOINT_CONFIRM_PAYMENT_SECRET=whsec_8X2ZCZpxo1kT83E3MlbF47vQbhH7sVVL
+STRIPE_SK="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"
 STRIPE_PRICE="price_1NLZ3bCRHbMqiuoDf19Tbz66"
-STRIPE_DOMAIN="http://localhost:3001"
+STRIPE_DOMAIN="https://aicorrige.com"
+
 RPM_OPENAI="3"
 PORT_NEST="3000"

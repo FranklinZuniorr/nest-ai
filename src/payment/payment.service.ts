@@ -55,6 +55,9 @@ export class PaymentService extends AuthService{
 
       const id = url.split("(!)")[1];
 
+      console.log(id)
+      console.log(url)
+
       const user: any = (await this.userModel.findById({_id: id})).toObject();
       const find = user.shopping.find(pay => pay.data.object.success_url === url);
       const indexOf = user.shopping.indexOf(find);
