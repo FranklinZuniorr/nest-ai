@@ -10,6 +10,7 @@ import { User } from 'src/mongoDb/user.schema';
 import { Model } from 'mongoose';
 import { capturePayment, createOrder } from './payment.utils';
 import * as moment from "moment";
+import { response } from 'src/core/http/responseDto/response';
 const stripe = require('stripe')(process.env.STRIPE_SK);
 require("dotenv").config();
 const { v4: uuidv4 } = require('uuid');
@@ -48,6 +49,32 @@ export class PaymentService extends AuthService{
         console.log(session)
         return {r: true, data: {msg: "Checkout criado!", res: session}, status: HttpStatus.ACCEPTED};
         
+    };
+
+    public async checkPayment(accessToken: string, url: string): Promise<response> {
+
+      const verifyToken = await this.verifyToken(accessToken, "access");
+      const { id } = verifyToken.user;
+
+      const user: any = (await this.userModel.findById({_id: id})).toObject();
+      const find = user.shopping.find(pay => pay.data.object.success_url === url);
+      const indexOf = user.shopping.indexOf(find);
+
+      if(find){
+
+        const userEdit = await this.userModel.findByIdAndUpdate(
+          id,
+        { 
+          $set: {
+            [`shopping.${indexOf}.data.object.success_url`]: ""
+          }
+        }
+        ).exec();
+
+        return {r: true, data: {msg: "Pagamento verificado!"}, status: HttpStatus.ACCEPTED};
+      };
+
+      return {r: false, data: {msg: "Indisponível!"}, status: HttpStatus.BAD_REQUEST};
     };
 
     public async newWebHookStripe(request): Promise<any> {
