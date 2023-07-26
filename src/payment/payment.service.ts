@@ -41,7 +41,7 @@ export class PaymentService extends AuthService{
               },
             ],
             mode: 'payment',
-            success_url: `${YOUR_DOMAIN}?successId=${successId}`,
+            success_url: `${YOUR_DOMAIN}?successId=${successId}(!)${id}`,
             cancel_url: `${YOUR_DOMAIN}?canceled=true`,
             client_reference_id: id
         });
@@ -51,10 +51,9 @@ export class PaymentService extends AuthService{
         
     };
 
-    public async checkPayment(accessToken: string, url: string): Promise<response> {
+    public async checkPayment(url: string): Promise<response> {
 
-      const verifyToken = await this.verifyToken(accessToken, "access");
-      const { id } = verifyToken.user;
+      const id = url.split("(!)")[1];
 
       const user: any = (await this.userModel.findById({_id: id})).toObject();
       const find = user.shopping.find(pay => pay.data.object.success_url === url);

@@ -36,10 +36,9 @@ export class PaymentController {
     };
 
     @Post("check-payment")
-    @UseInterceptors(VerifyTokenInterceptor)
-    public async checkPayment(@Headers('accessToken') accessToken: string, @Body() body: {url: string}): Promise<NestResponse>{
+    public async checkPayment(@Body() body: {url: string}): Promise<NestResponse>{
 
-        const response = await this.PaymentService.checkPayment(accessToken, body.url);
+        const response = await this.PaymentService.checkPayment(body.url);
 
         return new NestResponseBuilder()
         .comStatus(response.status)
