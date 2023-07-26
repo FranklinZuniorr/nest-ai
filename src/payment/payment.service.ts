@@ -12,6 +12,7 @@ import { capturePayment, createOrder } from './payment.utils';
 import * as moment from "moment";
 const stripe = require('stripe')(process.env.STRIPE_SK);
 require("dotenv").config();
+const { v4: uuidv4 } = require('uuid');
 
 const jwtService = new JwtService();
 @Injectable()
@@ -26,6 +27,7 @@ export class PaymentService extends AuthService{
         const verifyToken = await this.verifyToken(accessToken, "access");
 
         const { id } = verifyToken.user;
+        const successId = uuidv4();
 
         const YOUR_DOMAIN = process.env.STRIPE_DOMAIN;
 
@@ -38,7 +40,7 @@ export class PaymentService extends AuthService{
               },
             ],
             mode: 'payment',
-            success_url: `${YOUR_DOMAIN}?success=true`,
+            success_url: `${YOUR_DOMAIN}?successId=${successId}`,
             cancel_url: `${YOUR_DOMAIN}?canceled=true`,
             client_reference_id: id
         });
