@@ -11,7 +11,7 @@ export class VerifyTokenInterceptor implements NestInterceptor {
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<NestResponse>> {
     const request = context.switchToHttp().getRequest();
-    const isNavigator = request.rawHeaders.find(item => item.includes("https://aicorrige.com") || item.includes("http://localhost"))? true:false;
+    const isNavigator = request.rawHeaders.find(item => item.includes(process.env.AI_CORRIGE_SITE) || item.includes("http://localhost"))? true:false;
 
     if(!isNavigator){
       const res = new NestResponseBuilder()
